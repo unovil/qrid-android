@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -24,7 +25,7 @@ fun BottomNavigationBar(navController: NavController) {
     var selectedNavItemState by remember{ mutableIntStateOf(0) }
 
     NavigationBar {
-        BottomNavigationItem().bottomNavigationItems().forEachIndexed { index, navItem ->
+        BottomNavigationItem().bottomNavigationItems(LocalContext.current).forEachIndexed { index, navItem ->
             NavigationBarItem(
                 icon = {
                     Icon(
