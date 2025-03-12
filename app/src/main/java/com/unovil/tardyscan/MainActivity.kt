@@ -4,6 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -45,9 +52,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = { BottomNavigationBar(navController) }
                 ) { paddingValues ->
-                    NavHost(
+                    NavHost (
                         navController = navController,
                         startDestination = Screens.Scan.route,
+                        enterTransition = { slideInHorizontally(
+                            animationSpec = tween(500),
+                            initialOffsetX = { it / 3 }
+                        ) + fadeIn(animationSpec = tween(300)) },
+                        exitTransition = { slideOutHorizontally(
+                            animationSpec = tween(500),
+                            targetOffsetX = { -it / 3 }
+                        ) + fadeOut(animationSpec = tween(300)) },
                         modifier = Modifier.padding(paddingValues = paddingValues)
                     ) {
                         composable(Screens.Scan.route) {

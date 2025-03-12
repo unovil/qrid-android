@@ -60,6 +60,7 @@ fun ScanScreen(navController: NavController = rememberNavController()) {
     LaunchedEffect(key1 = requestCameraPermission) {
         Log.d("ScanScreen", "Requesting camera permission: $requestCameraPermission")
         if (requestCameraPermission && !hasCameraPermission) {
+            Log.d("ScanScreen", "Launching camera permission launcher...")
             launcher.launch(Manifest.permission.CAMERA)
             requestCameraPermission = false
         }

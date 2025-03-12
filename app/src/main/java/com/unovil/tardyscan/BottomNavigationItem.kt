@@ -23,20 +23,20 @@ data class BottomNavigationItem(
         return listOf(
             BottomNavigationItem(
                 label = context.resources.getString(R.string.scan_screen),
-                selectedIcon = Icons.Filled.QrCodeScanner,
-                unselectedIcon = Icons.Outlined.QrCodeScanner,
+                selectedIcon = Screens.Scan.selectedImage,
+                unselectedIcon = Screens.Scan.deselectedImage,
                 route = Screens.Scan.route
             ),
             BottomNavigationItem(
                 label = context.resources.getString(R.string.history_screen),
-                selectedIcon = Icons.Filled.History,
-                unselectedIcon = Icons.Outlined.History,
+                selectedIcon = Screens.History.selectedImage,
+                unselectedIcon = Screens.History.deselectedImage,
                 route = Screens.History.route
             ),
             BottomNavigationItem(
                 label = context.resources.getString(R.string.setting_screen),
-                selectedIcon = Icons.Filled.Settings,
-                unselectedIcon = Icons.Outlined.Settings,
+                selectedIcon = Screens.Settings.selectedImage,
+                unselectedIcon = Screens.Settings.deselectedImage,
                 route = Screens.Settings.route
             )
         )
