@@ -11,24 +11,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -48,33 +44,41 @@ fun SettingsScreen(navController: NavController = rememberNavController()) {
             color = MaterialTheme.colorScheme.background
         ) {
             Column (
-                modifier = Modifier.fillMaxSize().padding(20.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top
             ) {
-                val toast = Toast.makeText(LocalContext.current, "Account pressed", Toast.LENGTH_SHORT)
+                Spacer(modifier = Modifier.fillMaxHeight(0.15f))
                 Text(
                     "Settings",
-                    fontSize = 40.sp
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    style = MaterialTheme.typography.headlineLarge
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                SettingsMainItem(
+                Text(
+                    "Integrations",
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    color = Color(78, 89, 122),
+                    style = MaterialTheme.typography.labelLarge
+                )
+                val toast = Toast.makeText(LocalContext.current, "Account pressed", Toast.LENGTH_SHORT)
+                SettingsItem(
                     mainLabel = "Account",
                     subLabel = "View account information or logout",
                     icon = Icons.Default.AccountCircle
                 ) {
                     toast.show()
                 }
-                SettingsMainItem(
+                SettingsItem(
                     mainLabel = "Appearance",
                     subLabel = "Change the app's look and feel",
                     icon = Icons.Default.Palette
                 ) {}
-                SettingsMainItem(
+                SettingsItem(
                     mainLabel = "Other Preferences",
                     icon = Icons.Default.Settings
                 ) {}
-                SettingsMainItem(
+                SettingsItem(
                     mainLabel = "About Tardy Scanner",
                     icon = Icons.Default.Info
                 ) {}
@@ -84,13 +88,11 @@ fun SettingsScreen(navController: NavController = rememberNavController()) {
 }
 
 @Composable
-fun SettingsMainItem(mainLabel: String, subLabel: String? = null, icon: ImageVector, onClick: () -> Unit) {
+fun SettingsItem(mainLabel: String, subLabel: String? = null, icon: ImageVector, onClick: () -> Unit) {
     TardyScannerTheme {
         Surface(
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 15.dp),
-            onClick = onClick,
-            color = Color.LightGray
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onClick
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp, horizontal = 15.dp),
@@ -100,15 +102,20 @@ fun SettingsMainItem(mainLabel: String, subLabel: String? = null, icon: ImageVec
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        icon,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = mainLabel
-                    )
-                    Spacer(modifier = Modifier.size(10.dp))
+                    Surface(
+                        modifier = Modifier.padding(horizontal = 15.dp)
+                    ) {
+                        Icon(
+                            icon,
+                            modifier = Modifier.size(20.dp),
+                            contentDescription = mainLabel
+                        )
+                    }
                     Column(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.Center
+
+
                     ) {
                         Text(
                             mainLabel,
@@ -133,7 +140,7 @@ fun SettingsMainItem(mainLabel: String, subLabel: String? = null, icon: ImageVec
 @Composable
 @Preview
 fun SettingsMainItemPreview() {
-    SettingsMainItem(
+    SettingsItem(
         mainLabel = "Account",
         subLabel = "View account information or logout",
         icon = Icons.Default.AccountCircle

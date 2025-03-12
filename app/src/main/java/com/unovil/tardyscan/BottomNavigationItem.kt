@@ -2,16 +2,9 @@ package com.unovil.tardyscan
 
 import android.content.Context
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.QrCodeScanner
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 
 data class BottomNavigationItem(
     val label: String = "",
