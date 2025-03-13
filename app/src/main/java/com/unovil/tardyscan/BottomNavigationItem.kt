@@ -14,12 +14,12 @@ data class BottomNavigationItem(
 ) {
     fun bottomNavigationItems(context: Context): List<BottomNavigationItem> {
         return listOf(
-            BottomNavigationItem(
+            /*BottomNavigationItem(
                 label = context.resources.getString(R.string.scan_screen),
                 selectedIcon = Screens.Scan.selectedImage,
                 unselectedIcon = Screens.Scan.deselectedImage,
                 route = Screens.Scan.route
-            ),
+            ),*/
             BottomNavigationItem(
                 label = context.resources.getString(R.string.history_screen),
                 selectedIcon = Screens.History.selectedImage,

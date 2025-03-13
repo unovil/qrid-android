@@ -1,10 +1,6 @@
 package com.unovil.tardyscan.screens
 
 import android.Manifest
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,16 +18,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
-import com.unovil.tardyscan.dialogs.CameraRequiredDialog
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
 @Preview
+@ExperimentalPermissionsApi
 fun ScanScreen(navController: NavController = rememberNavController()) {
     val context = LocalContext.current
-    var hasCameraPermission by remember { mutableStateOf(false) }
+    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+
+    if (!cameraPermissionState.status.isGranted) {
+        AllowCameraScreen { cameraPermissionState.launchPermissionRequest() }
+    }
+
+    /*var hasCameraPermission by remember { mutableStateOf(false) }
     var showPermissionRationale by remember { mutableStateOf(false) }
 
     // launcher init to get permissions
@@ -70,10 +68,10 @@ fun ScanScreen(navController: NavController = rememberNavController()) {
                 showPermissionRationale = false
             }
         )
-    }
+    }*/
 
     TardyScannerTheme {
-        if (!hasCameraPermission) {
+        /*if (!hasCameraPermission) {
             AllowCameraScreen { requestCameraPermission = true }
         } else {
             val qrLauncher = rememberLauncherForActivityResult(
@@ -98,7 +96,7 @@ fun ScanScreen(navController: NavController = rememberNavController()) {
                 qrLauncher.launch(scanOptions)
             }
 
-            /*var scanFlag by remember { mutableStateOf(false) }
+            *//*var scanFlag by remember { mutableStateOf(false) }
 
             val compoundQRView = remember {
                 CompoundBarcodeView(context).apply {
@@ -124,8 +122,8 @@ fun ScanScreen(navController: NavController = rememberNavController()) {
             AndroidView(
                 modifier = Modifier,
                 factory = { compoundQRView }
-            )*/
-        }
+            )*//*
+        }*/
 
     }
 }
