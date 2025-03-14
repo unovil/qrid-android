@@ -27,10 +27,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
+            android:name=".ScanActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.TardyScanner">
+        </activity>
+        <!--<activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="android:screenOrientation">
-        </activity>
+        </activity>-->
     </application>
 </manifest>
