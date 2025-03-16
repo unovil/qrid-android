@@ -10,6 +10,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.unovil.tardyscan.screens.CameraPermissionScreen
 import com.unovil.tardyscan.screens.ScanningScreen
+import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -23,15 +24,17 @@ class ScanActivity : ComponentActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         enableEdgeToEdge()
         setContent {
-            val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
-            if (!cameraPermissionState.status.isGranted) {
-                CameraPermissionScreen { cameraPermissionState.launchPermissionRequest() }
-            } else {
-                ScanningScreen(
-                    cameraExecutor,
-                    onBack = { this.finish() }
-                )
+            TardyScannerTheme {
+                val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
+                if (!cameraPermissionState.status.isGranted) {
+                    CameraPermissionScreen { cameraPermissionState.launchPermissionRequest() }
+                } else {
+                    ScanningScreen(
+                        cameraExecutor,
+                        onBack = { this.finish() }
+                    )
 
+                }
             }
         }
     }

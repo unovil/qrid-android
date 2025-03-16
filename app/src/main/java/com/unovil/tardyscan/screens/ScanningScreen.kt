@@ -1,20 +1,27 @@
 package com.unovil.tardyscan.screens
 
 import android.content.Context
-import android.graphics.Rect
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +37,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.LifecycleOwner
@@ -37,6 +46,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.unovil.tardyscan.helpers.processImageProxy
+import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage
@@ -44,10 +54,16 @@ import java.util.concurrent.ExecutorService
 fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
     val context = LocalContext.current
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
+    var scannedQrValue by remember { mutableStateOf<String?>(null) }
+    var scanningEnabled by remember { mutableStateOf(true) }
 
-    LaunchedEffect(previewView) {
+    LaunchedEffect(previewView, scanningEnabled) {
         previewView?.let { view ->
-            scanningCoroutine(view, executor, context)
+            scanningCoroutine(view, executor, context, scanningEnabled) {
+                Log.d("Scan Screen", "Scanned! $it")
+                scannedQrValue = it
+                scanningEnabled = false
+            }
         }
     }
 
@@ -65,7 +81,7 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
         )
 
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val squareSize = 250.dp.toPx()
+            val squareSize = 300.dp.toPx()
             val topLeft = center - Offset(squareSize / 2f, squareSize / 2f)
 
             // draw black background region
@@ -108,6 +124,16 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
         }
+
+        if (scannedQrValue != null) {
+            SuccessfulScanCard(
+                scannedQrValue = scannedQrValue!!,
+                onClick = {
+                    scannedQrValue = null
+                    scanningEnabled = true
+                }
+            )
+        }
     }
 }
 
@@ -115,7 +141,9 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
 private fun scanningCoroutine(
     view: PreviewView,
     executor: ExecutorService,
-    context: Context
+    context: Context,
+    scanningEnabled: Boolean,
+    onQrDetected: (String) -> Unit
 ) {
     val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder()
         .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
@@ -124,24 +152,61 @@ private fun scanningCoroutine(
     val cameraController = LifecycleCameraController(context)
     cameraController.bindToLifecycle(context as LifecycleOwner)
 
-    // 250 dp to px
-    val scanRegionSize = 250
-
     cameraController.setImageAnalysisAnalyzer(executor) { image ->
-        val centerX = image.width / 2
-        val centerY = image.height / 2
-        val scanRegion = Rect(
-            centerX - scanRegionSize / 2,
-            centerY - scanRegionSize / 2,
-            centerX + scanRegionSize / 2,
-            centerY + scanRegionSize / 2
-        )
-
-        processImageProxy(image, scanner, scanRegion,
-            onSuccess = { Log.d("QR Scan", "Successful! ${it.displayValue}") },
-            onFailure = { Log.d("QR Scan", "Failed to scan") }
-        )
+        if (scanningEnabled) {
+            processImageProxy(
+                image,
+                scanner,
+                { barcode ->
+                    barcode.displayValue?.let { onQrDetected(it) }
+                },
+                { Log.d("Scan Screen", "No QR code found") }
+            )
+        } else {
+            Log.d("Scan Screen", "Scanning disabled, skipping analysis")
+            image.close()
+        }
     }
 
     view.controller = cameraController
+}
+
+@Preview
+@Composable
+fun SuccessfulScanCard(scannedQrValue: String = "", onClick: () -> Unit = { }) {
+    if (scannedQrValue.isEmpty()) return
+
+    TardyScannerTheme {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = scannedQrValue,
+                        textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = onClick
+                    ) {
+                        Text("Dismiss")
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
 }
