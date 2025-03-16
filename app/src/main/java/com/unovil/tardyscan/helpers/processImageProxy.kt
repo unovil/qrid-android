@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.helpers
 
 import android.graphics.Rect
+import android.graphics.RectF
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanner
@@ -11,6 +12,7 @@ import com.google.mlkit.vision.common.InputImage
 fun processImageProxy(
     imageProxy: ImageProxy,
     scanner: BarcodeScanner,
+    scanRegion: Rect,
     onSuccess: (barcode: Barcode) -> Unit,
     onFailure: () -> Unit
 ) {
@@ -21,15 +23,28 @@ fun processImageProxy(
     }
 
     val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+    val imageWidth = imageProxy.width
+    val imageHeight = imageProxy.height
+    val rotationDegrees = imageProxy.imageInfo.rotationDegrees
 
     scanner.process(image)
         .addOnSuccessListener { barcodes ->
+            var foundValidBarcode = false
+            
             for (barcode in barcodes) {
-                val boundingBox = barcode.boundingBox
-                if (boundingBox == null) continue
-                if (!isQrInCenterRegion(Pair(imageProxy.width, imageProxy.height), boundingBox)) continue
+                val boundingBox = barcode.boundingBox ?: continue
+                
+                val isInCenter = isQrInCenterRegion(boundingBox, scanRegion, imageWidth, imageHeight, rotationDegrees)
 
-                onSuccess(barcode)
+                if (isInCenter) {
+                    onSuccess(barcode)
+                    foundValidBarcode = true
+                    break
+                }
+            }
+            
+            if (!foundValidBarcode && barcodes.isNotEmpty()) {
+                onFailure()
             }
         }
         .addOnFailureListener {
@@ -40,17 +55,64 @@ fun processImageProxy(
         }
 }
 
-private fun isQrInCenterRegion(imageDim: Pair<Int, Int>, qrBoundingBox: Rect): Boolean {
-    val centerX = imageDim.first / 2
-    val centerY = imageDim.second / 2
-    val regionSize = 200 // region size pixels here
-
-    val centerRegion = Rect(
-        centerX - regionSize / 2,
-        centerY - regionSize / 2,
-        centerX + regionSize / 2,
-        centerY + regionSize / 2
+private fun isQrInCenterRegion(
+    qrBox: Rect, 
+    scanRegion: Rect, 
+    imageWidth: Int, 
+    imageHeight: Int, 
+    rotationDegrees: Int
+): Boolean {
+    val normalizedQrBox = RectF(
+        qrBox.left.toFloat() / imageWidth,
+        qrBox.top.toFloat() / imageHeight,
+        qrBox.right.toFloat() / imageWidth,
+        qrBox.bottom.toFloat() / imageHeight
     )
+    
+    val normalizedScanRegion = RectF(
+        scanRegion.left.toFloat() / imageWidth,
+        scanRegion.top.toFloat() / imageHeight,
+        scanRegion.right.toFloat() / imageWidth,
+        scanRegion.bottom.toFloat() / imageHeight
+    )
+    
+    val rotatedQrBox = when (rotationDegrees) {
+        90 -> RectF(
+            normalizedQrBox.top,
+            1f - normalizedQrBox.right,
+            normalizedQrBox.bottom,
+            1f - normalizedQrBox.left
+        )
+        180 -> RectF(
+            1f - normalizedQrBox.right,
+            1f - normalizedQrBox.bottom,
+            1f - normalizedQrBox.left,
+            1f - normalizedQrBox.top
+        )
+        270 -> RectF(
+            1f - normalizedQrBox.bottom,
+            normalizedQrBox.left,
+            1f - normalizedQrBox.top,
+            normalizedQrBox.right
+        )
+        else -> normalizedQrBox
+    }
 
-    return centerRegion.contains(qrBoundingBox.centerX(), qrBoundingBox.centerY())
+    
+    val overlap = RectF()
+    val hasOverlap = overlap.setIntersect(rotatedQrBox, normalizedScanRegion)
+    
+    if (!hasOverlap) {
+        return false
+    }
+    
+    val qrArea = (rotatedQrBox.width() * rotatedQrBox.height())
+    val overlapArea = (overlap.width() * overlap.height())
+    val percentageInside = overlapArea / qrArea
+    
+    val qrCenterX = rotatedQrBox.centerX()
+    val qrCenterY = rotatedQrBox.centerY()
+    val centerInRegion = normalizedScanRegion.contains(qrCenterX, qrCenterY)
+    
+    return centerInRegion || percentageInside > 0.4f
 }

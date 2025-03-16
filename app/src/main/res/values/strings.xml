@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Tardy Scanner</string>
+    <string name="app_name">QR-ID</string>
 
     <!-- Bottom Navigation -->
     <string name="scan_screen">Scan</string>

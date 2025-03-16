@@ -1,16 +1,15 @@
 package com.unovil.tardyscan.screens
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -24,7 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
@@ -62,32 +64,50 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
             }
         )
 
-        Box (
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
-        ) {
-            Canvas(modifier = Modifier
-                .align(Alignment.Center)
-                .size(200.dp)) {
-                drawRect(
-                    color = Color.Transparent,
-                    style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
-                )
-            }
-        }
-    }
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val squareSize = 250.dp.toPx()
+            val topLeft = center - Offset(squareSize / 2f, squareSize / 2f)
 
-    Button (
-        colors = ButtonColors(
-            Color.Transparent,
-            Color.White,
-            Color.Transparent,
-            Color.Transparent
-        ),
-        onClick = { onBack }
-    ) {
-        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            // draw black background region
+            drawPath(
+                Path().apply {
+                    moveTo(0f, 0f)
+                    lineTo(size.width, 0f)
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
+                    
+                    moveTo(topLeft.x, topLeft.y)
+                    lineTo(topLeft.x, topLeft.y + squareSize)
+                    lineTo(topLeft.x + squareSize, topLeft.y + squareSize)
+                    lineTo(topLeft.x + squareSize, topLeft.y)
+                    close()
+                },
+                color = Color.Black.copy(alpha = 0.5f)
+            )
+
+            // draw white stroke
+            drawRect(
+                color = Color.White,
+                topLeft = topLeft,
+                size = Size(squareSize, squareSize),
+                style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round)
+            )
+        }
+
+        // back button
+        Button(
+            modifier = Modifier.align(Alignment.TopStart),
+            colors = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White,
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent
+            ),
+            onClick = onBack
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+        }
     }
 }
 
@@ -104,8 +124,20 @@ private fun scanningCoroutine(
     val cameraController = LifecycleCameraController(context)
     cameraController.bindToLifecycle(context as LifecycleOwner)
 
+    // 250 dp to px
+    val scanRegionSize = 250
+
     cameraController.setImageAnalysisAnalyzer(executor) { image ->
-        processImageProxy(image, scanner,
+        val centerX = image.width / 2
+        val centerY = image.height / 2
+        val scanRegion = Rect(
+            centerX - scanRegionSize / 2,
+            centerY - scanRegionSize / 2,
+            centerX + scanRegionSize / 2,
+            centerY + scanRegionSize / 2
+        )
+
+        processImageProxy(image, scanner, scanRegion,
             onSuccess = { Log.d("QR Scan", "Successful! ${it.displayValue}") },
             onFailure = { Log.d("QR Scan", "Failed to scan") }
         )
