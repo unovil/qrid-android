@@ -33,7 +33,6 @@ class ScanActivity : ComponentActivity() {
                         cameraExecutor,
                         onBack = { this.finish() }
                     )
-
                 }
             }
         }

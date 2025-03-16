@@ -7,6 +7,7 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -113,13 +115,16 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
 
         // back button
         Button(
-            modifier = Modifier.align(Alignment.TopStart),
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding(),
             colors = ButtonColors(
                 containerColor = Color.Transparent,
                 contentColor = Color.White,
                 disabledContainerColor = Color.Transparent,
-                disabledContentColor = Color.Transparent
+                disabledContentColor = Color.White
             ),
+            enabled = scanningEnabled,
             onClick = onBack
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -180,6 +185,7 @@ fun SuccessfulScanCard(scannedQrValue: String = "", onClick: () -> Unit = { }) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
                 .padding(16.dp),
             contentAlignment = Alignment.BottomCenter
         ) {
@@ -187,6 +193,7 @@ fun SuccessfulScanCard(scannedQrValue: String = "", onClick: () -> Unit = { }) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
+                    .statusBarsPadding()
             ) {
                 Column(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
