@@ -1,10 +1,11 @@
-package com.unovil.tardyscan
+package com.unovil.tardyscan.accessory.classes
 
 import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.unovil.tardyscan.R
 
 data class BottomNavigationItem(
     val label: String = "",

@@ -1,4 +1,4 @@
-package com.unovil.tardyscan
+package com.unovil.tardyscan.accessory.classes
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History

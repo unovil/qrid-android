@@ -64,4 +64,9 @@ dependencies {
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
     implementation(libs.accompanist.permissions)
+
+    implementation(libs.supabase.bom)
+    implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.ktor.client.android)
 }

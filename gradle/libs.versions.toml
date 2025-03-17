@@ -2,6 +2,8 @@
 accompanistPermissions = "0.37.2"
 agp = "8.9.0"
 barcodeScanning = "17.3.0"
+ktorClientAndroid = "3.1.1"
+supabaseBom = "3.1.2"
 camera = "1.4.1"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
@@ -18,7 +20,11 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
+supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
 camera-core = { module = "androidx.camera:camera-core", version.ref = "camera" }
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera" }
