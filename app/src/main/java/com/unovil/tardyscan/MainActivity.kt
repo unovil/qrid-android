@@ -38,18 +38,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.unovil.tardyscan.accessory.classes.BottomNavigationItem
-import com.unovil.tardyscan.accessory.classes.MainScreens
-import com.unovil.tardyscan.screens.HistoryScreen
-import com.unovil.tardyscan.screens.SettingsScreen
+import com.unovil.tardyscan.presentation.navigation.BottomNavigationItem
+import com.unovil.tardyscan.presentation.navigation.MainScreens
+import com.unovil.tardyscan.presentation.feature.history.HistoryScreen
+import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
+import dagger.hilt.android.AndroidEntryPoint
+import io.github.jan.supabase.SupabaseClient
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var supabaseClient: SupabaseClient
 
     @ExperimentalPermissionsApi
     @ExperimentalGetImage
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()

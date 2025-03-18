@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.screens
+package com.unovil.tardyscan.presentation.feature.scan
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

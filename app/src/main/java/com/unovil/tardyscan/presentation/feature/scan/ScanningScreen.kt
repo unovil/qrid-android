@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.screens
+package com.unovil.tardyscan.presentation.feature.scan
 
 import android.content.Context
 import android.util.Log
@@ -36,7 +36,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import com.unovil.tardyscan.accessory.composables.SuccessfulScanCard
+import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
 import com.unovil.tardyscan.helpers.processImageProxy
 import java.util.concurrent.ExecutorService
 

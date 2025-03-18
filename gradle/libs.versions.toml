@@ -2,7 +2,9 @@
 accompanistPermissions = "0.37.2"
 agp = "8.9.0"
 barcodeScanning = "17.3.0"
+kotlinxDatetime = "0.6.2"
 ktorClientAndroid = "3.1.1"
+secretsGradlePlugin = "2.0.1"
 supabaseBom = "3.1.2"
 camera = "1.4.1"
 kotlin = "2.0.0"
@@ -14,17 +16,21 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.03.00"
 navigationCompose = "2.8.9"
+kotlinSerialization = "2.1.0"
+hiltVersion = "2.51.1"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
-supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabaseBom" }
+supabase-bom = { group = "io.github.jan-tennert.supabase", name = "bom", version.ref = "supabaseBom" }
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
 camera-core = { module = "androidx.camera:camera-core", version.ref = "camera" }
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera" }
@@ -42,9 +48,12 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+hilt = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
+secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin"}

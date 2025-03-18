@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.screens
+package com.unovil.tardyscan.presentation.feature.settings
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

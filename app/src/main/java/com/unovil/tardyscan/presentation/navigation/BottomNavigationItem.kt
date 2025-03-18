@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.accessory.classes
+package com.unovil.tardyscan.presentation.navigation
 
 import android.content.Context
 import androidx.compose.material.icons.Icons

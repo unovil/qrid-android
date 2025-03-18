@@ -8,8 +8,8 @@ import androidx.camera.core.ExperimentalGetImage
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.unovil.tardyscan.screens.CameraPermissionScreen
-import com.unovil.tardyscan.screens.ScanningScreen
+import com.unovil.tardyscan.presentation.feature.scan.CameraPermissionScreen
+import com.unovil.tardyscan.presentation.feature.scan.ScanningScreen
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors

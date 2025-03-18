@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.accessory.composables
+package com.unovil.tardyscan.presentation.feature.scan.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

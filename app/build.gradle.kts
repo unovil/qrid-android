@@ -2,6 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.secrets)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -36,7 +40,17 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+}
+
+kapt {
+    correctErrorTypes = true
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "local.defaults.properties"
 }
 
 dependencies {
@@ -65,8 +79,11 @@ dependencies {
     implementation(libs.camera.view)
     implementation(libs.accompanist.permissions)
 
-    implementation(libs.supabase.bom)
+    implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.auth.kt)
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.ktor.client.android)
+    implementation(libs.hilt)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.kotlinx.datetime)
 }
