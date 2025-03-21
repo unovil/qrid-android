@@ -34,7 +34,7 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun getAttendance(id: Int): AttendanceDto {
         return attendanceTable.select {
             filter {
-                eq("id", id)
+                AttendanceDto::id eq id
             }
         }.decodeSingle<AttendanceDto>()
     }
@@ -42,7 +42,7 @@ class AttendanceRepositoryImpl @Inject constructor(
     override suspend fun deleteAttendance(id: Int) {
         attendanceTable.delete {
             filter {
-                eq("id", id)
+                AttendanceDto::id eq id
             }
         }
     }

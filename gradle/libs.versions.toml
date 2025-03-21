@@ -1,9 +1,12 @@
 [versions]
 accompanistPermissions = "0.37.2"
 agp = "8.9.0"
+argon2JvmNolibsVersion = "2.12"
 barcodeScanning = "17.3.0"
+kotlinxCoroutinesTest = "1.10.1"
 kotlinxDatetime = "0.6.2"
 ktorClientAndroid = "3.1.1"
+mockkVersion = "1.13.17"
 secretsGradlePlugin = "2.0.1"
 supabaseBom = "3.1.2"
 camera = "1.4.1"
@@ -25,8 +28,13 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+mkammerer-argon2-jvm-nolibs = { module = "de.mkammerer:argon2-jvm-nolibs", version.ref = "argon2JvmNolibsVersion" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
+mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
+mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkVersion" }
 supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 supabase-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }

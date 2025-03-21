@@ -38,10 +38,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.unovil.tardyscan.presentation.navigation.BottomNavigationItem
-import com.unovil.tardyscan.presentation.navigation.MainScreens
 import com.unovil.tardyscan.presentation.feature.history.HistoryScreen
 import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
+import com.unovil.tardyscan.presentation.navigation.BottomNavigationItem
+import com.unovil.tardyscan.presentation.navigation.MainScreens
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
@@ -56,6 +56,9 @@ class MainActivity : ComponentActivity() {
     @ExperimentalGetImage
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // test on authact first
+        this.startActivity(Intent(this, AuthActivity::class.java))
 
         enableEdgeToEdge()
         setContent {
