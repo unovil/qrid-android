@@ -36,8 +36,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
 import com.unovil.tardyscan.helpers.processImageProxy
+import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage

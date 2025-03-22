@@ -8,7 +8,9 @@ interface VerifyAllowedUserUseCase : UseCase<VerifyAllowedUserUseCase.Input, Ver
     sealed class Output {
         object Success : Output()
         open class Failure : Output() {
-            data class Conflict(val message: String) : Failure()
+            object AlreadyRegistered : Failure()
+            object NotFound : Failure()
+            object Conflict : Failure()
         }
     }
 }

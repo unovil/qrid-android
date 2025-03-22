@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.hilt)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
     implementation(libs.mkammerer.argon2.jvm.nolibs)
 }
