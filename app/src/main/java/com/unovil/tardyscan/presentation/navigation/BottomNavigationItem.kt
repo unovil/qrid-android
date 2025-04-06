@@ -17,15 +17,15 @@ data class BottomNavigationItem(
         return listOf(
             BottomNavigationItem(
                 label = context.resources.getString(R.string.history_screen),
-                selectedIcon = MainScreens.History.selectedImage,
-                unselectedIcon = MainScreens.History.deselectedImage,
-                route = MainScreens.History.route
+                selectedIcon = Screens.History.selectedImage!!,
+                unselectedIcon = Screens.History.deselectedImage!!,
+                route = Screens.History.route
             ),
             BottomNavigationItem(
                 label = context.resources.getString(R.string.setting_screen),
-                selectedIcon = MainScreens.Settings.selectedImage,
-                unselectedIcon = MainScreens.Settings.deselectedImage,
-                route = MainScreens.Settings.route
+                selectedIcon = Screens.Settings.selectedImage!!,
+                unselectedIcon = Screens.Settings.deselectedImage!!,
+                route = Screens.Settings.route
             )
         )
     }

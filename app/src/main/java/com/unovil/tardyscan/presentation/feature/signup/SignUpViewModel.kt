@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.signup
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.domain.model.AllowedUser
@@ -68,6 +69,7 @@ class SignUpViewModel @Inject constructor(
             }
 
             _isVerified.value = result is VerifyAllowedUserUseCase.Output.Success
+            Log.d("SignUpVM", "Verification result: ${isVerified.value}")
         }
     }
 }
