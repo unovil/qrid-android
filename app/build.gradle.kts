@@ -8,6 +8,10 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 android {
     namespace = "com.unovil.tardyscan"
     compileSdk = 35
@@ -30,13 +34,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true

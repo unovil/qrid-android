@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val verifyAllowedUserUseCase: VerifyAllowedUserUseCase
+    private val verifyAllowedUserUseCase: VerifyAllowedUserUseCase,
+    private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
     private val _domain = MutableStateFlow("")
     val domain = _domain.asStateFlow()
@@ -30,16 +32,43 @@ class SignUpViewModel @Inject constructor(
     private val _verificationErrorMessage = MutableStateFlow("")
     val verificationErrorMessage = _verificationErrorMessage.asStateFlow()
 
+    private val _newEmail = MutableStateFlow("")
+    val newEmail = _newEmail.asStateFlow()
+    
+    private val _newPassword = MutableStateFlow("")
+    val newPassword = _newPassword.asStateFlow()
+
+    private val _signUpErrorMessage = MutableStateFlow("")
+    val signUpErrorMessage = _signUpErrorMessage.asStateFlow()
+
+    private val _isSuccessfulSignUp = MutableStateFlow(false)
+    val isSuccessfulSignUp = _isSuccessfulSignUp.asStateFlow()
+
     fun onDomainChange(domain: String) {
         _domain.value = domain
+        _verificationErrorMessage.value = ""
     }
 
     fun onDomainIdChange(domainId: String) {
         _domainId.value = domainId
+        _verificationErrorMessage.value = ""
     }
 
     fun onPasswordChange(rawPassword: String) {
         _rawPassword.value = rawPassword
+        _verificationErrorMessage.value = ""
+    }
+
+    fun onNewEmailChange(newEmail: String) {
+        _newEmail.value = newEmail
+        _verificationErrorMessage.value = ""
+        _signUpErrorMessage.value = ""
+    }
+
+    fun onNewPasswordChange(newPassword: String) {
+        _newPassword.value = newPassword
+        _verificationErrorMessage.value = ""
+        _signUpErrorMessage.value = ""
     }
 
     fun onVerifyCredentials() {
@@ -70,6 +99,50 @@ class SignUpViewModel @Inject constructor(
 
             _isVerified.value = result is VerifyAllowedUserUseCase.Output.Success
             Log.d("SignUpVM", "Verification result: ${isVerified.value}")
+        }
+    }
+
+    fun onSignUp() {
+        viewModelScope.launch {
+            Log.d("SignUp", "domain: ${_domain.value}")
+            Log.d("SignUp", "org number: ${_domainId.value}")
+            Log.d("SignUp", "given pw: ${_rawPassword.value}")
+
+            val result = signUpUseCase.execute(
+                SignUpUseCase.Input(
+                    AllowedUser(
+                        domain = _domain.value,
+                        domainId = _domainId.value,
+                        givenPassword = _rawPassword.value
+                    ),
+                    _newEmail.value,
+                    _newPassword.value
+                )
+            )
+
+            _signUpErrorMessage.value = when (result) {
+                is SignUpUseCase.Output.Failure.Unverified -> {
+                    "An error has occurred while verifying your credentials. " +
+                            "Please exit and relaunch the app to try again."
+                }
+
+                is SignUpUseCase.Output.Failure.WeakPassword -> {
+                    "Your password is too weak. Please ensure it meets the required security standards:\n" +
+                            result.reasons.joinToString("\n")
+                }
+
+                is SignUpUseCase.Output.Failure.Unknown -> {
+                    "An unknown error occurred. Please try again later."
+                }
+
+                is SignUpUseCase.Output.Success -> {
+                    ""
+                }
+
+                is SignUpUseCase.Output.Failure -> throw IllegalStateException("Unknown failure reason")
+            }
+
+            _isSuccessfulSignUp.value = result is SignUpUseCase.Output.Success
         }
     }
 }

@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +26,7 @@ class AuthActivity : ComponentActivity() {
         setContent {
             TardyScannerTheme {
                 val navController = rememberNavController()
+
                 Scaffold { innerPadding ->
                     NavHost(
                         navController,
@@ -31,10 +34,24 @@ class AuthActivity : ComponentActivity() {
                         Modifier.padding(innerPadding)
                     ) {
                         composable(Screens.VerifyGivenCredentials.route) {
-                            VerifyGivenCredentials(navController = navController)
+                            val parentEntry = remember(navController.currentBackStackEntry) {
+                                navController.getBackStackEntry(Screens.VerifyGivenCredentials.route)
+                            }
+
+                            VerifyGivenCredentials(
+                                viewModel = hiltViewModel(parentEntry),
+                                onSuccess = { navController.navigate(Screens.SignUp.route) }
+                            )
                         }
                         composable(Screens.SignUp.route) {
-                            SignUp(navController = navController)
+                            val parentEntry = remember(navController.currentBackStackEntry) {
+                                navController.getBackStackEntry(Screens.VerifyGivenCredentials.route)
+                            }
+
+                            SignUp(
+                                viewModel = hiltViewModel(parentEntry),
+                                onSuccess = { this@AuthActivity.finish() }
+                            )
                         }
                     }
                 }

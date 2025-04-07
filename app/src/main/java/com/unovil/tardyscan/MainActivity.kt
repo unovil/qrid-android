@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 
         // test on authact first
         this.startActivity(Intent(this, AuthActivity::class.java))
+        // supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
 
         enableEdgeToEdge()
         setContent {
