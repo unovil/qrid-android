@@ -14,6 +14,7 @@ interface SignUpUseCase : UseCase<SignUpUseCase.Input, SignUpUseCase.Output> {
         open class Failure : Output() {
             object Unverified : Failure()
             class WeakPassword(val reasons: List<String>) : Failure()
+            object AlreadyExists : Failure()
             object Unknown : Failure()
         }
     }

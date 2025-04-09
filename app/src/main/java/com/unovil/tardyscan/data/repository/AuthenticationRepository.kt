@@ -9,6 +9,7 @@ interface AuthenticationRepository {
         sealed class Failure : SignUpResult() {
             object Unverified : Failure()
             class WeakPassword(val reasons: List<String>) : Failure()
+            object AlreadyExists : Failure()
             object Unknown : Failure()
         }
     }

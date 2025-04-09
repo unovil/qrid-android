@@ -135,6 +135,10 @@ class SignUpViewModel @Inject constructor(
                     "An unknown error occurred. Please try again later."
                 }
 
+                is SignUpUseCase.Output.Failure.AlreadyExists -> {
+                    "This user already exists. Try to sign up with a different email address."
+                }
+
                 is SignUpUseCase.Output.Success -> {
                     ""
                 }

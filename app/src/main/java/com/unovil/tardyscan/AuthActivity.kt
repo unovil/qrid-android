@@ -1,5 +1,7 @@
 package com.unovil.tardyscan
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.unovil.tardyscan.MainActivity
 import com.unovil.tardyscan.presentation.feature.signup.SignUp
 import com.unovil.tardyscan.presentation.feature.signup.VerifyGivenCredentials
 import com.unovil.tardyscan.presentation.navigation.Screens
@@ -30,28 +34,36 @@ class AuthActivity : ComponentActivity() {
                 Scaffold { innerPadding ->
                     NavHost(
                         navController,
-                        startDestination = Screens.VerifyGivenCredentials.route,
+                        startDestination = "auth_flow",
                         Modifier.padding(innerPadding)
                     ) {
-                        composable(Screens.VerifyGivenCredentials.route) {
-                            val parentEntry = remember(navController.currentBackStackEntry) {
-                                navController.getBackStackEntry(Screens.VerifyGivenCredentials.route)
-                            }
+                        navigation(
+                            startDestination = Screens.VerifyGivenCredentials.route,
+                            route = "auth_flow"
+                        ) {
+                            composable(Screens.VerifyGivenCredentials.route) {
+                                val parentEntry = remember(navController.currentBackStackEntry) {
+                                    navController.getBackStackEntry("auth_flow")
+                                }
 
-                            VerifyGivenCredentials(
-                                viewModel = hiltViewModel(parentEntry),
-                                onSuccess = { navController.navigate(Screens.SignUp.route) }
-                            )
-                        }
-                        composable(Screens.SignUp.route) {
-                            val parentEntry = remember(navController.currentBackStackEntry) {
-                                navController.getBackStackEntry(Screens.VerifyGivenCredentials.route)
+                                VerifyGivenCredentials(
+                                    viewModel = hiltViewModel(parentEntry),
+                                    onSuccess = { navController.navigate(Screens.SignUp.route) }
+                                )
                             }
+                            composable(Screens.SignUp.route) {
+                                val parentEntry = remember(navController.currentBackStackEntry) {
+                                    navController.getBackStackEntry("auth_flow")
+                                }
 
-                            SignUp(
-                                viewModel = hiltViewModel(parentEntry),
-                                onSuccess = { this@AuthActivity.finish() }
-                            )
+                                SignUp(
+                                    viewModel = hiltViewModel(parentEntry),
+                                    onSuccess = {
+                                        this@AuthActivity.startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                                        finish()
+                                    }
+                                )
+                            }
                         }
                     }
                 }

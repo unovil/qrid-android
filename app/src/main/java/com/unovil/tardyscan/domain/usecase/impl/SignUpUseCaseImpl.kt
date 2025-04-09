@@ -3,6 +3,7 @@ package com.unovil.tardyscan.domain.usecase.impl
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignUpResult
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
+import com.unovil.tardyscan.domain.usecase.SignUpUseCase.Output.Failure.AlreadyExists
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase.Output.Failure.Unknown
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase.Output.Failure.Unverified
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase.Output.Failure.WeakPassword
@@ -23,6 +24,7 @@ class SignUpUseCaseImpl @Inject constructor(
             is SignUpResult.Success -> Success
             is SignUpResult.Failure.Unverified -> Unverified
             is SignUpResult.Failure.WeakPassword -> WeakPassword(result.reasons)
+            is SignUpResult.Failure.AlreadyExists -> AlreadyExists
             is SignUpResult.Failure -> Unknown
         }
     }

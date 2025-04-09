@@ -2,6 +2,7 @@ package com.unovil.tardyscan
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,8 +23,11 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +39,11 @@ import com.unovil.tardyscan.presentation.navigation.Screens
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.user.UserInfo
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,12 +56,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // test on authact first
-        this.startActivity(Intent(this, AuthActivity::class.java))
-        // supabaseClient.auth.retrieveUserForCurrentSession(updateSession = true)
-
         enableEdgeToEdge()
         setContent {
+            val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
+
+            LaunchedEffect(sessionStatus.value) {
+                if (sessionStatus.value !is SessionStatus.Authenticated) {
+                    Log.d("MainActivity", "session status: not authenticated")
+                    this@MainActivity.startActivity(Intent(this@MainActivity, AuthActivity::class.java))
+                    finish()
+                }
+            }
+
             val navController = rememberNavController()
             TardyScannerTheme {
                 Scaffold(
