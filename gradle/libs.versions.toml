@@ -9,9 +9,9 @@ kotlinxDatetime = "0.6.2"
 ktorClientAndroid = "3.1.1"
 mockkVersion = "1.13.17"
 secretsGradlePlugin = "2.0.1"
-supabaseBom = "3.1.2"
+supabaseBom = "3.1.4"
 camera = "1.4.1"
-kotlin = "2.0.0"
+kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -21,7 +21,8 @@ activityCompose = "1.10.1"
 composeBom = "2025.03.00"
 navigationCompose = "2.8.9"
 kotlinSerialization = "2.1.0"
-hiltVersion = "2.51.1"
+hiltVersion = "2.56.1"
+ksp = "2.1.10-1.0.31"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -67,3 +68,4 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin"}
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

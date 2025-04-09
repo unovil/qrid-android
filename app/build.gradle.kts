@@ -4,8 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.secrets)
-    id("kotlin-kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 kotlin {
@@ -39,10 +39,6 @@ android {
         compose = true
         buildConfig = true
     }
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 secrets {
@@ -86,7 +82,7 @@ dependencies {
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.hilt)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
     implementation(libs.mkammerer.argon2.jvm.nolibs)

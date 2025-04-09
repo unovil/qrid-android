@@ -61,10 +61,17 @@ class MainActivity : ComponentActivity() {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
 
             LaunchedEffect(sessionStatus.value) {
-                if (sessionStatus.value !is SessionStatus.Authenticated) {
-                    Log.d("MainActivity", "session status: not authenticated")
-                    this@MainActivity.startActivity(Intent(this@MainActivity, AuthActivity::class.java))
-                    finish()
+                Log.d("MainActivity", "Session status is: ${sessionStatus.value}")
+                when (sessionStatus.value) {
+                    is SessionStatus.Authenticated -> { }
+                    is SessionStatus.Initializing -> {
+                        // run a loading screen here, hopefully
+                    }
+                    else -> {
+                        Log.d("MainActivity", "session status: not authenticated")
+                        this@MainActivity.startActivity(Intent(this@MainActivity, AuthActivity::class.java))
+                        finish()
+                    }
                 }
             }
 
