@@ -2,10 +2,12 @@ package com.unovil.tardyscan.di
 
 import com.unovil.tardyscan.domain.usecase.CreateAttendanceUseCase
 import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
+import com.unovil.tardyscan.domain.usecase.SignInUseCase
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
 import com.unovil.tardyscan.domain.usecase.impl.CreateAttendanceUseCaseImpl
 import com.unovil.tardyscan.domain.usecase.impl.GetAttendancesUseCaseImpl
+import com.unovil.tardyscan.domain.usecase.impl.SignInUseCaseImpl
 import com.unovil.tardyscan.domain.usecase.impl.SignUpUseCaseImpl
 import com.unovil.tardyscan.domain.usecase.impl.VerifyAllowedUserUseCaseImpl
 import dagger.Binds
@@ -27,4 +29,7 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindSignUpUseCase(impl: SignUpUseCaseImpl): SignUpUseCase
+
+    @Binds
+    abstract fun bindSignInUseCase(impl: SignInUseCaseImpl): SignInUseCase
 }

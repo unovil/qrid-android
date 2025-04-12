@@ -19,4 +19,5 @@ sealed class Screens(
     // for auth screen
     data object VerifyGivenCredentials: Screens("verify_given_credentials_route")
     data object SignUp : Screens("sign_up_route")
+    data object SignIn : Screens("sign_in_route")
 }

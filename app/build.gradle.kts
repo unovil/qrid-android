@@ -70,6 +70,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // scanning
     implementation(libs.barcode.scanning)
     implementation(libs.camera.core)
     implementation(libs.camera.camera2)
@@ -77,6 +78,7 @@ dependencies {
     implementation(libs.camera.view)
     implementation(libs.accompanist.permissions)
 
+    // supabase
     implementation(platform(libs.supabase.bom))
     implementation(libs.supabase.auth.kt)
     implementation(libs.supabase.postgrest.kt)
@@ -86,4 +88,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
     implementation(libs.mkammerer.argon2.jvm.nolibs)
+
+    // testing supabase
+    implementation(libs.multiplatform.settings.test)
 }

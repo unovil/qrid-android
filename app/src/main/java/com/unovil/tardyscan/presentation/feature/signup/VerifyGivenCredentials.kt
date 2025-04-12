@@ -25,6 +25,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unovil.tardyscan.presentation.common.AuthorizeButton
+import com.unovil.tardyscan.presentation.common.PasswordTextField
 
 @Composable
 fun VerifyGivenCredentials(
@@ -79,19 +81,9 @@ fun VerifyGivenCredentials(
                     style = MaterialTheme.typography.bodySmall
                 )
 
-                Button(
-                    modifier = Modifier.padding(top = 20.dp),
-                    onClick = {
-                        viewModel?.onVerifyCredentials()
-                        Toast.makeText(context, "Credentials button pressed", Toast.LENGTH_SHORT).show()
-                    }
-                ) {
-                    Text("Verify Credentials")
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Verify credentials"
-                    )
+                AuthorizeButton("Verify Credentials") {
+                    viewModel?.onVerifyCredentials()
+                    Toast.makeText(context, "Credentials button pressed", Toast.LENGTH_SHORT).show()
                 }
             }
         }

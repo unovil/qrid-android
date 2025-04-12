@@ -14,10 +14,10 @@ class VerifyAllowedUserUseCaseImpl @Inject constructor(
         val result = authenticationRepository.getAllowedUser(input.allowedUser)
 
         when (result) {
-            AllowedUserResult.ERROR -> VerifyAllowedUserUseCase.Output.Failure.Conflict
-            AllowedUserResult.NOT_FOUND -> VerifyAllowedUserUseCase.Output.Failure.NotFound
-            AllowedUserResult.ALREADY_REGISTERED -> VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered
-            AllowedUserResult.NOT_REGISTERED -> VerifyAllowedUserUseCase.Output.Success
+            is AllowedUserResult.Failure.Unknown -> VerifyAllowedUserUseCase.Output.Failure.Conflict
+            is AllowedUserResult.Failure.NotFound -> VerifyAllowedUserUseCase.Output.Failure.NotFound
+            is AllowedUserResult.Failure.AlreadyRegistered -> VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered
+            is AllowedUserResult.Success -> VerifyAllowedUserUseCase.Output.Success
         }
     }
 }

@@ -3,7 +3,17 @@ package com.unovil.tardyscan.data.repository
 import com.unovil.tardyscan.domain.model.AllowedUser
 
 interface AuthenticationRepository {
-    enum class AllowedUserResult { NOT_FOUND, NOT_REGISTERED, ALREADY_REGISTERED, ERROR }
+    sealed class AllowedUserResult {
+        class Success(val allowedUserId: Int) : AllowedUserResult()
+
+        sealed class Failure : AllowedUserResult() {
+            object NotFound : Failure()
+            object AlreadyRegistered : Failure()
+            object Unknown : Failure()
+        }
+    }
+
+
     sealed class SignUpResult {
         object Success : SignUpResult()
         sealed class Failure : SignUpResult() {
@@ -13,8 +23,17 @@ interface AuthenticationRepository {
             object Unknown : Failure()
         }
     }
+    sealed class SignInResult {
+        object Success : SignInResult()
+        sealed class Failure : SignInResult() {
+            object HttpTimeout : Failure()
+            object HttpNetworkError : Failure()
+            object InvalidCredentials : Failure()
+            object Unknown : Failure()
+        }
+    }
 
     suspend fun getAllowedUser(allowedUser: AllowedUser): AllowedUserResult
     suspend fun signUp(allowedUser: AllowedUser, email: String, password: String): SignUpResult
-    suspend fun signIn(email: String, password: String): Boolean
+    suspend fun signIn(email: String, password: String): SignInResult
 }

@@ -1,19 +1,24 @@
 package com.unovil.tardyscan.data.repository.impl
 
 import android.util.Log
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
 import com.unovil.tardyscan.data.network.dto.VerifyAllowedUserRpcDto
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignInResult
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignUpResult
 import com.unovil.tardyscan.domain.model.AllowedUser
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.Postgrest
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -21,21 +26,22 @@ class AuthenticationRepositoryImpl @Inject constructor(
     private val auth: Auth
 ) : AuthenticationRepository {
 
-    val allowedUsers = postgrest["allowed_users"]
-
     override suspend fun getAllowedUser(allowedUser: AllowedUser): AllowedUserResult {
         val allowedUserDto = allowedUser.let { VerifyAllowedUserRpcDto(it.domain, it.domainId, it.givenPassword) }
 
         val functionCall = postgrest.rpc(
-            function = "verify_allowed_user",
+            function = "get_allowed_user",
             parameters = Json.encodeToJsonElement(VerifyAllowedUserRpcDto.serializer(), allowedUserDto) as JsonObject
-        ).decodeAs<String>()
+        ).decodeAs<Int>()
 
-        return when (functionCall) {
-            "not_registered" -> AllowedUserResult.NOT_REGISTERED
-            "already_registered" -> AllowedUserResult.ALREADY_REGISTERED
-            "not_found" -> AllowedUserResult.NOT_FOUND
-            else -> AllowedUserResult.ERROR
+        return try {
+            when (functionCall) {
+                -1 -> AllowedUserResult.Failure.NotFound
+                0 -> AllowedUserResult.Failure.AlreadyRegistered
+                else -> AllowedUserResult.Success(functionCall)
+            }
+        } catch (_: Exception) {
+            AllowedUserResult.Failure.Unknown
         }
     }
 
@@ -44,21 +50,25 @@ class AuthenticationRepositoryImpl @Inject constructor(
         newEmail: String,
         newPassword: String
     ): SignUpResult {
-        if (getAllowedUser(allowedUser) != AllowedUserResult.NOT_REGISTERED) {
+        val allowedUserResult = getAllowedUser(allowedUser)
+        if (allowedUserResult !is AllowedUserResult.Success) {
             return SignUpResult.Failure.Unverified
         }
+
+        Log.d("AuthenticationRepository", "allowedUserId: ${allowedUserResult.allowedUserId}")
 
         try {
             auth.signUpWith(Email) {
                 email = newEmail
                 password = newPassword
+                data = buildJsonObject {
+                    put("allowed_user_id", JsonPrimitive(allowedUserResult.allowedUserId))
+                }
             }
         } catch (e: AuthWeakPasswordException) {
             return SignUpResult.Failure.WeakPassword(e.reasons)
         } catch (e: AuthRestException) {
-            // user credentials already exist in auth so this is a duplicate error
-            if (e.message == null) throw e
-            if (!e.message!!.startsWith("user_already_exists")) throw e
+            if (e.errorCode != AuthErrorCode.UserAlreadyExists) throw e
             return SignUpResult.Failure.AlreadyExists
         } catch (e: Exception) {
             Log.w("AuthenticationRepository", "Unknown exception:\n" +
@@ -66,31 +76,41 @@ class AuthenticationRepositoryImpl @Inject constructor(
             return SignUpResult.Failure.Unknown
         }
 
-        val allowedUser = allowedUsers.select {
-            filter {
-                and {
-                    AllowedUserDto::domain eq allowedUser.domain
-                    AllowedUserDto::domainId eq allowedUser.domainId
-                    AllowedUserDto::givenPassword eq allowedUser.givenPassword
-                }
-            }
-            limit(1)
-        }.decodeSingleOrNull<AllowedUserDto>()
+        val user = auth.currentUserOrNull()
+        val allowedUserId = (user?.userMetadata?.get("allowed_user_id") as JsonPrimitive).content.toInt()
 
-        if (allowedUser == null) return SignUpResult.Failure.Unknown
-
-        allowedUsers.update( {
-            AllowedUserDto::isRegistered setTo true
-        } ) {
-            filter {
-                AllowedUserDto::id eq allowedUser.id
+        val markRegisteredResult = postgrest.rpc(
+            function = "mark_as_registered",
+            parameters = buildJsonObject {
+                put("allowed_id", JsonPrimitive(allowedUserId))
             }
-        }
+        ).decodeAs<Int>()
+
+        // registered result of 0: success, -1: failure
+        if (markRegisteredResult != 0) return SignUpResult.Failure.Unknown
 
         return SignUpResult.Success
     }
 
-    override suspend fun signIn(email: String, password: String): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun signIn(enteredEmail: String, enteredPassword: String): SignInResult {
+        try {
+            auth.signInWith(Email) {
+                email = enteredEmail
+                password = enteredPassword
+            }
+        } catch (_: HttpRequestTimeoutException) {
+            return SignInResult.Failure.HttpTimeout
+        } catch (_: HttpRequestException) {
+            return SignInResult.Failure.HttpNetworkError
+        } catch (e: AuthRestException) {
+            Log.w("AuthenticationRepository", "AuthRestException:\n${e.errorCode}")
+            if (e.errorCode != AuthErrorCode.InvalidCredentials) throw e
+            return SignInResult.Failure.InvalidCredentials
+        } catch (e: Exception) {
+            Log.w("AuthenticationRepository", "Exception:\n${e.message}")
+            return SignInResult.Failure.Unknown
+        }
+
+        return SignInResult.Success
     }
 }
