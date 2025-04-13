@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Scaffold
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.AndroidEntryPoint
