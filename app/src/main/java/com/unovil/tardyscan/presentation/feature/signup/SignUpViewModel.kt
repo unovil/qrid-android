@@ -3,6 +3,7 @@ package com.unovil.tardyscan.presentation.feature.signup
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.domain.helpers.PasswordValidation
 import com.unovil.tardyscan.domain.model.AllowedUser
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.text.Regex
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
@@ -44,6 +46,21 @@ class SignUpViewModel @Inject constructor(
     private val _isSuccessfulSignUp = MutableStateFlow(false)
     val isSuccessfulSignUp = _isSuccessfulSignUp.asStateFlow()
 
+    private val _passwordValidations = MutableStateFlow(mapOf(
+        "Must be at least 8 characters" to false,
+        "Must contain at least one lowercase letter" to false,
+        "Must contain at least one uppercase letter" to false,
+        "Must contain at least one number" to false,
+        "Must contain at least one special character" to false
+    ))
+    val passwordValidations = _passwordValidations.asStateFlow()
+
+    private val _passwordStrength = MutableStateFlow(0)
+    val passwordStrength = _passwordStrength.asStateFlow()
+    
+    private val _isSignUpButtonEnabled = MutableStateFlow(false)
+    val isSignUpButtonEnabled = _isSignUpButtonEnabled.asStateFlow()
+
     fun onDomainChange(domain: String) {
         _domain.value = domain
         _verificationErrorMessage.value = ""
@@ -60,15 +77,34 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun onNewEmailChange(newEmail: String) {
-        _newEmail.value = newEmail
+        _newEmail.value = newEmail.replace(Regex("\\s"), "")
         _verificationErrorMessage.value = ""
         _signUpErrorMessage.value = ""
+
+        onChangeFormText()
     }
 
     fun onNewPasswordChange(newPassword: String) {
         _newPassword.value = newPassword
         _verificationErrorMessage.value = ""
         _signUpErrorMessage.value = ""
+
+        _passwordValidations.value = mapOf(
+            "Must be at least 8 characters" to PasswordValidation.hasMinimumLength(newPassword),
+            "Must contain at least one lowercase letter" to PasswordValidation.hasLowercase(newPassword),
+            "Must contain at least one uppercase letter" to PasswordValidation.hasUppercase(newPassword),
+            "Must contain at least one number" to PasswordValidation.hasNumber(newPassword),
+            "Must contain at least one special character" to PasswordValidation.hasSpecialCharacter(newPassword)
+        )
+        _passwordStrength.value = _passwordValidations.value.values.count { it }
+
+        onChangeFormText()
+    }
+
+    private fun onChangeFormText() {
+        _isSignUpButtonEnabled.value = _newEmail.value.matches(
+            Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+        ) && _passwordStrength.value == _passwordValidations.value.size
     }
 
     fun onVerifyCredentials() {

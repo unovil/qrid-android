@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.helpers
+package com.unovil.tardyscan.domain.helpers
 
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageProxy
