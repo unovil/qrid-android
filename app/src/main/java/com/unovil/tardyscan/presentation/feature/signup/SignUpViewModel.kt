@@ -53,9 +53,6 @@ class SignUpViewModel @Inject constructor(
         "Must contain at least one special character" to false
     ))
     val passwordValidations = _passwordValidations.asStateFlow()
-
-    private val _passwordStrength = MutableStateFlow(0)
-    val passwordStrength = _passwordStrength.asStateFlow()
     
     private val _isSignUpButtonEnabled = MutableStateFlow(false)
     val isSignUpButtonEnabled = _isSignUpButtonEnabled.asStateFlow()
@@ -95,7 +92,6 @@ class SignUpViewModel @Inject constructor(
             "Must contain at least one number" to PasswordValidation.hasNumber(newPassword),
             "Must contain at least one special character" to PasswordValidation.hasSpecialCharacter(newPassword)
         )
-        _passwordStrength.value = _passwordValidations.value.values.count { it }
 
         onChangeFormText()
     }
@@ -103,7 +99,7 @@ class SignUpViewModel @Inject constructor(
     private fun onChangeFormText() {
         _isSignUpButtonEnabled.value = _newEmail.value.matches(
             Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
-        ) && _passwordStrength.value == _passwordValidations.value.size
+        ) && _passwordValidations.value.values.count { it } == _passwordValidations.value.size
     }
 
     fun onVerifyCredentials() {

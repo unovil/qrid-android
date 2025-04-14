@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,7 +37,6 @@ fun SignUp(
     signUpErrorMessage: State<String> = viewModel!!.signUpErrorMessage.collectAsState(),
     isSuccessfulSignUp: State<Boolean> = viewModel!!.isSuccessfulSignUp.collectAsState(),
     passwordValidations: State<Map<String, Boolean>> = viewModel!!.passwordValidations.collectAsState(),
-    passwordStrength: State<Int> = viewModel!!.passwordStrength.collectAsState(),
     isSignUpButtonEnabled: State<Boolean> = viewModel!!.isSignUpButtonEnabled.collectAsState(),
     onEmailChange: (String) -> Unit = { viewModel!!.onNewEmailChange(it) },
     onPasswordChange: (String) -> Unit = { viewModel!!.onNewPasswordChange(it) },
@@ -49,36 +47,42 @@ fun SignUp(
         if (isSuccessfulSignUp.value) onSuccess()
     }
 
-    OutlinedTextField(
-        value = newEmail.value,
-        onValueChange = onEmailChange,
-        isError = newEmail.value.matches(Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")),
-        label = { Text("Email Address") },
-        placeholder = { Text("Enter your email address")}
-    )
-
-    PasswordTextField(
-        value = newPassword.value,
-        onValueChange = onPasswordChange
-    )
-    PasswordStrengthIndicator(currentStrength = (passwordStrength.value.plus(1)))
-    Column(Modifier.fillMaxWidth()) {
-        for ((message, isRuleMet) in passwordValidations.value) {
-            PasswordValidationFeedbackItem(message, isRuleMet)
-        }
-    }
-
-    Text(
-        text = signUpErrorMessage.value,
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall
-    )
-
-    AuthorizeButton(
-        isSignUpButtonEnabled.value,
-        "Sign up"
+    Column(
+        modifier = Modifier.width(IntrinsicSize.Min),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        onSignUpClick()
+
+        OutlinedTextField(
+            value = newEmail.value,
+            onValueChange = onEmailChange,
+            label = { Text("Email Address") },
+            placeholder = { Text("Enter your email address") }
+        )
+
+        PasswordTextField(
+            value = newPassword.value,
+            onValueChange = onPasswordChange
+        )
+        PasswordStrengthIndicator(currentStrength = passwordValidations.value.values.count { it } + 1)
+        Column(Modifier.fillMaxWidth()) {
+            for ((message, isRuleMet) in passwordValidations.value) {
+                PasswordValidationFeedbackItem(message, isRuleMet)
+            }
+        }
+
+        Text(
+            text = signUpErrorMessage.value,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        AuthorizeButton(
+            isSignUpButtonEnabled.value,
+            "Sign up"
+        ) {
+            onSignUpClick()
+        }
     }
 }
 
@@ -108,8 +112,11 @@ fun SignUpPreview() {
                     "Must contain at least one number" to false,
                     "Must contain at least one special character" to false
                 )) }
-                val passwordStrength = remember { mutableIntStateOf(0) }
                 val isSignUpButtonEnabled = remember { mutableStateOf(false) }
+
+                isSignUpButtonEnabled.value = email.value.matches(
+                    Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+                ) && passwordValidations.value.values.count { it } == passwordValidations.value.size
 
                 SignUp(
                     null,
@@ -118,7 +125,6 @@ fun SignUpPreview() {
                     signUpErrorMessage,
                     isSuccessfulSignUp,
                     passwordValidations,
-                    passwordStrength,
                     isSignUpButtonEnabled,
                     { email.value = it },
                     {
@@ -130,7 +136,6 @@ fun SignUpPreview() {
                             "Must contain at least one number" to PasswordValidation.hasNumber(it),
                             "Must contain at least one special character" to PasswordValidation.hasSpecialCharacter(it)
                         )
-                        passwordStrength.intValue = passwordValidations.value.count { it.value }
                     },
                 )
             }
