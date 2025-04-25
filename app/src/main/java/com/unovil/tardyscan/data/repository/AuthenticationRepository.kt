@@ -4,7 +4,7 @@ import com.unovil.tardyscan.domain.model.AllowedUser
 
 interface AuthenticationRepository {
     sealed class AllowedUserResult {
-        class Success(val allowedUserId: Int) : AllowedUserResult()
+        class Success(val allowedUserId: Int, val hashedPassword: String) : AllowedUserResult()
 
         sealed class Failure : AllowedUserResult() {
             object NotFound : Failure()

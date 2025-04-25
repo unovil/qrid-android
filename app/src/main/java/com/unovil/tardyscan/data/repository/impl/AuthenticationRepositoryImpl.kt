@@ -19,6 +19,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -27,21 +31,22 @@ class AuthenticationRepositoryImpl @Inject constructor(
 ) : AuthenticationRepository {
 
     override suspend fun getAllowedUser(allowedUser: AllowedUser): AllowedUserResult {
-        val allowedUserDto = allowedUser.let { VerifyAllowedUserRpcDto(it.domain, it.domainId, it.givenPassword) }
+        val allowedUserDto = allowedUser.let { VerifyAllowedUserRpcDto(it.domain, it.domainId) }
 
         val functionCall = postgrest.rpc(
-            function = "get_allowed_user",
+            function = "get_allowed_user_json",
             parameters = Json.encodeToJsonElement(VerifyAllowedUserRpcDto.serializer(), allowedUserDto) as JsonObject
-        ).decodeAs<Int>()
+        ).data
+        
+        val functionCallJson = Json.parseToJsonElement(functionCall).jsonObject
+        val status = functionCallJson["status"]?.jsonPrimitive?.int
+        val hashedPassword = functionCallJson["hashedPassword"]?.jsonPrimitive?.contentOrNull
 
-        return try {
-            when (functionCall) {
-                -1 -> AllowedUserResult.Failure.NotFound
-                0 -> AllowedUserResult.Failure.AlreadyRegistered
-                else -> AllowedUserResult.Success(functionCall)
-            }
-        } catch (_: Exception) {
-            AllowedUserResult.Failure.Unknown
+        return when (status) {
+            -1 -> AllowedUserResult.Failure.NotFound
+            0 -> AllowedUserResult.Failure.AlreadyRegistered
+            null -> AllowedUserResult.Failure.Unknown
+            else -> AllowedUserResult.Success(status, hashedPassword!!)
         }
     }
 

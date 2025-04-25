@@ -1,9 +1,10 @@
 [versions]
 accompanistPermissions = "0.37.2"
 agp = "8.9.1"
-argon2JvmNolibsVersion = "2.12"
+argon2JvmVersion = "2.12"
 barcodeScanning = "17.3.0"
 hiltNavigationCompose = "1.2.0"
+jna = "5.17.0"
 kotlinxCoroutinesTest = "1.10.1"
 kotlinxDatetime = "0.6.2"
 ktorClientAndroid = "3.1.1"
@@ -32,10 +33,11 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
-mkammerer-argon2-jvm-nolibs = { module = "de.mkammerer:argon2-jvm-nolibs", version.ref = "argon2JvmNolibsVersion" }
+mkammerer-argon2-jvm = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2JvmVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkVersion" }

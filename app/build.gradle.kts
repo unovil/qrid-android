@@ -87,7 +87,10 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.mkammerer.argon2.jvm.nolibs)
+
+    // hashing
+    implementation(libs.jna)
+    implementation(libs.mkammerer.argon2.jvm)
 
     // testing supabase
     implementation(libs.multiplatform.settings.test)

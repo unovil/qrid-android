@@ -9,8 +9,5 @@ class VerifyAllowedUserRpcDto (
     val domain: String,
 
     @SerialName("org_id")
-    val domainId: String,
-
-    @SerialName("password")
-    val givenPassword: String
+    val domainId: String
 )
