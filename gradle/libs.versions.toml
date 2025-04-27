@@ -1,10 +1,9 @@
 [versions]
 accompanistPermissions = "0.37.2"
-agp = "8.9.1"
-argon2JvmVersion = "2.12"
+agp = "8.9.2"
+argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
 hiltNavigationCompose = "1.2.0"
-jna = "5.17.0"
 kotlinxCoroutinesTest = "1.10.1"
 kotlinxDatetime = "0.6.2"
 ktorClientAndroid = "3.1.1"
@@ -14,13 +13,13 @@ secretsGradlePlugin = "2.0.1"
 supabaseBom = "3.1.4"
 camera = "1.4.2"
 kotlin = "2.1.10"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.03.01"
+composeBom = "2025.04.01"
 navigationCompose = "2.8.9"
 kotlinSerialization = "2.1.0"
 hiltVersion = "2.56.1"
@@ -32,12 +31,11 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
-jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
-mkammerer-argon2-jvm = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2JvmVersion" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkVersion" }

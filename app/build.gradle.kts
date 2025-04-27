@@ -9,7 +9,7 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 android {
@@ -89,8 +89,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     // hashing
-    implementation(libs.jna)
-    implementation(libs.mkammerer.argon2.jvm)
+    implementation(libs.argon2kt)
 
     // testing supabase
     implementation(libs.multiplatform.settings.test)
