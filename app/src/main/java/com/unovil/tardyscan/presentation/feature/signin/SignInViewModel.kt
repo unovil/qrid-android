@@ -1,9 +1,12 @@
 package com.unovil.tardyscan.presentation.feature.signin
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.usecase.SignInUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -11,6 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val signInUseCase: SignInUseCase
 ) : ViewModel() {
 
@@ -41,10 +45,10 @@ class SignInViewModel @Inject constructor(
             val result = signInUseCase.execute(SignInUseCase.Input(_email.value, _password.value))
 
             _signInErrorMessage.value = when (result) {
-                is SignInUseCase.Output.Failure.AuthError -> "Authentication failed."
-                is SignInUseCase.Output.Failure.HttpNetworkError -> "Failed to connect to the server. Please check your internet connection."
-                is SignInUseCase.Output.Failure.HttpTimeout -> "Connection timed out. Please try again."
-                is SignInUseCase.Output.Failure.Unknown -> "An unknown error occurred. Please try again."
+                is SignInUseCase.Output.Failure.AuthError -> context.getString(R.string.auth_failed)
+                is SignInUseCase.Output.Failure.HttpNetworkError -> context.getString(R.string.auth_network_error)
+                is SignInUseCase.Output.Failure.HttpTimeout -> context.getString(R.string.auth_network_timeout)
+                is SignInUseCase.Output.Failure.Unknown -> context.getString(R.string.auth_unknown_error)
                 is SignInUseCase.Output.Success -> ""
             }
 

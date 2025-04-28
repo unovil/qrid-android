@@ -19,9 +19,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.helpers.PasswordValidation
 import com.unovil.tardyscan.presentation.common.AuthorizeButton
 import com.unovil.tardyscan.presentation.common.PasswordStrengthIndicator
@@ -56,8 +58,8 @@ fun SignUp(
         OutlinedTextField(
             value = newEmail.value,
             onValueChange = onEmailChange,
-            label = { Text("Email Address") },
-            placeholder = { Text("Enter your email address") }
+            label = { Text(stringResource(R.string.email_address)) },
+            placeholder = { Text(stringResource(R.string.email_address)) }
         )
 
         PasswordTextField(
@@ -79,7 +81,7 @@ fun SignUp(
 
         AuthorizeButton(
             isSignUpButtonEnabled.value,
-            "Sign up"
+            stringResource(R.string.sign_up)
         ) {
             onSignUpClick()
         }

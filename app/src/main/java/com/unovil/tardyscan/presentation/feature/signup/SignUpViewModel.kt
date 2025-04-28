@@ -1,13 +1,16 @@
 package com.unovil.tardyscan.presentation.feature.signup
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.helpers.PasswordValidation
 import com.unovil.tardyscan.domain.model.AllowedUser
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -15,6 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val verifyAllowedUserUseCase: VerifyAllowedUserUseCase,
     private val signUpUseCase: SignUpUseCase
 ) : ViewModel() {
@@ -86,11 +90,11 @@ class SignUpViewModel @Inject constructor(
         _signUpErrorMessage.value = ""
 
         _passwordValidations.value = mapOf(
-            "Must be at least 8 characters" to PasswordValidation.hasMinimumLength(newPassword),
-            "Must contain at least one lowercase letter" to PasswordValidation.hasLowercase(newPassword),
-            "Must contain at least one uppercase letter" to PasswordValidation.hasUppercase(newPassword),
-            "Must contain at least one number" to PasswordValidation.hasNumber(newPassword),
-            "Must contain at least one special character" to PasswordValidation.hasSpecialCharacter(newPassword)
+            context.getString(R.string.password_requirement_length) to PasswordValidation.hasMinimumLength(newPassword),
+            context.getString(R.string.password_requirement_lowercase) to PasswordValidation.hasLowercase(newPassword),
+            context.getString(R.string.password_requirement_uppercase) to PasswordValidation.hasUppercase(newPassword),
+            context.getString(R.string.password_requirement_number) to PasswordValidation.hasNumber(newPassword),
+            context.getString(R.string.password_requirement_special) to PasswordValidation.hasSpecialCharacter(newPassword)
         )
 
         onChangeFormText()
@@ -117,14 +121,13 @@ class SignUpViewModel @Inject constructor(
                     ""
                 }
                 is VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered -> {
-                    "This user has already been registered."
+                    context.getString(R.string.auth_valid_creds_already_registered)
                 }
                 is VerifyAllowedUserUseCase.Output.Failure.NotFound -> {
-                    "No user has been found with the provided credentials." +
-                            " Please check your credentials and try again."
+                    context.getString(R.string.auth_no_valid_creds_found)
                 }
                 else -> {
-                    "An unknown error occurred. Please try again later."
+                    context.getString(R.string.auth_unknown_error)
                 }
             }
 

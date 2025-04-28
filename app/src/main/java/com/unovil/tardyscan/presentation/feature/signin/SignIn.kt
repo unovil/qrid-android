@@ -14,10 +14,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.presentation.common.AuthorizeButton
 import com.unovil.tardyscan.presentation.common.PasswordTextField
 
@@ -47,8 +49,8 @@ fun SignIn(
         OutlinedTextField(
             value = email.value,
             onValueChange = onEmailChange,
-            label = { Text("Email Address") },
-            placeholder = { Text("Enter your email address") }
+            label = { Text(stringResource(R.string.email_address)) },
+            placeholder = { Text(stringResource(R.string.email_address)) }
         )
 
         PasswordTextField(
@@ -64,14 +66,14 @@ fun SignIn(
 
         AuthorizeButton(
             enabled = (password.value.isNotBlank() && email.value.isNotBlank()),
-            buttonText = "Sign in"
+            buttonText = stringResource(R.string.sign_in)
         ) {
             onSignIn()
         }
 
         TextButton(onClick = onSwitchToSignUp) {
             Text(
-                text = "Don't have an account? Sign up here.",
+                text = stringResource(R.string.switch_to_sign_up),
                 textDecoration = TextDecoration.Underline
             )
         }

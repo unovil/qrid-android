@@ -5,4 +5,35 @@
     <string name="scan_screen">Scan</string>
     <string name="history_screen">History</string>
     <string name="setting_screen">Settings</string>
+
+    <!-- Permissions -->
+    <string name="camera_permissions_needed_title">Camera permissions needed</string>
+    <string name="camera_permissions_needed_explanation">QR-ID requires camera permissions to properly scan QR codes. You can grant them by clicking the button below.</string>
+    <string name="grant_permission">Grant permission</string>
+
+    <!-- Auth -->
+    <string name="password">Password</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="email_address">Email Address</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="switch_to_sign_up">Don\'t have an account? Sign up here.</string>
+    <string name="domain">Domain</string>
+    <string name="domain_id">Domain ID</string>
+    <string name="verify_credentials">Verify Credentials</string>
+
+    <!-- Auth Errors -->
+    <string name="auth_failed">Authentication failed.</string>
+    <string name="auth_network_error">Failed to connect to the server. Please check your internet connection.</string>
+    <string name="auth_network_timeout">Connection timed out. Please try again.</string>
+    <string name="auth_unknown_error">An unknown error occurred. Please try again.</string>
+    <string name="auth_valid_creds_already_registered">This user has already been registered.</string>
+    <string name="auth_no_valid_creds_found">No user has been found with the provided credentials. Please check your credentials and try again.</string>
+
+    <!-- Auth Password Requirements -->
+    <string name="password_requirement_length">Must be at least 8 characters</string>
+    <string name="password_requirement_lowercase">Must contain at least one lowercase letter</string>
+    <string name="password_requirement_uppercase">Must contain at least one uppercase letter</string>
+    <string name="password_requirement_number">Must contain at least one number</string>
+    <string name="password_requirement_special">Must contain at least one special character</string>
 </resources>

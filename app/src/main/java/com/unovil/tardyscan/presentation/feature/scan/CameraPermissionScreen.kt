@@ -11,9 +11,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.unovil.tardyscan.R
 
 @Preview
 @Composable
@@ -23,18 +25,19 @@ fun CameraPermissionScreen(onClick: () -> Unit = { }) {
         color = MaterialTheme.colorScheme.background
     ) {
         Column (
-            modifier = Modifier.fillMaxSize().padding(15.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                "Camera permissions needed",
+                stringResource(R.string.camera_permissions_needed_title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(20.dp)
             )
             Text(
-                "QR-ID requires camera permissions to properly scan QR codes." +
-                        "You can grant them by clicking the button below.",
+                stringResource(R.string.camera_permissions_needed_explanation),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 40.dp)
@@ -43,7 +46,7 @@ fun CameraPermissionScreen(onClick: () -> Unit = { }) {
                 onClick = onClick,
                 modifier = Modifier.padding(top = 20.dp)
             ) {
-                Text("Grant permission")
+                Text(stringResource(R.string.grant_permission))
             }
         }
     }

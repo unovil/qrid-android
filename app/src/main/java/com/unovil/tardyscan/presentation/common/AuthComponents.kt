@@ -33,11 +33,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
@@ -47,8 +49,8 @@ fun PasswordTextField(value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Password") },
-        placeholder = { Text("Enter password") },
+        label = { Text(stringResource(R.string.password)) },
+        placeholder = { Text(stringResource(R.string.password)) },
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
