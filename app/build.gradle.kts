@@ -23,7 +23,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.unovil.tardyscan.HiltTestRunner"
     }
 
     buildTypes {
@@ -38,6 +38,14 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
+        }
     }
 }
 
@@ -62,6 +70,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -84,7 +93,9 @@ dependencies {
     implementation(libs.supabase.postgrest.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.hilt)
+    androidTestImplementation(libs.hilt.android.testing)
     ksp(libs.hilt.android.compiler)
+    kspAndroidTest(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
 

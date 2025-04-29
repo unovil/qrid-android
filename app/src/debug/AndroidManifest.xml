@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="com.unovil.tardyscan.HiltTestActivity"
+            android:exported="false">
+        </activity>
+    </application>
+
+</manifest>
