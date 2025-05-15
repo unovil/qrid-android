@@ -36,53 +36,50 @@ import androidx.navigation.compose.rememberNavController
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
-@Preview
 fun SettingsScreen(navController: NavController = rememberNavController()) {
-    TardyScannerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top
+            Spacer(modifier = Modifier.fillMaxHeight(0.15f))
+            Text(
+                "Settings",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                "Integrations",
+                modifier = Modifier.padding(horizontal = 20.dp),
+                color = Color(78, 89, 122),
+                style = MaterialTheme.typography.labelLarge
+            )
+            val toast = Toast.makeText(LocalContext.current, "Account pressed", Toast.LENGTH_SHORT)
+            SettingsItem(
+                mainLabel = "Account",
+                subLabel = "View account information or logout",
+                icon = Icons.Default.AccountCircle
             ) {
-                Spacer(modifier = Modifier.fillMaxHeight(0.15f))
-                Text(
-                    "Settings",
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    "Integrations",
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    color = Color(78, 89, 122),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                val toast = Toast.makeText(LocalContext.current, "Account pressed", Toast.LENGTH_SHORT)
-                SettingsItem(
-                    mainLabel = "Account",
-                    subLabel = "View account information or logout",
-                    icon = Icons.Default.AccountCircle
-                ) {
-                    toast.show()
-                }
-                SettingsItem(
-                    mainLabel = "Appearance",
-                    subLabel = "Change the app's look and feel",
-                    icon = Icons.Default.Palette
-                ) {}
-                SettingsItem(
-                    mainLabel = "Other Preferences",
-                    icon = Icons.Default.Settings
-                ) {}
-                SettingsItem(
-                    mainLabel = "About Tardy Scanner",
-                    icon = Icons.Default.Info
-                ) {}
+                toast.show()
             }
+            SettingsItem(
+                mainLabel = "Appearance",
+                subLabel = "Change the app's look and feel",
+                icon = Icons.Default.Palette
+            ) {}
+            SettingsItem(
+                mainLabel = "Other Preferences",
+                icon = Icons.Default.Settings
+            ) {}
+            SettingsItem(
+                mainLabel = "About Tardy Scanner",
+                icon = Icons.Default.Info
+            ) {}
         }
     }
 }
@@ -144,7 +141,13 @@ fun SettingsMainItemPreview() {
         mainLabel = "Account",
         subLabel = "View account information or logout",
         icon = Icons.Default.AccountCircle
-    ) {
+    ) { }
+}
 
+@Composable
+@Preview
+fun SettingsScreenPreview() {
+    TardyScannerTheme {
+        SettingsScreen()
     }
 }

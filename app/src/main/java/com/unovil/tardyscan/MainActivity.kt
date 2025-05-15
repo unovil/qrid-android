@@ -9,6 +9,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
@@ -27,38 +31,38 @@ class MainActivity : ComponentActivity() {
     @ExperimentalGetImage
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        var showMainActivity = false
 
         enableEdgeToEdge()
         setContent {
-            TardyScannerTheme {
-                val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
+            val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
+            var showMainActivity by remember { mutableStateOf(false) }
 
-                LaunchedEffect(sessionStatus.value) {
-                    Log.d("MainActivity", "Session status is: ${sessionStatus.value}")
-                    when (sessionStatus.value) {
-                        is SessionStatus.Authenticated -> {
-                            showMainActivity = true
-                        }
+            LaunchedEffect(sessionStatus.value, showMainActivity) {
+                Log.d("MainActivity", "Session status is: ${sessionStatus.value}")
+                when (sessionStatus.value) {
+                    is SessionStatus.Authenticated -> {
+                        showMainActivity = true
+                    }
 
-                        is SessionStatus.Initializing -> {
-                            // run a loading screen here, hopefully
-                        }
+                    is SessionStatus.Initializing -> {
+                        // run a loading screen here, hopefully
+                    }
 
-                        else -> {
-                            Log.d("MainActivity", "session status: not authenticated")
-                            this@MainActivity.startActivity(
-                                Intent(
-                                    this@MainActivity,
-                                    AuthActivity::class.java
-                                )
+                    else -> {
+                        Log.d("MainActivity", "session status: not authenticated")
+                        this@MainActivity.startActivity(
+                            Intent(
+                                this@MainActivity,
+                                AuthActivity::class.java
                             )
-                            finish()
-                        }
+                        )
+                        finish()
                     }
                 }
+            }
 
-                if (showMainActivity) {
+            if (showMainActivity) {
+                TardyScannerTheme {
                     MainNavigation {
                         this@MainActivity.startActivity(
                             Intent(
