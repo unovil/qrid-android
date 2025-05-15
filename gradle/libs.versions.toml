@@ -4,9 +4,10 @@ agp = "8.9.2"
 argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
 hiltNavigationCompose = "1.2.0"
+kotlinFakerBom = "2.0.0-rc.9"
 kotlinxCoroutinesTest = "1.10.1"
 kotlinxDatetime = "0.6.2"
-ktorClientAndroid = "3.1.1"
+ktorClient = "3.1.1"
 mockkVersion = "1.13.17"
 multiplatformSettings = "1.3.0"
 secretsGradlePlugin = "2.0.1"
@@ -34,9 +35,12 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltVersion" }
+kotlin-faker = { module = "io.github.serpro69:kotlin-faker" }
+kotlin-faker-bom = { module = "io.github.serpro69:kotlin-faker-bom", version.ref = "kotlinFakerBom" }
+kotlin-faker-edu = { module = "io.github.serpro69:kotlin-faker-edu" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkVersion" }

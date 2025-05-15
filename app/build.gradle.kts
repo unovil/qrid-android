@@ -103,5 +103,9 @@ dependencies {
     implementation(libs.argon2kt)
 
     // testing supabase
-    implementation(libs.multiplatform.settings.test)
+    testImplementation(libs.multiplatform.settings.test)
+    testImplementation(platform(libs.kotlin.faker.bom))
+    testImplementation(libs.kotlin.faker)
+    testImplementation(libs.kotlin.faker.edu)
+    testImplementation(project(":app"))
 }
