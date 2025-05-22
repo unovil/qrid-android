@@ -59,7 +59,7 @@ fun MainNavigation(
             modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
             composable(Screens.History.route) {
-                HistoryScreen(navController)
+                HistoryScreen(navController = navController)
             }
             composable(Screens.Settings.route) {
                 SettingsScreen(navController)

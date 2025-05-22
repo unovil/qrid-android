@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StudentDto (
     @SerialName("id")
-    val id: Int? = null,
+    val id: Long? = null,
 
     @SerialName("last_name")
     val lastName: String,
@@ -17,6 +17,6 @@ data class StudentDto (
     @SerialName("middle_name")
     val middleName: String?,
 
-    @SerialName("section_id")
-    val sectionId: Int
+    @SerialName("sections")
+    val section: SectionDto
 )

@@ -1,9 +1,12 @@
 package com.unovil.tardyscan.data.repository.impl
 
+import android.util.Log
 import com.unovil.tardyscan.data.network.dto.AttendanceDto
+import com.unovil.tardyscan.data.network.dto.StudentDto
 import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.domain.model.Attendance
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import javax.inject.Inject
 
 class AttendanceRepositoryImpl @Inject constructor(
@@ -11,13 +14,13 @@ class AttendanceRepositoryImpl @Inject constructor(
 ) : AttendanceRepository {
 
     private val attendanceTable = postgrest["attendances"]
+    private val studentTable = postgrest["students"]
 
     override suspend fun createAttendance(attendance: Attendance): Boolean {
         return try {
             val attendanceDto = AttendanceDto(
                 studentId = attendance.studentId,
-                date = attendance.date,
-                isPresent = attendance.isPresent
+                timestamp = attendance.timestamp,
             )
             attendanceTable.insert(attendanceDto)
 
@@ -45,5 +48,22 @@ class AttendanceRepositoryImpl @Inject constructor(
                 AttendanceDto::id eq id
             }
         }
+    }
+
+    override suspend fun getStudentInfo(id: Long): StudentDto? {
+        Log.d("AttendanceRepository", "getStudentInfo called with id: $id")
+        return studentTable.select(columns =
+            Columns.raw("""
+                id, last_name, first_name, middle_name,
+                sections (
+                    level, section,
+                    schools (
+                        name, domain
+                    )
+                )
+            """.trimIndent())
+        ) {
+            filter { StudentDto::id eq id }
+        }.decodeSingleOrNull<StudentDto>()
     }
 }

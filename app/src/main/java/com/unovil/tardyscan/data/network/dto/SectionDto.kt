@@ -14,6 +14,6 @@ data class SectionDto (
     @SerialName("section")
     val section: String,
 
-    @SerialName("school_id")
-    val schoolId: Int
+    @SerialName("schools")
+    val school: SchoolDto
 )

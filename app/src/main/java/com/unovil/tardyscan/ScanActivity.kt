@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -29,6 +31,11 @@ class ScanActivity : ComponentActivity() {
                 if (!cameraPermissionState.status.isGranted) {
                     CameraPermissionScreen { cameraPermissionState.launchPermissionRequest() }
                 } else {
+                    val navController = rememberNavController()
+                    NavHost(navController, startDestination = "scan") {
+                        composable
+                    }
+
                     ScanningScreen(
                         cameraExecutor,
                         onBack = { this.finish() }

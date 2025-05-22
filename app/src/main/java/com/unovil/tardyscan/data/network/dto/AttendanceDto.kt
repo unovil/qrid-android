@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.data.network.dto
 
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -10,11 +10,8 @@ data class AttendanceDto (
     val id: Int? = null,
 
     @SerialName("student_id")
-    val studentId: Int,
+    val studentId: Long,
 
-    @SerialName("date")
-    val date: LocalDate,
-
-    @SerialName("is_present")
-    val isPresent: Boolean
+    @SerialName("timestamp")
+    val timestamp: Instant
 )

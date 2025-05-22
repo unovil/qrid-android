@@ -9,5 +9,8 @@ data class SchoolDto (
     val id: Int? = null,
 
     @SerialName("name")
-    val name: String
+    val name: String,
+
+    @SerialName("domain")
+    val domain: String
 )

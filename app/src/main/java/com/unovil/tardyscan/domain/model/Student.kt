@@ -1,9 +1,15 @@
 package com.unovil.tardyscan.domain.model
 
 data class Student (
-    val id: Int? = null,
+    // student
     val lastName: String,
     val firstName: String,
     val middleName: String?,
-    val sectionId: Int
+
+    // section
+    val level: Int,
+    val section: String,
+
+    // school
+    val school: String
 )

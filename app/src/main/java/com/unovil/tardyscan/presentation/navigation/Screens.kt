@@ -17,7 +17,11 @@ sealed class Screens(
     data object Settings : Screens("settings_route", Icons.Filled.Settings, Icons.Outlined.Settings)
 
     // for auth screen
-    data object VerifyGivenCredentials: Screens("verify_given_credentials_route")
+    data object VerifyGivenCredentials : Screens("verify_given_credentials_route")
     data object SignUp : Screens("sign_up_route")
     data object SignIn : Screens("sign_in_route")
+
+    // for scan screen
+    data object Scanning : Screens("scanning_route")
+    data object SuccessfulScan : Screens("successful_scan_route")
 }
