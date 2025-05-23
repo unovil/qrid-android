@@ -29,10 +29,11 @@ class ScanViewModel @Inject constructor(
     val scanValue = _scanValue.asStateFlow()
 
     @ExperimentalGetImage
-    fun scanningCoroutine(
+    fun onScan(
         view: PreviewView,
         executor: ExecutorService,
-        context: Context
+        context: Context,
+        onSuccess: () -> Unit
     ) {
         val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder()
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
@@ -48,12 +49,19 @@ class ScanViewModel @Inject constructor(
                 {
                     _scanValue.value = it.displayValue
                     _isScanningEnabled.value = false
+
+                    if (_scanValue.value != null && _scanValue.value!!.isNotEmpty()) onSuccess()
                 },
                 { Log.d("Scan Screen", "No QR code found") }
             )
         }
 
         view.controller = cameraController
+    }
+
+    fun onReset() {
+        _isScanningEnabled.value = true
+        _scanValue.value = null
     }
 
 }

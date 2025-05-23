@@ -33,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage
@@ -42,10 +41,11 @@ fun ScanningScreen(
     viewModel: ScanViewModel? = hiltViewModel(),
     executor: ExecutorService,
     isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
-    scanValue: State<String?> = viewModel!!.scanValue.collectAsState(),
     onBack: () -> Unit,
-    onScan: (PreviewView, ExecutorService, Context) -> Unit = { view, executor, context -> viewModel!!.scanningCoroutine(view, executor, context)},
-    onSuccessfulScan: () -> Unit
+    onNavigate: () -> Unit,
+    onScan: (PreviewView, ExecutorService, Context, () -> Unit) -> Unit = { view, executor, context, _ ->
+        viewModel!!.onScan(view, executor, context) { onNavigate() }
+    }
 ) {
 
     val context = LocalContext.current
@@ -53,21 +53,7 @@ fun ScanningScreen(
 
     LaunchedEffect(previewView, isScanningEnabled.value) {
         if (!isScanningEnabled.value) return@LaunchedEffect
-
-        previewView?.let { view -> onScan(view, executor, context) }
-    }
-
-    LaunchedEffect(scanValue) {
-        if (scanValue.value == null || scanValue.value!!.isEmpty()) return@LaunchedEffect
-        onSuccessfulScan()
-
-        SuccessfulScanCard(
-            scannedQrValue = scanValue!!,
-            onClick = {
-                scanValue = null
-                isScanningEnabled = true
-            }
-        )
+        previewView?.let { view -> onScan(view, executor, context) { onNavigate() } }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

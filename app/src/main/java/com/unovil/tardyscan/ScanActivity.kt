@@ -16,7 +16,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.unovil.tardyscan.presentation.feature.scan.CameraPermissionScreen
 import com.unovil.tardyscan.presentation.feature.scan.ScanViewModel
 import com.unovil.tardyscan.presentation.feature.scan.ScanningScreen
-import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
+import com.unovil.tardyscan.presentation.feature.scan.SuccessfulScanCard
 import com.unovil.tardyscan.presentation.navigation.Screen
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import java.util.concurrent.ExecutorService
@@ -46,15 +46,17 @@ class ScanActivity : ComponentActivity() {
                                 viewModel = scanViewModel,
                                 executor = cameraExecutor,
                                 onBack = { this@ScanActivity.finish() },
-                                onSuccessfulScan = { navController.navigate(Screen.SuccessfulScan) }
+                                onNavigate = { navController.navigate(Screen.SuccessfulScan) }
                             )
                         }
 
                         dialog<Screen.SuccessfulScan> {
-                            SuccessfulScanCard()
+                            SuccessfulScanCard(
+                                viewModel = scanViewModel,
+                                onNavigate = { navController.navigate(Screen.Scanning) },
+                            )
                         }
                     }
-
                 }
             }
         }
