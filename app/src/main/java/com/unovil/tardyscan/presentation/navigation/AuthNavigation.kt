@@ -36,24 +36,24 @@ fun AuthNavigation(
             ) {
                 NavHost(
                     navController,
-                    startDestination = Screens.SignIn.route,
+                    startDestination = Screen.SignIn,
                     Modifier.padding(innerPadding)
                 ) {
-                    composable(Screens.SignIn.route) {
+                    composable<Screen.SignIn> {
                         SignIn(
                             onSuccess = onSuccess,
-                            onSwitchToSignUp = { navController.navigate(Screens.VerifyGivenCredentials.route) }
+                            onSwitchToSignUp = { navController.navigate(Screen.VerifyGivenCredentials) }
                         )
                     }
 
-                    composable(Screens.VerifyGivenCredentials.route) {
+                    composable<Screen.VerifyGivenCredentials> {
                         VerifyGivenCredentials(
                             viewModel = signUpViewModel,
-                            onSuccess = { navController.navigate(Screens.SignUp.route) }
+                            onSuccess = { navController.navigate(Screen.SignUp) }
                         )
                     }
 
-                    composable(Screens.SignUp.route) {
+                    composable<Screen.SignUp> {
                         SignUp(
                             viewModel = signUpViewModel,
                             onSuccess = onSuccess

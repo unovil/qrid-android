@@ -47,7 +47,7 @@ fun MainNavigation(
     ) { paddingValues ->
         NavHost (
             navController = navController,
-            startDestination = Screens.History.route,
+            startDestination = Screen.History,
             enterTransition = { slideInHorizontally(
                 animationSpec = tween(500),
                 initialOffsetX = { it / 3 }
@@ -58,10 +58,10 @@ fun MainNavigation(
             ) + fadeOut(animationSpec = tween(300)) },
             modifier = Modifier.padding(paddingValues = paddingValues)
         ) {
-            composable(Screens.History.route) {
+            composable<Screen.History> {
                 HistoryScreen(navController = navController)
             }
-            composable(Screens.Settings.route) {
+            composable<Screen.Settings> {
                 SettingsScreen(navController)
             }
         }

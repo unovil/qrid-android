@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissions = "0.37.2"
-agp = "8.9.2"
+agp = "8.10.0"
 argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
 hiltNavigationCompose = "1.2.0"

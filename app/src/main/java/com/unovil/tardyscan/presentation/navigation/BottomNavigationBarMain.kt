@@ -18,7 +18,7 @@ fun BottomNavigationBarMain(navController: NavController) {
     var selectedNavItemState by remember { mutableIntStateOf(0) }
 
     NavigationBar {
-        BottomNavigationItem().bottomNavigationItems(LocalContext.current)
+        BottomNavigationItems(LocalContext.current)
             .forEachIndexed { index, navItem ->
                 NavigationBarItem(
                     icon = {

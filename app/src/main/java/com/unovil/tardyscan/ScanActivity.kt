@@ -5,13 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.unovil.tardyscan.presentation.feature.scan.CameraPermissionScreen
+import com.unovil.tardyscan.presentation.feature.scan.ScanViewModel
 import com.unovil.tardyscan.presentation.feature.scan.ScanningScreen
+import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
+import com.unovil.tardyscan.presentation.navigation.Screen
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -32,14 +38,23 @@ class ScanActivity : ComponentActivity() {
                     CameraPermissionScreen { cameraPermissionState.launchPermissionRequest() }
                 } else {
                     val navController = rememberNavController()
-                    NavHost(navController, startDestination = "scan") {
-                        composable
+                    val scanViewModel = hiltViewModel<ScanViewModel>()
+
+                    NavHost(navController, startDestination = Screen.Scanning) {
+                        composable<Screen.Scanning> {
+                            ScanningScreen(
+                                viewModel = scanViewModel,
+                                executor = cameraExecutor,
+                                onBack = { this@ScanActivity.finish() },
+                                onSuccessfulScan = { navController.navigate(Screen.SuccessfulScan) }
+                            )
+                        }
+
+                        dialog<Screen.SuccessfulScan> {
+                            SuccessfulScanCard()
+                        }
                     }
 
-                    ScanningScreen(
-                        cameraExecutor,
-                        onBack = { this.finish() }
-                    )
                 }
             }
         }

@@ -8,14 +8,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
-fun HistoryScreen(navController: NavController) {
+fun HistoryScreen(
+    historyViewModel: HistoryViewModel? = hiltViewModel(),
+    navController: NavController
+) {
     TardyScannerTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -33,5 +38,9 @@ fun HistoryScreen(navController: NavController) {
                 )
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        historyViewModel?.testFunction()
     }
 }

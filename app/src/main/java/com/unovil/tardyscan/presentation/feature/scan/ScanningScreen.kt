@@ -1,10 +1,8 @@
 package com.unovil.tardyscan.presentation.feature.scan
 
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -17,6 +15,8 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,30 +32,42 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.unovil.tardyscan.domain.helpers.processImageProxy
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.presentation.feature.scan.composables.SuccessfulScanCard
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage
 @Composable
-fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
+fun ScanningScreen(
+    viewModel: ScanViewModel? = hiltViewModel(),
+    executor: ExecutorService,
+    isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
+    scanValue: State<String?> = viewModel!!.scanValue.collectAsState(),
+    onBack: () -> Unit,
+    onScan: (PreviewView, ExecutorService, Context) -> Unit = { view, executor, context -> viewModel!!.scanningCoroutine(view, executor, context)},
+    onSuccessfulScan: () -> Unit
+) {
+
     val context = LocalContext.current
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
-    var scannedQrValue by remember { mutableStateOf<String?>(null) }
-    var scanningEnabled by remember { mutableStateOf(true) }
 
-    LaunchedEffect(previewView, scanningEnabled) {
-        previewView?.let { view ->
-            scanningCoroutine(view, executor, context, scanningEnabled) {
-                Log.d("Scan Screen", "Scanned! $it")
-                scannedQrValue = it
-                scanningEnabled = false
+    LaunchedEffect(previewView, isScanningEnabled.value) {
+        if (!isScanningEnabled.value) return@LaunchedEffect
+
+        previewView?.let { view -> onScan(view, executor, context) }
+    }
+
+    LaunchedEffect(scanValue) {
+        if (scanValue.value == null || scanValue.value!!.isEmpty()) return@LaunchedEffect
+        onSuccessfulScan()
+
+        SuccessfulScanCard(
+            scannedQrValue = scanValue!!,
+            onClick = {
+                scanValue = null
+                isScanningEnabled = true
             }
-        }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -113,54 +125,10 @@ fun ScanningScreen(executor: ExecutorService, onBack: () -> Unit) {
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.White
             ),
-            enabled = scanningEnabled,
+            enabled = isScanningEnabled.value,
             onClick = onBack
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
         }
-
-        if (scannedQrValue != null && scannedQrValue!!.isNotEmpty()) {
-            SuccessfulScanCard(
-                scannedQrValue = scannedQrValue!!,
-                onClick = {
-                    scannedQrValue = null
-                    scanningEnabled = true
-                }
-            )
-        }
     }
-}
-
-@ExperimentalGetImage
-private fun scanningCoroutine(
-    view: PreviewView,
-    executor: ExecutorService,
-    context: Context,
-    scanningEnabled: Boolean,
-    onQrDetected: (String) -> Unit
-) {
-    val scanner = BarcodeScanning.getClient(BarcodeScannerOptions.Builder()
-        .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-        .build())
-
-    val cameraController = LifecycleCameraController(context)
-    cameraController.bindToLifecycle(context as LifecycleOwner)
-
-    cameraController.setImageAnalysisAnalyzer(executor) { image ->
-        if (scanningEnabled) {
-            processImageProxy(
-                image,
-                scanner,
-                { barcode ->
-                    barcode.displayValue?.let { onQrDetected(it) }
-                },
-                { Log.d("Scan Screen", "No QR code found") }
-            )
-        } else {
-            Log.d("Scan Screen", "Scanning disabled, skipping analysis")
-            image.close()
-        }
-    }
-
-    view.controller = cameraController
 }
