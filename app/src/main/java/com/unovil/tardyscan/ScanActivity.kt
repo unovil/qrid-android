@@ -19,9 +19,11 @@ import com.unovil.tardyscan.presentation.feature.scan.ScanningScreen
 import com.unovil.tardyscan.presentation.feature.scan.SuccessfulScanCard
 import com.unovil.tardyscan.presentation.navigation.Screen
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@AndroidEntryPoint
 class ScanActivity : ComponentActivity() {
     private lateinit var cameraExecutor: ExecutorService
 

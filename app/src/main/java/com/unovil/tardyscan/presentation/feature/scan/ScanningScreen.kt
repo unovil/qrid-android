@@ -1,8 +1,15 @@
 package com.unovil.tardyscan.presentation.feature.scan
 
-import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -33,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage
@@ -42,32 +50,51 @@ fun ScanningScreen(
     executor: ExecutorService,
     isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
     onBack: () -> Unit,
-    onNavigate: () -> Unit,
-    onScan: (PreviewView, ExecutorService, Context, () -> Unit) -> Unit = { view, executor, context, _ ->
-        viewModel!!.onScan(view, executor, context) { onNavigate() }
-    }
+    onNavigate: () -> Unit
 ) {
-
+    var code by remember { mutableStateOf("") }
     val context = LocalContext.current
-    var previewView by remember { mutableStateOf<PreviewView?>(null) }
 
-    LaunchedEffect(previewView, isScanningEnabled.value) {
-        if (!isScanningEnabled.value) return@LaunchedEffect
-        previewView?.let { view -> onScan(view, executor, context) { onNavigate() } }
+    LaunchedEffect(code) {
+        if (code.isNotEmpty()) Toast.makeText(context, code, Toast.LENGTH_SHORT).show()
+        Log.d("ScanningScreen", "Code: $code")
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        AndroidView (
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                PreviewView(context).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
+        AndroidView(factory = { context ->
+            val cameraController = LifecycleCameraController(context).apply {
+                cameraSelector = CameraSelector.Builder()
+                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                    .build()
+
+                imageAnalysisResolutionSelector = ResolutionSelector.Builder()
+                    .setResolutionStrategy(
+                        ResolutionStrategy(
+                            android.util.Size(720, 1280),
+                            FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                        )
                     )
-                }.also { previewView = it }
+                    .build()
+
+                imageAnalysisBackpressureStrategy = STRATEGY_KEEP_ONLY_LATEST
+
+                setImageAnalysisAnalyzer(executor, QrCodeAnalyzer(
+                    onQrCodeScanned = { code = it },
+                    onQrCodeFailed = { Log.d("ScanningScreen", "QR Code scanning failed")}
+                ))
+
+                bindToLifecycle(context as LifecycleOwner)
             }
-        )
+            val previewView = PreviewView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                controller = cameraController
+            }
+
+            previewView
+        })
 
         Canvas(modifier = Modifier.fillMaxSize()) {
             val squareSize = 300.dp.toPx()
