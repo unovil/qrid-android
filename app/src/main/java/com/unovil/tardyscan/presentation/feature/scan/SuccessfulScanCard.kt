@@ -32,7 +32,7 @@ import kotlinx.coroutines.flow.filterNotNull
 @Composable
 fun SuccessfulScanCard(
     viewModel: ScanViewModel? = hiltViewModel(),
-    scanValue: State<String> = viewModel!!.scanValue.filterNotNull().collectAsState(""),
+    scanValue: State<String> = viewModel!!.code.filterNotNull().collectAsState(""),
     onNavigate: () -> Unit = { },
     onReset: () -> Unit = {
         viewModel!!.onReset()

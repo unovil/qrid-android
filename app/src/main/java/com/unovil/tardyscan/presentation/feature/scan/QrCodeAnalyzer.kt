@@ -5,12 +5,14 @@ import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import androidx.compose.runtime.State
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 
 class QrCodeAnalyzer(
+    private val enabledState: State<Boolean>,
     private val onQrCodeFailed: () -> Unit = { },
     private val onQrCodeScanned: (String) -> Unit
 ): ImageAnalysis.Analyzer {
@@ -22,6 +24,14 @@ class QrCodeAnalyzer(
 
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
+        val isEnabled = enabledState.value
+
+        Log.d("QrCodeAnalyzer", "isEnabled: $isEnabled")
+        if (!isEnabled) {
+            imageProxy.close()
+            return
+        }
+
         val mediaImage = imageProxy.image
         if (mediaImage == null) {
             imageProxy.close()

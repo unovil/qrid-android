@@ -24,10 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -49,15 +45,17 @@ fun ScanningScreen(
     viewModel: ScanViewModel? = hiltViewModel(),
     executor: ExecutorService,
     isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
+    code: State<String?> = viewModel!!.code.collectAsState(),
+    onQrCodeScanned: (String) -> Unit = { viewModel!!.onQrCodeScanned(it) },
     onBack: () -> Unit,
     onNavigate: () -> Unit
 ) {
-    var code by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    LaunchedEffect(code) {
-        if (code.isNotEmpty()) Toast.makeText(context, code, Toast.LENGTH_SHORT).show()
-        Log.d("ScanningScreen", "Code: $code")
+    LaunchedEffect(code.value) {
+        if (code.value == null) return@LaunchedEffect
+        if (code.value!!.isNotEmpty()) Toast.makeText(context, code.value, Toast.LENGTH_SHORT).show()
+        Log.d("ScanningScreen", "Code: ${code.value}")
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -79,8 +77,9 @@ fun ScanningScreen(
                 imageAnalysisBackpressureStrategy = STRATEGY_KEEP_ONLY_LATEST
 
                 setImageAnalysisAnalyzer(executor, QrCodeAnalyzer(
-                    onQrCodeScanned = { code = it },
-                    onQrCodeFailed = { Log.d("ScanningScreen", "QR Code scanning failed")}
+                    enabledState = isScanningEnabled,
+                    onQrCodeScanned = onQrCodeScanned,
+                    onQrCodeFailed = { Log.d("ScanningScreen", "QR Code scanning failed") }
                 ))
 
                 bindToLifecycle(context as LifecycleOwner)

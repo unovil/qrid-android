@@ -14,12 +14,16 @@ class ScanViewModel @Inject constructor(
     private val _isScanningEnabled = MutableStateFlow(true)
     val isScanningEnabled = _isScanningEnabled.asStateFlow()
 
-    private val _scanValue = MutableStateFlow<String?>(null)
-    val scanValue = _scanValue.asStateFlow()
+    private val _code = MutableStateFlow<String?>(null)
+    val code = _code.asStateFlow()
 
     fun onReset() {
         _isScanningEnabled.value = true
-        _scanValue.value = null
+        _code.value = null
     }
 
+    fun onQrCodeScanned(qrCode: String) {
+        _isScanningEnabled.value = false
+        _code.value = qrCode
+    }
 }
