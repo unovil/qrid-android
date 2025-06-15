@@ -86,6 +86,7 @@ dependencies {
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
     implementation(libs.accompanist.permissions)
+    implementation(libs.fernet.java8)
 
     // supabase
     implementation(platform(libs.supabase.bom))

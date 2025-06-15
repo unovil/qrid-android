@@ -10,4 +10,5 @@ interface AttendanceRepository {
     suspend fun getAttendance(id: Int): AttendanceDto
     suspend fun deleteAttendance(id: Int)
     suspend fun getStudentInfo(id: Long): StudentDto?
+    suspend fun getDecryptionKey(schoolId: Int): String?
 }

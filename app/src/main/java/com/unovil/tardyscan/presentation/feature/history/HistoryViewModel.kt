@@ -15,7 +15,7 @@ class HistoryViewModel @Inject constructor(
 
     fun testFunction() {
         viewModelScope.launch {
-            val result = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input(999999999999))
+            val result = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input("999999999999"))
 
             if (result is GetStudentInfoUseCase.Output.Failure) {
                 Log.d("HistoryViewModel", "Success! Failed to get student info for 999999999999")
@@ -23,10 +23,10 @@ class HistoryViewModel @Inject constructor(
                 Log.d("HistoryViewModel", "Failure! Something went wrong. Result: $result")
             }
 
-            val result2 = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input(100730136315))
+            val result2 = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input("100730136315"))
 
-            if (result2 is GetStudentInfoUseCase.Output.Success) {
-                Log.d("HistoryViewModel", "Success! Got student info for 100730136315: ${result2.student}")
+            if (result2 is GetStudentInfoUseCase.Output.Failure) {
+                Log.d("HistoryViewModel", "Success! Failed to get student info for 100730136315: $result2")
             } else {
                 Log.d("HistoryViewModel", "Failure! Something went wrong. Result: $result2")
             }

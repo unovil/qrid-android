@@ -3,6 +3,7 @@ accompanistPermissions = "0.37.2"
 agp = "8.10.1"
 argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
+fernetJava8 = "1.4.2"
 hiltNavigationCompose = "1.2.0"
 kotlinFakerBom = "2.0.0-rc.9"
 kotlinxCoroutinesTest = "1.10.1"
@@ -33,6 +34,7 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
+fernet-java8 = { module = "com.macasaet.fernet:fernet-java8", version.ref = "fernetJava8" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltVersion" }
 kotlin-faker = { module = "io.github.serpro69:kotlin-faker" }
