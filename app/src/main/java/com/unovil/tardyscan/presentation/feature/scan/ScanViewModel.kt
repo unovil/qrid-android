@@ -3,17 +3,21 @@ package com.unovil.tardyscan.presentation.feature.scan
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.domain.model.Student
+import com.unovil.tardyscan.domain.usecase.CreateAttendanceUseCase
 import com.unovil.tardyscan.domain.usecase.GetStudentInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import javax.inject.Inject
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
-    private val getStudentInfoUseCase: GetStudentInfoUseCase
+    private val getStudentInfoUseCase: GetStudentInfoUseCase,
+    private val createAttendanceUseCase: CreateAttendanceUseCase
 ) : ViewModel() {
 
     private val _isScanningEnabled = MutableStateFlow(true)
@@ -21,11 +25,6 @@ class ScanViewModel @Inject constructor(
 
     private val _scannedStudent = MutableStateFlow<Student?>(null)
     val scannedStudent = _scannedStudent.asStateFlow()
-
-    fun onReset() {
-        _isScanningEnabled.value = true
-        _scannedStudent.value = null
-    }
 
     fun onQrCodeScanned(qrCode: String, actionOnSuccess: () -> Unit) {
         Log.d("ScanViewModel", "qr code string is: $qrCode")
@@ -41,5 +40,31 @@ class ScanViewModel @Inject constructor(
                 Log.d("ScanViewModel", "Failure! Student info not found, ${studentInfo.javaClass}")
             }
         }
+    }
+
+    fun onSubmitAttendance(onSuccess: () -> Unit, onFailure: () -> Unit) {
+        viewModelScope.launch {
+            val isSubmitted = createAttendanceUseCase.execute(
+                CreateAttendanceUseCase.Input(
+                    Attendance(_scannedStudent.value!!.id, Clock.System.now())
+                )
+            )
+
+            when (isSubmitted) {
+                is CreateAttendanceUseCase.Output.Success -> {
+                    onSuccess()
+                }
+                is CreateAttendanceUseCase.Output.Failure -> {
+                    Log.e("ScanViewModel", "Failed to submit attendance")
+                    onFailure()
+                }
+            }
+        }
+    }
+
+
+    fun onReset() {
+        _isScanningEnabled.value = true
+        _scannedStudent.value = null
     }
 }

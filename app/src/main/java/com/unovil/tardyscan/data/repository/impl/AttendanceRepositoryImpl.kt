@@ -29,7 +29,8 @@ class AttendanceRepositoryImpl @Inject constructor(
 
             true
         } catch (e: Exception) {
-            throw e
+            e.printStackTrace()
+            false
         }
     }
 

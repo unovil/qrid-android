@@ -1,5 +1,7 @@
 package com.unovil.tardyscan.presentation.feature.scan
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -39,14 +42,28 @@ import kotlinx.coroutines.flow.filterNotNull
 fun SuccessfulScanCard(
     viewModel: ScanViewModel? = hiltViewModel(),
     scannedStudent: State<Student> = viewModel!!.scannedStudent.filterNotNull().collectAsState(
-        Student(100_000_000_000, "","","",0,"","")
+        Student(100_000_000_000, "", "", "", 0, "", "")
     ),
     onNavigate: () -> Unit = { },
+    onSubmit: (Context) -> Unit = {
+        viewModel!!.onSubmitAttendance (
+            {
+                Toast.makeText(it, "Submitted attendance!", Toast.LENGTH_SHORT).show()
+                onNavigate()
+                viewModel.onReset()
+            },
+            {
+                Toast.makeText(it, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
+            }
+        )
+    },
     onReset: () -> Unit = {
         viewModel!!.onReset()
         onNavigate()
     },
 ) {
+    val context = LocalContext.current
+
     TardyScannerTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -59,7 +76,9 @@ fun SuccessfulScanCard(
                     .statusBarsPadding()
             ) {
                 Column(
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(24.dp),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -91,7 +110,7 @@ fun SuccessfulScanCard(
                             Color.Gray,
                             Color.Black
                         ),
-                        onClick = { }
+                        onClick = { onSubmit(context) }
                     ) {
                         Text("Accept attendance")
                     }
@@ -104,7 +123,7 @@ fun SuccessfulScanCard(
                             Color.Gray,
                             Color.Black
                         ),
-                        onClick = { }
+                        onClick = onReset
                     ) {
                         Text("Reject attendance")
                     }
@@ -130,10 +149,8 @@ private fun Preview() {
     ) }
     SuccessfulScanCard(
         viewModel = null,
-        scannedStudent = student,
-        onNavigate = { },
-        onReset = { }
-    )
+        scannedStudent = student
+    ) { }
 }
 
 @Composable
@@ -147,7 +164,9 @@ private fun InfoRow(label: String, value: String) {
         Text(
             text = label,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(80.dp).align(Alignment.Top)
+            modifier = Modifier
+                .width(80.dp)
+                .align(Alignment.Top)
         )
         Text(
             text = value,

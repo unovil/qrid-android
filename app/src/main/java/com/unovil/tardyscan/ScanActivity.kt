@@ -55,7 +55,7 @@ class ScanActivity : ComponentActivity() {
                         dialog<Screen.SuccessfulScan> {
                             SuccessfulScanCard(
                                 viewModel = scanViewModel,
-                                onNavigate = { navController.navigate(Screen.Scanning) },
+                                onNavigate = { navController.popBackStack() },
                             )
                         }
                     }
