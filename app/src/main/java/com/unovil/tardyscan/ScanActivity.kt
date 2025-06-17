@@ -47,8 +47,8 @@ class ScanActivity : ComponentActivity() {
                             ScanningScreen(
                                 viewModel = scanViewModel,
                                 executor = cameraExecutor,
-                                onBack = { this@ScanActivity.finish() },
-                                onNavigate = { navController.navigate(Screen.SuccessfulScan) }
+                                onNavigate = { navController.navigate(Screen.SuccessfulScan) },
+                                onBack = { this@ScanActivity.finish() }
                             )
                         }
 

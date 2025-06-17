@@ -62,6 +62,7 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
         }
 
         val student = Student(
+            decryptedString.toLong(),
             result.lastName,
             result.firstName,
             result.middleName,

@@ -26,7 +26,6 @@ class QrCodeAnalyzer(
     override fun analyze(imageProxy: ImageProxy) {
         val isEnabled = enabledState.value
 
-        Log.d("QrCodeAnalyzer", "isEnabled: $isEnabled")
         if (!isEnabled) {
             imageProxy.close()
             return

@@ -2,7 +2,6 @@ package com.unovil.tardyscan.presentation.feature.scan
 
 import android.util.Log
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
@@ -32,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,18 +42,20 @@ import java.util.concurrent.ExecutorService
 fun ScanningScreen(
     viewModel: ScanViewModel? = hiltViewModel(),
     executor: ExecutorService,
+    onNavigate: () -> Unit,
     isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
-    code: State<String?> = viewModel!!.code.collectAsState(),
-    onQrCodeScanned: (String) -> Unit = { viewModel!!.onQrCodeScanned(it) },
     onBack: () -> Unit,
-    onNavigate: () -> Unit
+    onQrCodeScanned: (String) -> Unit = { viewModel!!.onQrCodeScanned(it) { onNavigate() } }
 ) {
-    val context = LocalContext.current
-
-    LaunchedEffect(code.value) {
+    // testing for scanned code
+    /* LaunchedEffect(code.value) {
         if (code.value == null) return@LaunchedEffect
         if (code.value!!.isNotEmpty()) Toast.makeText(context, code.value, Toast.LENGTH_SHORT).show()
         Log.d("ScanningScreen", "Code: ${code.value}")
+    }*/
+
+    LaunchedEffect(isScanningEnabled.value) {
+        Log.d("ScanningScreen", "IsEnabled: ${isScanningEnabled.value}")
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
