@@ -53,6 +53,11 @@ fun SuccessfulScanCard(
                 viewModel.onReset()
             },
             {
+                Toast.makeText(it, "Duplicate attendance!", Toast.LENGTH_SHORT).show()
+                onNavigate()
+                viewModel.onReset()
+            },
+            {
                 Toast.makeText(it, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
             }
         )

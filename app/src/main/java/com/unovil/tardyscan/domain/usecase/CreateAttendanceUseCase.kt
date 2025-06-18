@@ -8,10 +8,8 @@ interface CreateAttendanceUseCase : UseCase<CreateAttendanceUseCase.Input, Creat
     sealed class Output {
         object Success : Output()
         open class Failure : Output() {
+            object Duplication : Failure()
             data class Conflict(val message: String) : Failure()
-            object Unauthorized : Failure()
-            object BadRequest : Failure()
-            object InternalError : Failure()
         }
     }
 }

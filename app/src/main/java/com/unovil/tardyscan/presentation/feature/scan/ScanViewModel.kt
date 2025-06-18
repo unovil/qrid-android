@@ -42,7 +42,7 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun onSubmitAttendance(onSuccess: () -> Unit, onFailure: () -> Unit) {
+    fun onSubmitAttendance(onSuccess: () -> Unit, onDuplicate: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch {
             val isSubmitted = createAttendanceUseCase.execute(
                 CreateAttendanceUseCase.Input(
@@ -54,10 +54,15 @@ class ScanViewModel @Inject constructor(
                 is CreateAttendanceUseCase.Output.Success -> {
                     onSuccess()
                 }
-                is CreateAttendanceUseCase.Output.Failure -> {
+                is CreateAttendanceUseCase.Output.Failure.Duplication -> {
+                    Log.e("ScanViewModel", "Duplicate attendance already exists!")
+                    onDuplicate()
+                }
+                is CreateAttendanceUseCase.Output.Failure.Conflict -> {
                     Log.e("ScanViewModel", "Failed to submit attendance")
                     onFailure()
                 }
+                else -> { }
             }
         }
     }

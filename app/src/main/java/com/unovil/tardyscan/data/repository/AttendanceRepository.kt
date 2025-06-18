@@ -5,7 +5,16 @@ import com.unovil.tardyscan.data.network.dto.StudentDto
 import com.unovil.tardyscan.domain.model.Attendance
 
 interface AttendanceRepository {
-    suspend fun createAttendance(attendance: Attendance): Boolean
+    sealed class CreateAttendanceResult {
+        object Success : CreateAttendanceResult()
+
+        sealed class Failure : CreateAttendanceResult() {
+            object AttendanceExists : Failure()
+            data class UnknownError(val e: Exception) : Failure()
+        }
+    }
+
+    suspend fun createAttendance(attendance: Attendance): CreateAttendanceResult
     suspend fun getAttendances(): List<AttendanceDto>?
     suspend fun getAttendance(id: Int): AttendanceDto
     suspend fun deleteAttendance(id: Int)

@@ -13,10 +13,13 @@ class CreateAttendanceUseCaseImpl @Inject constructor(
         return try {
             withContext(Dispatchers.IO) {
                 val result = attendanceRepository.createAttendance(input.attendance)
-                if (result) {
-                    CreateAttendanceUseCase.Output.Success
-                } else {
-                    CreateAttendanceUseCase.Output.Failure()
+                when (result) {
+                    is AttendanceRepository.CreateAttendanceResult.Success ->
+                        CreateAttendanceUseCase.Output.Success
+                    is AttendanceRepository.CreateAttendanceResult.Failure.AttendanceExists ->
+                        CreateAttendanceUseCase.Output.Failure.Duplication
+                    is AttendanceRepository.CreateAttendanceResult.Failure.UnknownError ->
+                        CreateAttendanceUseCase.Output.Failure.Conflict(result.e.message ?: "Unknown error")
                 }
             }
         } catch (e: Exception) {
