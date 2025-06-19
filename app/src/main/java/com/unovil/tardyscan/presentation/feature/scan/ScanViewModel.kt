@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.presentation.feature.scan
 
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.domain.model.Attendance
@@ -25,6 +26,9 @@ class ScanViewModel @Inject constructor(
 
     private val _scannedStudent = MutableStateFlow<Student?>(null)
     val scannedStudent = _scannedStudent.asStateFlow()
+
+    private val _returnColor = MutableStateFlow<Color?>(null)
+    val returnColor = _returnColor.asStateFlow()
 
     fun onQrCodeScanned(qrCode: String, actionOnSuccess: () -> Unit) {
         Log.d("ScanViewModel", "qr code string is: $qrCode")
@@ -52,14 +56,17 @@ class ScanViewModel @Inject constructor(
 
             when (isSubmitted) {
                 is CreateAttendanceUseCase.Output.Success -> {
+                    _returnColor.value = Color.Green
                     onSuccess()
                 }
                 is CreateAttendanceUseCase.Output.Failure.Duplication -> {
                     Log.e("ScanViewModel", "Duplicate attendance already exists!")
+                    _returnColor.value = Color.Yellow
                     onDuplicate()
                 }
                 is CreateAttendanceUseCase.Output.Failure.Conflict -> {
                     Log.e("ScanViewModel", "Failed to submit attendance")
+                    _returnColor.value = Color.Red
                     onFailure()
                 }
                 else -> { }
@@ -67,6 +74,9 @@ class ScanViewModel @Inject constructor(
         }
     }
 
+    fun resetReturnColor() {
+        _returnColor.value = null
+    }
 
     fun onReset() {
         _isScanningEnabled.value = true

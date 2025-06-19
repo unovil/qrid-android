@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed class Screen() {
+
     // for main screen
     @Serializable object History : Screen()
     @Serializable object Settings : Screen()

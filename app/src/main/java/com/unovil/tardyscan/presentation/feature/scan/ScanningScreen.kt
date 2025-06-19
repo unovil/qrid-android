@@ -10,6 +10,8 @@ import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +25,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -35,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.delay
 import java.util.concurrent.ExecutorService
 
 @ExperimentalGetImage
@@ -44,9 +51,29 @@ fun ScanningScreen(
     executor: ExecutorService,
     onNavigate: () -> Unit,
     isScanningEnabled: State<Boolean> = viewModel!!.isScanningEnabled.collectAsState(),
+    returnColor: State<Color?> = viewModel!!.returnColor.collectAsState(),
     onBack: () -> Unit,
+    resetReturnColor: () -> Unit = { viewModel!!.resetReturnColor()},
     onQrCodeScanned: (String) -> Unit = { viewModel!!.onQrCodeScanned(it) { onNavigate() } }
 ) {
+    val defaultOverlayColor = Color.Black.copy(alpha = 0.5f)
+    var overlayColor by remember { mutableStateOf(defaultOverlayColor) }
+
+    val animatedOverlayColor by animateColorAsState(
+        targetValue = overlayColor,
+        animationSpec = tween(durationMillis = 300),
+        label = "overlayColor"
+    )
+
+    LaunchedEffect(returnColor.value) {
+        returnColor.value?.let {
+            overlayColor = it.copy(alpha = 0.5f)
+            delay(800)
+            overlayColor = defaultOverlayColor
+            resetReturnColor()
+        }
+    }
+
     // testing for scanned code
     /* LaunchedEffect(code.value) {
         if (code.value == null) return@LaunchedEffect
@@ -114,7 +141,7 @@ fun ScanningScreen(
                     lineTo(topLeft.x + squareSize, topLeft.y)
                     close()
                 },
-                color = Color.Black.copy(alpha = 0.5f)
+                color = animatedOverlayColor
             )
 
             // draw white stroke
