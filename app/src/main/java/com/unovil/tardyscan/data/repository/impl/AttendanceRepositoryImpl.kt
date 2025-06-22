@@ -13,6 +13,7 @@ import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.JsonPrimitive
 import javax.inject.Inject
 import kotlin.time.Duration
 
@@ -48,9 +49,12 @@ class AttendanceRepositoryImpl @Inject constructor(
                 return CreateAttendanceResult.Failure.AttendanceExists
             }
 
+            val userId = (auth.currentUserOrNull()!!.userMetadata!!["allowed_user_id"] as JsonPrimitive).content.toInt()
+
             val attendanceDto = AttendanceDto(
                 studentId = attendance.studentId,
                 timestamp = attendance.timestamp,
+                senderId = userId
             )
             attendanceTable.insert(attendanceDto)
 

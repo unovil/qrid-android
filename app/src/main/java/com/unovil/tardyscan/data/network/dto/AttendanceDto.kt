@@ -13,5 +13,8 @@ data class AttendanceDto (
     val studentId: Long,
 
     @SerialName("timestamp")
-    val timestamp: Instant
+    val timestamp: Instant,
+
+    @SerialName("allowed_user_id")
+    val senderId: Int? = null
 )
