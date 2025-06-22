@@ -1,8 +1,10 @@
 package com.unovil.tardyscan.data.repository
 
+import com.unovil.tardyscan.data.local.entity.AttendanceEntity
 import com.unovil.tardyscan.data.network.dto.AttendanceDto
 import com.unovil.tardyscan.data.network.dto.StudentDto
 import com.unovil.tardyscan.domain.model.Attendance
+import kotlinx.coroutines.flow.Flow
 
 interface AttendanceRepository {
     sealed class CreateAttendanceResult {
@@ -15,7 +17,7 @@ interface AttendanceRepository {
     }
 
     suspend fun createAttendance(attendance: Attendance): CreateAttendanceResult
-    suspend fun getAttendances(): List<AttendanceDto>?
+    fun getAttendances(): Flow<List<AttendanceEntity>>
     suspend fun getAttendance(id: Int): AttendanceDto
     suspend fun deleteAttendance(id: Int)
     suspend fun getStudentInfo(id: Long): StudentDto?

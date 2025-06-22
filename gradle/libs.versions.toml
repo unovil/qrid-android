@@ -11,6 +11,7 @@ kotlinxDatetime = "0.6.2"
 ktorClient = "3.1.1"
 mockkVersion = "1.13.17"
 multiplatformSettings = "1.3.0"
+room = "2.7.2"
 secretsGradlePlugin = "2.0.1"
 supabaseBom = "3.1.4"
 camera = "1.4.2"
@@ -33,6 +34,9 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
 fernet-java8 = { module = "com.macasaet.fernet:fernet-java8", version.ref = "fernetJava8" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }

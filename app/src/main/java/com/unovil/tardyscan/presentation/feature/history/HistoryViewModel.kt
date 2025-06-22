@@ -3,15 +3,38 @@ package com.unovil.tardyscan.presentation.feature.history
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.data.local.entity.AttendanceEntity
+import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
 import com.unovil.tardyscan.domain.usecase.GetStudentInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getStudentInfoUseCase: GetStudentInfoUseCase
+    private val getStudentInfoUseCase: GetStudentInfoUseCase,
+    private val getAttendancesUseCase: GetAttendancesUseCase
 ) : ViewModel() {
+
+    private val _attendances = MutableStateFlow<List<AttendanceEntity>>(emptyList())
+    val attendances = _attendances.asStateFlow()
+
+    fun loadAttendances() {
+        viewModelScope.launch {
+            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input())) {
+                is GetAttendancesUseCase.Output.Success -> {
+                    result.attendanceFlow.collect {
+                        _attendances.value = it
+                    }
+                }
+                is GetAttendancesUseCase.Output.Failure -> {
+                    Log.e("HistoryViewModel", "Failed to load attendances: ${result.e.message}")
+                }
+            }
+        }
+    }
 
     fun testFunction() {
         viewModelScope.launch {
