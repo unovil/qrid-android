@@ -38,16 +38,11 @@ private val LightColorScheme = lightColorScheme(
 
 @Immutable
 data class ExtendedColors(
-    val onMissedRequirement: Color,
-    val onMatchedRequirement: Color
+    val onMissedRequirement: Color = Color.Unspecified,
+    val onMatchedRequirement: Color = Color.Unspecified
 )
 
-val LocalExtendedColors = staticCompositionLocalOf {
-    ExtendedColors(
-        onMissedRequirement = Color.Unspecified,
-        onMatchedRequirement = Color.Unspecified
-    )
-}
+val LocalExtendedColors = staticCompositionLocalOf { ExtendedColors() }
 
 @Composable
 fun TardyScannerTheme(

@@ -31,12 +31,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
-fun SettingsScreen(navController: NavController = rememberNavController()) {
+fun SettingsScreen(settingsViewModel: SettingsViewModel? = hiltViewModel()) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background

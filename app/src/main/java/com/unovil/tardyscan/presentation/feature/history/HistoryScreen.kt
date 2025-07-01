@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unovil.tardyscan.data.local.entity.AttendanceEntity
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +41,6 @@ fun HistoryScreen(
     historyViewModel: HistoryViewModel? = hiltViewModel(),
     loadAttendances: () -> Unit = { historyViewModel!!.loadAttendances() },
     attendanceStateFlow: StateFlow<List<AttendanceEntity>> = historyViewModel!!.attendances,
-    navController: NavController
 ) {
     val attendances by attendanceStateFlow.collectAsState()
 
