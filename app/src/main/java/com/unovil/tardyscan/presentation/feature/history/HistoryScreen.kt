@@ -27,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.data.local.entity.AttendanceEntity
-import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -44,35 +43,33 @@ fun HistoryScreen(
 ) {
     val attendances by attendanceStateFlow.collectAsState()
 
-    TardyScannerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp)
+                .scrollable(rememberScrollState(), Orientation.Vertical),
+            horizontalAlignment = Alignment.Start,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(15.dp)
-                    .scrollable(rememberScrollState(), Orientation.Vertical),
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Text(
-                    "History",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(20.dp)
-                )
+            Text(
+                "History",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(20.dp)
+            )
 
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(15.dp)
-                ) {
-                    items(attendances.size) { index ->
-                        HistoryItem(
-                            attendances[index].name,
-                            attendances[index].section,
-                            attendances[index].lrn,
-                            attendances[index].timestamp
-                        )
-                    }
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
+                items(attendances.size) { index ->
+                    HistoryItem(
+                        attendances[index].name,
+                        attendances[index].section,
+                        attendances[index].lrn,
+                        attendances[index].timestamp
+                    )
                 }
             }
         }

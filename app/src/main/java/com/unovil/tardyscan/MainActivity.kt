@@ -1,78 +1,66 @@
 package com.unovil.tardyscan
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
+import com.unovil.tardyscan.presentation.navigation.ScanNavigation
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var supabaseClient: SupabaseClient
+    @Inject lateinit var supabaseClient: SupabaseClient
+    private lateinit var cameraExecutor: ExecutorService
 
     @ExperimentalPermissionsApi
     @ExperimentalGetImage
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
         setContent {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
-            var showMainActivity by remember { mutableStateOf(false) }
+            val isDarkTheme = false
+            var scanMode by rememberSaveable { mutableStateOf(false) }
 
-            LaunchedEffect(sessionStatus.value, showMainActivity) {
-                Log.d("MainActivity", "Session status is: ${sessionStatus.value}")
+            TardyScannerTheme(darkTheme = isDarkTheme) {
                 when (sessionStatus.value) {
                     is SessionStatus.Authenticated -> {
-                        showMainActivity = true
+                        if (scanMode) {
+                            ScanNavigation(cameraExecutor) { scanMode = false }
+                        } else {
+                            MainNavigation { scanMode = true }
+                        }
                     }
 
-                    is SessionStatus.Initializing -> {
-                        // run a loading screen here, hopefully
-                    }
+                    is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> { /* splash */ }
 
-                    else -> {
-                        Log.d("MainActivity", "session status: not authenticated")
-                        this@MainActivity.startActivity(
-                            Intent(
-                                this@MainActivity,
-                                AuthActivity::class.java
-                            )
-                        )
-                        finish()
-                    }
+                    is SessionStatus.NotAuthenticated -> { AuthNavigation {  } }
                 }
             }
 
-            if (showMainActivity) {
-                TardyScannerTheme {
-                    MainNavigation {
-                        this@MainActivity.startActivity(
-                            Intent(
-                                this@MainActivity,
-                                ScanActivity::class.java
-                            )
-                        )
-                    }
-                }
-            }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 }

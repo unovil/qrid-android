@@ -85,52 +85,52 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel? = hiltViewModel()) {
 
 @Composable
 fun SettingsItem(mainLabel: String, subLabel: String? = null, icon: ImageVector, onClick: () -> Unit) {
-    TardyScannerTheme {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onClick
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp, horizontal = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp, horizontal = 15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                Surface(
+                    modifier = Modifier.padding(horizontal = 15.dp)
                 ) {
-                    Surface(
-                        modifier = Modifier.padding(horizontal = 15.dp)
-                    ) {
-                        Icon(
-                            icon,
-                            modifier = Modifier.size(20.dp),
-                            contentDescription = mainLabel
-                        )
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.Center
-
-
-                    ) {
-                        Text(
-                            mainLabel,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        if (subLabel != null && subLabel.isNotEmpty()) Text(
-                            subLabel,
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
+                    Icon(
+                        icon,
+                        modifier = Modifier.size(20.dp),
+                        contentDescription = mainLabel
+                    )
                 }
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = "View setting"
-                )
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Center
+
+
+                ) {
+                    Text(
+                        mainLabel,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (subLabel != null && subLabel.isNotEmpty()) Text(
+                        subLabel,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             }
+            Icon(
+                Icons.Default.ChevronRight,
+                contentDescription = "View setting"
+            )
         }
     }
+
 }
 
 @Composable

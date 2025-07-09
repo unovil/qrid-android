@@ -35,7 +35,6 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.domain.model.Student
-import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
@@ -69,69 +68,67 @@ fun SuccessfulScanCard(
 ) {
     val context = LocalContext.current
 
-    TardyScannerTheme {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        ElevatedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .statusBarsPadding()
         ) {
-            ElevatedCard(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .statusBarsPadding()
+                    .align(Alignment.CenterHorizontally)
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
+                Text(
+                    modifier = Modifier.padding(bottom = 12.dp),
+                    text = "Student scanned!",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
                 Column(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(
-                        modifier = Modifier.padding(bottom = 12.dp),
-                        text = "Student scanned!",
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        scannedStudent.value.let {
-                            InfoRow("Name:", "${it.lastName}, ${it.firstName} ${it.middleName}")
-                            InfoRow("Section:", "${it.level} - ${it.section}")
-                            InfoRow("ID #:", "${it.id}")
-                        }
+                    scannedStudent.value.let {
+                        InfoRow("Name:", "${it.lastName}, ${it.firstName} ${it.middleName}")
+                        InfoRow("Section:", "${it.level} - ${it.section}")
+                        InfoRow("ID #:", "${it.id}")
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
-                        colors = ButtonColors(
-                            Color(0xFF246227),
-                            Color.White,
-                            Color.Gray,
-                            Color.Black
-                        ),
-                        onClick = { onSubmit(context) }
-                    ) {
-                        Text("Accept attendance")
-                    }
-                    Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp),
-                        colors = ButtonColors(
-                            Color(0xFF801717),
-                            Color.White,
-                            Color.Gray,
-                            Color.Black
-                        ),
-                        onClick = onReset
-                    ) {
-                        Text("Reject attendance")
-                    }
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp, 8.dp, 0.dp, 0.dp),
+                    colors = ButtonColors(
+                        Color(0xFF246227),
+                        Color.White,
+                        Color.Gray,
+                        Color.Black
+                    ),
+                    onClick = { onSubmit(context) }
+                ) {
+                    Text("Accept attendance")
+                }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(0.dp, 0.dp, 8.dp, 8.dp),
+                    colors = ButtonColors(
+                        Color(0xFF801717),
+                        Color.White,
+                        Color.Gray,
+                        Color.Black
+                    ),
+                    onClick = onReset
+                ) {
+                    Text("Reject attendance")
                 }
             }
         }
