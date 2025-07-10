@@ -13,7 +13,6 @@ interface AuthenticationRepository {
         }
     }
 
-
     sealed class SignUpResult {
         object Success : SignUpResult()
         sealed class Failure : SignUpResult() {
@@ -32,8 +31,18 @@ interface AuthenticationRepository {
             object Unknown : Failure()
         }
     }
+    sealed class SignOutResult {
+        object Success : SignOutResult()
+        sealed class Failure : SignOutResult() {
+            object AuthError : Failure()
+            object HttpTimeout : Failure()
+            object HttpError: Failure()
+            data class Unknown(val error: Throwable) : Failure()
+        }
+    }
 
     suspend fun getAllowedUser(allowedUser: AllowedUser): AllowedUserResult
     suspend fun signUp(allowedUser: AllowedUser, email: String, password: String): SignUpResult
     suspend fun signIn(email: String, password: String): SignInResult
+    suspend fun signOut(): SignOutResult
 }

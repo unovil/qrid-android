@@ -5,9 +5,11 @@ import com.unovil.tardyscan.data.network.dto.VerifyAllowedUserRpcDto
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignInResult
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignOutResult
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignUpResult
 import com.unovil.tardyscan.domain.model.AllowedUser
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -103,6 +105,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
                 email = enteredEmail
                 password = enteredPassword
             }
+            auth.signOut(SignOutScope.OTHERS)
         } catch (_: HttpRequestTimeoutException) {
             return SignInResult.Failure.HttpTimeout
         } catch (_: HttpRequestException) {
@@ -117,5 +120,19 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
 
         return SignInResult.Success
+    }
+
+    override suspend fun signOut(): SignOutResult {
+        try {
+            auth.signOut(SignOutScope.LOCAL)
+            return SignOutResult.Success
+        } catch (e: Exception) {
+            return when (e) {
+                is AuthRestException -> SignOutResult.Failure.AuthError
+                is HttpRequestException -> SignOutResult.Failure.HttpError
+                is HttpRequestTimeoutException -> SignOutResult.Failure.HttpTimeout
+                else -> SignOutResult.Failure.Unknown(e)
+            }
+        }
     }
 }

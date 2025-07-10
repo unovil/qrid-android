@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,9 +45,11 @@ fun SettingsScreen(
     selectedAppearance: State<String> = settingsViewModel!!.selectedAppearance.collectAsState(),
     onUpdateAppearance: (String) -> Unit = settingsViewModel!!::onUpdateAppearance,
     onCancelAppearance: () -> Unit = settingsViewModel!!::onCancelAppearance,
-    onSetAppearance: () -> Unit = settingsViewModel!!::onSetAppearance
+    onSetAppearance: () -> Unit = settingsViewModel!!::onSetAppearance,
+    onLogOut: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onLogOut
 ) {
     var isOpenedAppearanceDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -80,7 +84,9 @@ fun SettingsScreen(
 
             SettingsItem(
                 mainLabel = "Log out"
-            ) {}
+            ) { onLogOut {
+                Toast.makeText(context, "Something went wrong.", Toast.LENGTH_SHORT).show()
+            }}
 
             SettingsItem(
                 mainLabel = "About Tardy Scanner"
