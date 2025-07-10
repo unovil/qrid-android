@@ -46,21 +46,23 @@ val LocalExtendedColors = staticCompositionLocalOf { ExtendedColors() }
 
 @Composable
 fun TardyScannerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean? = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val resolvedDarkTheme = darkTheme ?: isSystemInDarkTheme()
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (resolvedDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        resolvedDarkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-    val extendedColors = if (darkTheme) ExtendedColors(
+    val extendedColors = if (resolvedDarkTheme) ExtendedColors(
         Red500,
         CorrectGreen800
     ) else ExtendedColors(

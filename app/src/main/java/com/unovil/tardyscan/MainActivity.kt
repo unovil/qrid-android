@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
 import com.unovil.tardyscan.presentation.navigation.ScanNavigation
@@ -26,6 +27,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var supabaseClient: SupabaseClient
+    @Inject lateinit var themeManager: ThemeManager
     private lateinit var cameraExecutor: ExecutorService
 
     @ExperimentalPermissionsApi
@@ -37,10 +39,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
-            val isDarkTheme = false
+            val isDarkTheme = themeManager.isDarkTheme.collectAsState()
             var scanMode by rememberSaveable { mutableStateOf(false) }
 
-            TardyScannerTheme(darkTheme = isDarkTheme) {
+            TardyScannerTheme(darkTheme = isDarkTheme.value) {
                 when (sessionStatus.value) {
                     is SessionStatus.Authenticated -> {
                         if (scanMode) {
