@@ -1,6 +1,8 @@
 package com.unovil.tardyscan.domain.usecase.impl
 
 import com.unovil.tardyscan.data.repository.AttendanceRepository
+import com.unovil.tardyscan.data.repository.AttendanceRepository.CreateAttendanceResult.Failure
+import com.unovil.tardyscan.data.repository.AttendanceRepository.CreateAttendanceResult.Success
 import com.unovil.tardyscan.domain.usecase.CreateAttendanceUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,11 +16,11 @@ class CreateAttendanceUseCaseImpl @Inject constructor(
             withContext(Dispatchers.IO) {
                 val result = attendanceRepository.createAttendance(input.attendance)
                 when (result) {
-                    is AttendanceRepository.CreateAttendanceResult.Success ->
+                    is Success ->
                         CreateAttendanceUseCase.Output.Success
-                    is AttendanceRepository.CreateAttendanceResult.Failure.AttendanceExists ->
+                    is Failure.AttendanceExists ->
                         CreateAttendanceUseCase.Output.Failure.Duplication
-                    is AttendanceRepository.CreateAttendanceResult.Failure.UnknownError ->
+                    is Failure.UnknownError ->
                         CreateAttendanceUseCase.Output.Failure.Conflict(result.e.message ?: "Unknown error")
                 }
             }

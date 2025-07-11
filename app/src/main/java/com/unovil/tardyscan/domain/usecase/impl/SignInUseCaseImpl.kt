@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.domain.usecase.impl
 
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.SignInResult
 import com.unovil.tardyscan.domain.usecase.SignInUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,11 +14,11 @@ class SignInUseCaseImpl @Inject constructor(
         val result = authenticationRepository.signIn(input.email, input.password)
 
         when (result) {
-            is AuthenticationRepository.SignInResult.Success -> SignInUseCase.Output.Success
-            is AuthenticationRepository.SignInResult.Failure.HttpNetworkError -> SignInUseCase.Output.Failure.HttpNetworkError
-            is AuthenticationRepository.SignInResult.Failure.HttpTimeout -> SignInUseCase.Output.Failure.HttpTimeout
-            is AuthenticationRepository.SignInResult.Failure.InvalidCredentials -> SignInUseCase.Output.Failure.AuthError
-            is AuthenticationRepository.SignInResult.Failure.Unknown -> SignInUseCase.Output.Failure.Unknown
+            is SignInResult.Success -> SignInUseCase.Output.Success
+            is SignInResult.Failure.HttpNetworkError -> SignInUseCase.Output.Failure.HttpNetworkError
+            is SignInResult.Failure.HttpTimeout -> SignInUseCase.Output.Failure.HttpTimeout
+            is SignInResult.Failure.InvalidCredentials -> SignInUseCase.Output.Failure.AuthError
+            is SignInResult.Failure.Unknown -> SignInUseCase.Output.Failure.Unknown
         }
     }
 }

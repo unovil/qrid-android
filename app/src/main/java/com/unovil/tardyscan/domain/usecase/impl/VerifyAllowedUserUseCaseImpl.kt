@@ -3,7 +3,8 @@ package com.unovil.tardyscan.domain.usecase.impl
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2Mode
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
-import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult.Failure
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult.Success
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,10 +18,10 @@ class VerifyAllowedUserUseCaseImpl @Inject constructor(
         val result = authenticationRepository.getAllowedUser(input.allowedUser)
 
         return@withContext when (result) {
-            is AllowedUserResult.Failure.Unknown -> VerifyAllowedUserUseCase.Output.Failure.Conflict
-            is AllowedUserResult.Failure.NotFound -> VerifyAllowedUserUseCase.Output.Failure.NotFound
-            is AllowedUserResult.Failure.AlreadyRegistered -> VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered
-            is AllowedUserResult.Success -> {
+            is Failure.Unknown -> VerifyAllowedUserUseCase.Output.Failure.Conflict
+            is Failure.NotFound -> VerifyAllowedUserUseCase.Output.Failure.NotFound
+            is Failure.AlreadyRegistered -> VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered
+            is Success -> {
                 if (argon2.verify(Argon2Mode.ARGON2_I,result.hashedPassword, input.allowedUser.givenPassword.toByteArray()))
                     VerifyAllowedUserUseCase.Output.Success
                 else
