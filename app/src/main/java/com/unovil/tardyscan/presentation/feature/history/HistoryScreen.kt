@@ -24,10 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.data.local.entity.AttendanceEntity
+import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.datetime.Clock.System
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -156,14 +159,22 @@ private fun PreviewHistoryScreen() {
     // HistoryScreen(null, rememberNavController())
 }
 
-@Preview
+@PreviewDynamicColors
 @Composable
 private fun PreviewHistoryItem() {
     val information = mapOf(
         "name" to "John Doe",
         "section" to "Section 1",
         "lrn" to 123456789123,
-        "timestamp" to Instant.parse("2021-01-01T00:00:00Z")
+        "timestamp" to System.now().toEpochMilliseconds()
     )
-    HistoryItem(information["name"] as String, information["section"] as String, information["lrn"] as Long, information["timestamp"] as Long)
+    
+    TardyScannerTheme {
+        HistoryItem(
+            information["name"] as String,
+            information["section"] as String,
+            information["lrn"] as Long,
+            information["timestamp"] as Long
+        )
+    }
 }

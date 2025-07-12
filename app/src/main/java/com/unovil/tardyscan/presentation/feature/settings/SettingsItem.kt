@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +42,7 @@ fun SettingsItem(mainLabel: String, subLabel: String? = null, showChevron: Boole
                 )
                 if (subLabel != null && subLabel.isNotEmpty()) Text(
                     subLabel,
-                    style = MaterialTheme.typography.labelMedium
+                    style = typography.labelMedium
                 )
             }
 
