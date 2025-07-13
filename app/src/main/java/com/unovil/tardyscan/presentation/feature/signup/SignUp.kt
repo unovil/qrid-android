@@ -55,6 +55,12 @@ fun SignUp(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
+        Text(
+            text = "Sign up",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         OutlinedTextField(
             value = newEmail.value,
             onValueChange = onEmailChange,

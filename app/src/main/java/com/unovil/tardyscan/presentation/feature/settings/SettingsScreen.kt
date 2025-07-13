@@ -74,29 +74,20 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             SettingsItem(
-                mainLabel = "Account",
-                subLabel = "View account information or logout",
-            ) {}
-
-            SettingsItem(
                 mainLabel = "Appearance",
                 subLabel = "Currently set to: ${selectedAppearance.value}",
             ) { isOpenedAppearanceDialog = !isOpenedAppearanceDialog }
 
             SettingsItem(
-                mainLabel = "Other Preferences"
-            ) {}
+                mainLabel = "About the QR-ID App",
+                subLabel = "Made with 💖 through Android Studio and Git."
+            ) { context.startActivity(aboutIntent) }
 
             SettingsItem(
                 mainLabel = "Log out"
             ) { onLogOut {
                 Toast.makeText(context, "Something went wrong.", Toast.LENGTH_SHORT).show()
             }}
-
-            SettingsItem(
-                mainLabel = "About the QR-ID App",
-                subLabel = "Made with 💖 through Android Studio and Git."
-            ) { context.startActivity(aboutIntent) }
         }
     }
 
