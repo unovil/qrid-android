@@ -1,7 +1,5 @@
 package com.unovil.tardyscan.presentation.feature.history
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,42 +7,53 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unovil.tardyscan.data.local.entity.AttendanceEntity
+import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.datetime.Clock.System
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.toLocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     historyViewModel: HistoryViewModel? = hiltViewModel(),
-    loadAttendances: () -> Unit = { historyViewModel!!.loadAttendances() },
-    attendanceStateFlow: StateFlow<List<AttendanceEntity>> = historyViewModel!!.attendances,
+    selectedDate: State<LocalDate> = historyViewModel!!.selectedDate.collectAsState(),
+    loadAttendances: () -> Unit = historyViewModel!!::onLoadAttendances,
+    onDateSelected: (LocalDate) -> Unit = historyViewModel!!::onChangeDate,
+    attendances: State<List<Attendance>> = historyViewModel!!.attendances.collectAsState()
 ) {
-    val attendances by attendanceStateFlow.collectAsState()
+    var showDatePicker by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -53,8 +62,7 @@ fun HistoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp)
-                .scrollable(rememberScrollState(), Orientation.Vertical),
+                .padding(15.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             Text(
@@ -63,15 +71,24 @@ fun HistoryScreen(
                 modifier = Modifier.padding(20.dp)
             )
 
-            LazyColumn(
+            TextButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                onClick = { showDatePicker = true }
+            ) { Text("Current date: ${selectedDate.value}") }
+
+            Column(
+                modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-                items(attendances.size) { index ->
+                attendances.value.forEach {
                     HistoryItem(
-                        attendances[index].name,
-                        attendances[index].section,
-                        attendances[index].lrn,
-                        attendances[index].timestamp
+                        it.name,
+                        it.section,
+                        it.studentId,
+                        it.isPresent,
+                        it.timestamp.toEpochMilliseconds()
                     )
                 }
             }
@@ -80,6 +97,17 @@ fun HistoryScreen(
 
     LaunchedEffect(Unit) {
         loadAttendances()
+    }
+
+    if (showDatePicker) {
+        DatePickerModal({
+            onDateSelected(
+                Instant
+                    .fromEpochMilliseconds(it)
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .date
+            )
+        }) { showDatePicker = false }
     }
 
     /**
@@ -91,7 +119,7 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryItem(name: String, section: String, lrn: Long, epochMilliseconds: Long) {
+fun HistoryItem(name: String, section: String, lrn: Long, isPresent: Boolean, epochMilliseconds: Long) {
     val format = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         chars(" ")
@@ -109,9 +137,11 @@ fun HistoryItem(name: String, section: String, lrn: Long, epochMilliseconds: Lon
     }
 
     Surface(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
         shape = RoundedCornerShape(6.dp),
-        color = MaterialTheme.colorScheme.surfaceTint
+        color = if (isPresent) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -141,22 +171,52 @@ fun HistoryItem(name: String, section: String, lrn: Long, epochMilliseconds: Lon
                     horizontalAlignment = Alignment.End
                 ) {
                     Text("Timestamp", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
-                    Text(Instant.fromEpochMilliseconds(epochMilliseconds)
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .format(format)
-                        .toString(),
-                        textAlign = TextAlign.End
-                    )
+                    if (epochMilliseconds == 0L) {
+                        Text("-", textAlign = TextAlign.End)
+                    } else {
+                        Text(
+                            Instant.fromEpochMilliseconds(epochMilliseconds)
+                                .toLocalDateTime(TimeZone.currentSystemDefault())
+                                .format(format)
+                                .toString(),
+                            textAlign = TextAlign.End
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PreviewHistoryScreen() {
-    // HistoryScreen(null, rememberNavController())
+fun DatePickerModal(
+    onDateSelected: (Long) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                enabled = (datePickerState.selectedDateMillis != null),
+                onClick = {
+                    onDateSelected(datePickerState.selectedDateMillis!!)
+                    onDismiss()
+                }
+            ) {
+                Text("OK")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
+    }
 }
 
 @PreviewDynamicColors
@@ -174,7 +234,8 @@ private fun PreviewHistoryItem() {
             information["name"] as String,
             information["section"] as String,
             information["lrn"] as Long,
-            information["timestamp"] as Long
+            true,
+            information["timestamp"] as Long,
         )
     }
 }

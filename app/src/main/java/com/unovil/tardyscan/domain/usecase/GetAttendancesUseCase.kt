@@ -1,13 +1,13 @@
 package com.unovil.tardyscan.domain.usecase
 
-import com.unovil.tardyscan.data.local.entity.AttendanceEntity
-import kotlinx.coroutines.flow.Flow
+import com.unovil.tardyscan.domain.model.Attendance
+import kotlinx.datetime.LocalDate
 
-interface GetAttendancesUseCase : AsyncUseCase<GetAttendancesUseCase.Input, GetAttendancesUseCase.Output> {
-    class Input
+interface GetAttendancesUseCase : UseCase<GetAttendancesUseCase.Input, GetAttendancesUseCase.Output> {
+    data class Input(val date: LocalDate)
 
     sealed class Output {
-        data class Success(val attendanceFlow: Flow<List<AttendanceEntity>>) : Output()
+        data class Success(val attendanceList: List<Attendance>) : Output()
         class Failure(val e: Exception) : Output()
     }
 }
