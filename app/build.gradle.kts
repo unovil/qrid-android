@@ -65,7 +65,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.core.splashscreen)
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
     testImplementation(kotlin("test"))
@@ -101,10 +100,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
 
-    // room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
+    // pref datastore
+    implementation(libs.androidx.datastore.preferences)
 
     // hashing
     implementation(libs.argon2kt)

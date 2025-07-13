@@ -24,6 +24,21 @@ class SettingsViewModel @Inject constructor(
     private val _newAppearance = MutableStateFlow(appearanceList[2])
     val newAppearance = _newAppearance.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            themeManager.loadTheme() // Start listening
+
+            val currentAppearance = when (themeManager.isDarkTheme.value) {
+                false -> appearanceList[0]
+                true -> appearanceList[1]
+                null -> appearanceList[2]
+            }
+
+            _selectedAppearance.value = currentAppearance
+            _newAppearance.value = currentAppearance
+        }
+    }
+
     fun onUpdateAppearance(appearance: String) {
         _newAppearance.value = appearance
     }
@@ -33,11 +48,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onSetAppearance() {
-        themeManager.theme = when (_newAppearance.value) {
+        val themeMode = when (_newAppearance.value) {
             "☀️ Light mode" -> ThemeManager.ThemeMode.LIGHT
             "🌙 Dark mode" -> ThemeManager.ThemeMode.DARK
             "⚙️ Follow system setting" -> ThemeManager.ThemeMode.SYSTEM
             else -> ThemeManager.ThemeMode.SYSTEM
+        }
+
+        viewModelScope.launch {
+            themeManager.setTheme(themeMode)
         }
 
         _selectedAppearance.value = _newAppearance.value

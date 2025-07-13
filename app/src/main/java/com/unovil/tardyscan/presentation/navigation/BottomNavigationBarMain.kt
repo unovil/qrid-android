@@ -6,38 +6,34 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun BottomNavigationBarMain(navController: NavController) {
-    var selectedNavItemState by remember { mutableIntStateOf(0) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar {
         BottomNavigationItems(LocalContext.current)
-            .forEachIndexed { index, navItem ->
+            .forEach { navItem ->
+                val isSelected = currentRoute == navItem.route.routeName
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            if (selectedNavItemState == index) navItem.selectedIcon else navItem.unselectedIcon,
+                            if (isSelected) navItem.selectedIcon else navItem.unselectedIcon,
                             contentDescription = navItem.label
                         )
                     },
                     label = { Text(navItem.label) },
-                    selected = selectedNavItemState == index,
+                    selected = isSelected,
                     onClick = {
-                        selectedNavItemState = index
-                        navController.navigate(navItem.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                        if (!isSelected)
+                            navController.navigate(navItem.route.routeName) {
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
                     }
                 )
             }

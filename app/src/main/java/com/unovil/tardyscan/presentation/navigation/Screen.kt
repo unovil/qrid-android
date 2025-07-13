@@ -2,6 +2,9 @@ package com.unovil.tardyscan.presentation.navigation
 
 import kotlinx.serialization.Serializable
 
+val Screen.routeName: String
+    get() = this::class.simpleName ?: error("Unnamed Screen")
+
 @Serializable
 sealed class Screen() {
 

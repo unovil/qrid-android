@@ -5,9 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -40,21 +43,29 @@ class MainActivity : ComponentActivity() {
         setContent {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
+            var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
 
-            TardyScannerTheme(darkTheme = isDarkTheme.value) {
-                when (sessionStatus.value) {
-                    is SessionStatus.Authenticated -> {
-                        if (scanMode) {
-                            ScanNavigation(cameraExecutor) { scanMode = false }
-                        } else {
-                            MainNavigation { scanMode = true }
+            LaunchedEffect(Unit) {
+                themeManager.loadTheme()
+                isLoadingThemeFinished = true
+            }
+
+            if (isLoadingThemeFinished) {
+                TardyScannerTheme(darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()) {
+                    when (sessionStatus.value) {
+                        is SessionStatus.Authenticated -> {
+                            if (scanMode) {
+                                ScanNavigation(cameraExecutor) { scanMode = false }
+                            } else {
+                                MainNavigation { scanMode = true }
+                            }
                         }
+
+                        is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> { /* splash */ }
+
+                        is SessionStatus.NotAuthenticated -> { AuthNavigation {  } }
                     }
-
-                    is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> { /* splash */ }
-
-                    is SessionStatus.NotAuthenticated -> { AuthNavigation {  } }
                 }
             }
 
