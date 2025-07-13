@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.settings
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +51,9 @@ fun SettingsScreen(
     onLogOut: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onLogOut
 ) {
     var isOpenedAppearanceDialog by remember { mutableStateOf(false) }
+
+    val aboutIntent = Intent(Intent.ACTION_VIEW, "https://github.com/unovil/QR-ID".toUri())
+
     val context = LocalContext.current
 
     Surface(
@@ -89,8 +94,9 @@ fun SettingsScreen(
             }}
 
             SettingsItem(
-                mainLabel = "About Tardy Scanner"
-            ) {}
+                mainLabel = "About the QR-ID App",
+                subLabel = "Made with 💖 through Android Studio and Git."
+            ) { context.startActivity(aboutIntent) }
         }
     }
 

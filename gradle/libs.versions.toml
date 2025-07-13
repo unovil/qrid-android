@@ -3,6 +3,7 @@ accompanistPermissions = "0.37.2"
 agp = "8.10.1"
 argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
+coreSplashscreen = "1.0.1"
 fernetJava8 = "1.4.2"
 hiltNavigationCompose = "1.2.0"
 kotlinFakerBom = "2.0.0-rc.9"
@@ -20,10 +21,10 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2025.04.01"
-navigationCompose = "2.8.9"
+composeBom = "2025.06.01"
+navigationCompose = "2.9.1"
 kotlinSerialization = "2.1.0"
 hiltVersion = "2.56.1"
 ksp = "2.1.10-1.0.31"
@@ -31,6 +32,7 @@ ksp = "2.1.10-1.0.31"
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.history
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,13 +8,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,9 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unovil.tardyscan.domain.model.Attendance
@@ -38,20 +46,21 @@ import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.datetime.Clock.System
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@ExperimentalMaterial3Api
 @Composable
 fun HistoryScreen(
     historyViewModel: HistoryViewModel? = hiltViewModel(),
-    selectedDate: State<LocalDate> = historyViewModel!!.selectedDate.collectAsState(),
+    selectedTimestamp: State<Instant> = historyViewModel!!.selectedTimestamp.collectAsState(),
+    attendanceFilters: List<String> = historyViewModel!!.attendanceFilterOptions,
+    selectedFilter: State<String> = historyViewModel!!.selectedFilter.collectAsState(),
+    onChangeFilter: (String) -> Unit = historyViewModel!!::onChangeFilter,
     loadAttendances: () -> Unit = historyViewModel!!::onLoadAttendances,
     onDateSelected: (LocalDate) -> Unit = historyViewModel!!::onChangeDate,
-    attendances: State<List<Attendance>> = historyViewModel!!.attendances.collectAsState()
+    attendances: State<List<Attendance>> = historyViewModel!!.filteredAttendances.collectAsState()
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -65,18 +74,50 @@ fun HistoryScreen(
                 .padding(15.dp),
             horizontalAlignment = Alignment.Start,
         ) {
-            Text(
-                "History",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(20.dp)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "History",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.weight(0.5f)
+                )
 
-            TextButton(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                onClick = { showDatePicker = true }
-            ) { Text("Current date: ${selectedDate.value}") }
+                OutlinedButton (
+                    modifier = Modifier
+                        .weight(0.5f),
+                    shape = MaterialTheme.shapes.medium,
+                    onClick = { showDatePicker = true }
+                ) {
+                    Icon(Icons.Default.CalendarMonth, "Choose date")
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        "${selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date}",
+                        textAlign = TextAlign.End
+                    )
+                }
+            }
+
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                attendanceFilters.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = attendanceFilters.size,
+                            baseShape = MaterialTheme.shapes.small
+                        ),
+                        onClick = {
+                            Log.d("HistoryScreen", "Selected filter is now: $label")
+                            onChangeFilter(label)
+                                  },
+                        selected = selectedFilter.value == label,
+                        label = { Text(label, style = MaterialTheme.typography.labelMedium) }
+                    )
+                }
+            }
 
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -84,6 +125,7 @@ fun HistoryScreen(
             ) {
                 attendances.value.forEach {
                     HistoryItem(
+                        selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date,
                         it.name,
                         it.section,
                         it.studentId,
@@ -118,77 +160,7 @@ fun HistoryScreen(
      */
 }
 
-@Composable
-fun HistoryItem(name: String, section: String, lrn: Long, isPresent: Boolean, epochMilliseconds: Long) {
-    val format = LocalDateTime.Format {
-        monthName(MonthNames.ENGLISH_ABBREVIATED)
-        chars(" ")
-        dayOfMonth()
-        chars(", ")
-        year()
-
-        chars(" ")
-
-        hour()
-        chars(":")
-        minute()
-        chars(":")
-        second()
-    }
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        shape = RoundedCornerShape(6.dp),
-        color = if (isPresent) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row {
-                Column(Modifier.weight(0.5f)) {
-                    Text("Name", fontWeight = FontWeight.Bold)
-                    Text(name)
-                }
-                Column(
-                    modifier = Modifier.weight(0.5f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text("LRN", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
-                    Text(lrn.toString(), textAlign = TextAlign.End)
-                }
-            }
-            Spacer(Modifier.padding(6.dp))
-            Row {
-                Column(Modifier.weight(0.5f)) {
-                    Text("Section", fontWeight = FontWeight.Bold)
-                    Text(section)
-                }
-                Column(
-                    modifier = Modifier.weight(0.5f),
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text("Timestamp", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
-                    if (epochMilliseconds == 0L) {
-                        Text("-", textAlign = TextAlign.End)
-                    } else {
-                        Text(
-                            Instant.fromEpochMilliseconds(epochMilliseconds)
-                                .toLocalDateTime(TimeZone.currentSystemDefault())
-                                .format(format)
-                                .toString(),
-                            textAlign = TextAlign.End
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
+@ExperimentalMaterial3Api
 @Composable
 fun DatePickerModal(
     onDateSelected: (Long) -> Unit,
@@ -219,23 +191,46 @@ fun DatePickerModal(
     }
 }
 
+@ExperimentalMaterial3Api
+@PreviewLightDark
+@Composable
+private fun PreviewHistoryScreen() {
+    val attendanceFilterOptions = listOf("Present", "Absent", "Late", "All")
+    val selectedDate = remember { mutableStateOf(System.now()) }
+    val filter = remember { mutableStateOf(attendanceFilterOptions[0]) }
+    val attendances = remember { mutableStateOf<List<Attendance>>(listOf()) }
+
+    TardyScannerTheme {
+        HistoryScreen(
+            historyViewModel = null,
+            selectedTimestamp = selectedDate,
+            onChangeFilter = { filter.value = it },
+            selectedFilter = filter,
+            loadAttendances = { },
+            attendanceFilters = attendanceFilterOptions,
+            onDateSelected = { selectedDate.value = it.atStartOfDayIn(TimeZone.currentSystemDefault()) },
+            attendances = attendances
+        )
+    }
+}
+
 @PreviewDynamicColors
 @Composable
 private fun PreviewHistoryItem() {
-    val information = mapOf(
+    /*val information = mapOf(
         "name" to "John Doe",
         "section" to "Section 1",
         "lrn" to 123456789123,
         "timestamp" to System.now().toEpochMilliseconds()
-    )
+    )*/
     
     TardyScannerTheme {
-        HistoryItem(
+        /*HistoryItem(
             information["name"] as String,
             information["section"] as String,
             information["lrn"] as Long,
             true,
             information["timestamp"] as Long,
-        )
+        )*/
     }
 }

@@ -68,8 +68,9 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override suspend fun getAttendances(date: LocalDate): List<AttendanceDto> {
         // return attendanceDao.getAttendances()
+        Log.d("AttendanceRepositoryImpl", "localdate: $date")
 
-        val startOfDay = date.atStartOfDayIn(TimeZone.UTC)
+        val startOfDay = date.atStartOfDayIn(TimeZone.currentSystemDefault())
 
         val endOfDay = startOfDay
             .plus(Duration.parse("24h"))

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
-import com.unovil.tardyscan.domain.usecase.GetStudentInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,30 +12,50 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Duration
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val getStudentInfoUseCase: GetStudentInfoUseCase,
+    // private val getStudentInfoUseCase: GetStudentInfoUseCase,
     private val getAttendancesUseCase: GetAttendancesUseCase
 ) : ViewModel() {
 
-    private val _attendances = MutableStateFlow<List<Attendance>>(emptyList())
-    val attendances = _attendances.asStateFlow()
-    private val _selectedDate = MutableStateFlow(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date)
-    val selectedDate = _selectedDate.asStateFlow()
+    val attendanceFilterOptions = listOf("On time", "Absent", "Late", "All")
+
+    private var attendances = listOf<Attendance>()
+
+    private val _filteredAttendances = MutableStateFlow<List<Attendance>>(emptyList())
+    val filteredAttendances = _filteredAttendances.asStateFlow()
+
+    private val _selectedTimestamp = MutableStateFlow(Clock.System.now())
+    val selectedTimestamp = _selectedTimestamp.asStateFlow()
+    private val _selectedFilter = MutableStateFlow(attendanceFilterOptions[0])
+    val selectedFilter = _selectedFilter.asStateFlow()
 
     fun onLoadAttendances() {
         viewModelScope.launch {
-            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input(_selectedDate.value))) {
+            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input(
+                _selectedTimestamp.value.toLocalDateTime(
+                    TimeZone.currentSystemDefault()
+                ).date
+            ))) {
                 is GetAttendancesUseCase.Output.Success -> {
-                    val sortedAttendances = result.attendanceList
-                        .sortedWith(compareByDescending<Attendance> { it.isPresent }
-                            .thenBy { it.name.trim() }
-                        )
+                    val datedAttendances = result.attendanceList.sortedWith(
+                        compareBy<Attendance> { it.name.trim() }
+                    )
+                        /*if (_selectedFilter.value == "All") {
+                            sortedWith( compareBy<Attendance> { it.name.trim() } )
+                        } else {
+                            sortedWith(compareByDescending<Attendance> { it.isPresent }
+                                .thenBy { it.name.trim() }
+                            )
+                        }*/
+                    attendances = datedAttendances
 
-                    _attendances.value = sortedAttendances
+                    onChangeFilter(_selectedFilter.value)
                 }
                 is GetAttendancesUseCase.Output.Failure -> {
                     Log.e("HistoryViewModel", "Failed to load attendances: ${result.e.message}")
@@ -46,29 +65,36 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun onChangeDate(newDate: LocalDate) {
-        _selectedDate.value = newDate
+        _selectedTimestamp.value = newDate.atStartOfDayIn(TimeZone.currentSystemDefault())
+        attendances = emptyList()
         onLoadAttendances()
     }
 
+    fun onChangeFilter(newFilter: String) {
+        _selectedFilter.value = newFilter
+        if (newFilter == "All") {
+            _filteredAttendances.value = attendances
+            return
+        }
 
-    fun testFunction() {
-        viewModelScope.launch {
-            val result = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input("999999999999"))
+        val startOfLate = _selectedTimestamp.value
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+            .atStartOfDayIn(TimeZone.currentSystemDefault())
+            .plus(Duration.parse("7h"))
 
-            if (result is GetStudentInfoUseCase.Output.Failure) {
-                Log.d("HistoryViewModel", "Success! Failed to get student info for 999999999999")
-            } else {
-                Log.d("HistoryViewModel", "Failure! Something went wrong. Result: $result")
-            }
+        Log.d("HistoryViewModel", "Start of late in onChangeFilter: $startOfLate")
 
-            val result2 = getStudentInfoUseCase.execute(GetStudentInfoUseCase.Input("100730136315"))
+        if (newFilter !in attendanceFilterOptions) return
+        _filteredAttendances.value = attendances.filter {
+            if (it.studentId == 535317030410L)
+                Log.d("HistoryViewModel", "Test called in onChangeFilter, ${it.timestamp}")
 
-            if (result2 is GetStudentInfoUseCase.Output.Failure) {
-                Log.d("HistoryViewModel", "Success! Failed to get student info for 100730136315: $result2")
-            } else {
-                Log.d("HistoryViewModel", "Failure! Something went wrong. Result: $result2")
+            return@filter when (newFilter) {
+                "On time" -> (it.timestamp <= startOfLate && it.isPresent)
+                "Absent" -> (!it.isPresent)
+                "Late" -> (it.timestamp > startOfLate && it.isPresent)
+                else -> false
             }
         }
     }
-
 }
