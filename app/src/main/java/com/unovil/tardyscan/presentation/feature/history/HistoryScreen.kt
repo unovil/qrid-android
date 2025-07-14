@@ -9,8 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.DatePicker
@@ -119,7 +118,24 @@ fun HistoryScreen(
                 }
             }
 
-            Column(
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(15.dp)
+            ) {
+                val selectedDate = selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+                items(attendances.value.size) { index ->
+                    HistoryItem(
+                        selectedDate,
+                        attendances.value[index].name,
+                        attendances.value[index].section,
+                        attendances.value[index].studentId,
+                        attendances.value[index].isPresent,
+                        attendances.value[index].timestamp.toEpochMilliseconds()
+                    )
+                }
+            }
+
+            /*Column(
                 modifier = Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
@@ -133,7 +149,7 @@ fun HistoryScreen(
                         it.timestamp.toEpochMilliseconds()
                     )
                 }
-            }
+            }*/
         }
     }
 

@@ -11,7 +11,9 @@ import javax.inject.Inject
 class SignUpUseCaseImpl @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) : SignUpUseCase {
-    override suspend fun execute(input: SignUpUseCase.Input): SignUpUseCase.Output = withContext(Dispatchers.IO) {
+    override suspend fun execute(input: SignUpUseCase.Input): SignUpUseCase.Output = withContext(
+        Dispatchers.IO
+    ) {
         val result = authenticationRepository.signUp(
             input.allowedUser, input.email, input.password
         )

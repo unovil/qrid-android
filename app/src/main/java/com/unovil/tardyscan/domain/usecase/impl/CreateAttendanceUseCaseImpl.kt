@@ -11,21 +11,21 @@ import javax.inject.Inject
 class CreateAttendanceUseCaseImpl @Inject constructor(
     private val attendanceRepository: AttendanceRepository
 ) : CreateAttendanceUseCase {
-    override suspend fun execute(input: CreateAttendanceUseCase.Input): CreateAttendanceUseCase.Output {
-        return try {
-            withContext(Dispatchers.IO) {
-                val result = attendanceRepository.createAttendance(input.attendance)
-                when (result) {
-                    is Success ->
-                        CreateAttendanceUseCase.Output.Success
-                    is Failure.AttendanceExists ->
-                        CreateAttendanceUseCase.Output.Failure.Duplication
-                    is Failure.UnknownError ->
-                        CreateAttendanceUseCase.Output.Failure.Conflict(result.e.message ?: "Unknown error")
-                }
+    override suspend fun execute(input: CreateAttendanceUseCase.Input): CreateAttendanceUseCase.Output = withContext(
+        Dispatchers.IO
+    ) {
+        return@withContext try {
+            val result = attendanceRepository.createAttendance(input.attendance)
+            when (result) {
+                is Success ->
+                    CreateAttendanceUseCase.Output.Success
+                is Failure.AttendanceExists ->
+                    CreateAttendanceUseCase.Output.Failure.Duplication
+                is Failure.UnknownError ->
+                    CreateAttendanceUseCase.Output.Failure.Conflict(result.e.message ?: "Unknown error")
             }
         } catch (e: Exception) {
-            return CreateAttendanceUseCase.Output.Failure.Conflict(e.message ?: "Unknown error")
+            CreateAttendanceUseCase.Output.Failure.Conflict(e.message ?: "Unknown error")
         }
     }
 }

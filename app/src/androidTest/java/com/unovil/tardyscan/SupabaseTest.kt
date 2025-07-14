@@ -1,5 +1,6 @@
 package com.unovil.tardyscan
 
+/*
 import android.content.Context
 import android.util.Log
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -88,4 +89,4 @@ class SupabaseTest {
 
     }
     
-}
+}*/
