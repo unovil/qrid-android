@@ -64,12 +64,11 @@ class ScanViewModel @Inject constructor(
                     _returnColor.value = Color.Yellow
                     onDuplicate()
                 }
-                is CreateAttendanceUseCase.Output.Failure.Conflict -> {
+                is CreateAttendanceUseCase.Output.Failure -> {
                     Log.e("ScanViewModel", "Failed to submit attendance")
                     _returnColor.value = Color.Red
                     onFailure()
                 }
-                else -> { }
             }
         }
     }

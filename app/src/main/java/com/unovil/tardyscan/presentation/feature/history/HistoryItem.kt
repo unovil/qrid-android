@@ -1,6 +1,5 @@
 package com.unovil.tardyscan.presentation.feature.history
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,50 +18,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
-import kotlinx.datetime.format
-import kotlinx.datetime.format.MonthNames
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration
 
 @Composable
-fun HistoryItem(selectedDate: LocalDate, name: String, section: String, lrn: Long, isPresent: Boolean, epochMilliseconds: Long) {
-    val format = LocalDateTime.Format {
-        monthName(MonthNames.ENGLISH_ABBREVIATED)
-        chars(" ")
-        dayOfMonth()
-        chars(", ")
-        year()
-
-        chars(" ")
-
-        hour()
-        chars(":")
-        minute()
-        chars(":")
-        second()
-    }
-
-    val startOfLate = selectedDate
-        .atStartOfDayIn(TimeZone.currentSystemDefault())
-        .plus(Duration.parse("7h"))
-
-    val attendanceInstant = Instant.fromEpochMilliseconds(epochMilliseconds)
-
-    if (lrn == 535317030410L) {
-        Log.d("HistoryItem", "attendanceInstant: $attendanceInstant, startOfLate: $startOfLate")
-    }
-
-    val color = if (attendanceInstant > startOfLate) {
-        Color(0xFFA6A613)
-    } else if (!isPresent) {
-        MaterialTheme.colorScheme.errorContainer
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
+fun HistoryItem(attendanceUi: AttendanceUiModel) {
+    val color = when (attendanceUi.presence) {
+        Presence.PRESENT -> MaterialTheme.colorScheme.primaryContainer
+        Presence.ABSENT -> MaterialTheme.colorScheme.errorContainer
+        Presence.LATE -> Color(0xFFA6A613)
     }
 
     Surface(
@@ -79,35 +41,32 @@ fun HistoryItem(selectedDate: LocalDate, name: String, section: String, lrn: Lon
             Row {
                 Column(Modifier.weight(0.5f)) {
                     Text("Name", fontWeight = FontWeight.Bold)
-                    Text(name)
+                    Text(attendanceUi.name)
                 }
                 Column(
                     modifier = Modifier.weight(0.5f),
                     horizontalAlignment = Alignment.End
                 ) {
                     Text("LRN", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
-                    Text(lrn.toString(), textAlign = TextAlign.End)
+                    Text(attendanceUi.id.toString(), textAlign = TextAlign.End)
                 }
             }
             Spacer(Modifier.padding(6.dp))
             Row {
                 Column(Modifier.weight(0.5f)) {
                     Text("Section", fontWeight = FontWeight.Bold)
-                    Text(section)
+                    Text("${attendanceUi.level} - ${attendanceUi.section}")
                 }
                 Column(
                     modifier = Modifier.weight(0.5f),
                     horizontalAlignment = Alignment.End
                 ) {
                     Text("Timestamp", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
-                    if (epochMilliseconds == 0L) {
+                    if (attendanceUi.presence == Presence.ABSENT) {
                         Text("Not yet scanned", fontStyle = FontStyle.Italic, textAlign = TextAlign.End)
                     } else {
                         Text(
-                            Instant.fromEpochMilliseconds(epochMilliseconds)
-                                .toLocalDateTime(TimeZone.currentSystemDefault())
-                                .format(format)
-                                .toString(),
+                            attendanceUi.displayTimestamp,
                             textAlign = TextAlign.End
                         )
                     }

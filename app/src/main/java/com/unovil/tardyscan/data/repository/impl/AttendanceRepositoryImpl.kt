@@ -93,7 +93,7 @@ class AttendanceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllStudentIds(): List<Long> {
+    /*override suspend fun getAllStudentIds(): List<Long> {
         try {
             return studentTable
                 .select(Columns.list("id")) {}
@@ -103,7 +103,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             e.printStackTrace()
             return listOf()
         }
-    }
+    }*/
 
     override suspend fun deleteAttendance(id: Int) {
         attendanceTable.delete {
@@ -111,6 +111,20 @@ class AttendanceRepositoryImpl @Inject constructor(
                 AttendanceDto::id eq id
             }
         }
+    }
+
+    override suspend fun getAllStudentInfos(): List<StudentDto> {
+        return studentTable.select(columns =
+            Columns.raw("""
+                id, last_name, first_name, middle_name,
+                sections (
+                    level, section,
+                    schools (
+                        name, domain
+                    )
+                )
+            """.trimIndent())
+        ).decodeList<StudentDto>()
     }
 
     override suspend fun getStudentInfo(id: Long): StudentDto? {

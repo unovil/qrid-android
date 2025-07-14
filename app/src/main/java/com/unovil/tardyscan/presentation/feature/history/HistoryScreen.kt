@@ -3,6 +3,7 @@ package com.unovil.tardyscan.presentation.feature.history
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,7 +41,6 @@ import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.datetime.Clock.System
 import kotlinx.datetime.Instant
@@ -59,7 +59,7 @@ fun HistoryScreen(
     onChangeFilter: (String) -> Unit = historyViewModel!!::onChangeFilter,
     loadAttendances: () -> Unit = historyViewModel!!::onLoadAttendances,
     onDateSelected: (LocalDate) -> Unit = historyViewModel!!::onChangeDate,
-    attendances: State<List<Attendance>> = historyViewModel!!.filteredAttendances.collectAsState()
+    attendances: State<List<AttendanceUiModel>> = historyViewModel!!.filteredUiAttendances.collectAsState()
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
 
@@ -70,7 +70,7 @@ fun HistoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp),
+                .padding(15.dp, 15.dp, 15.dp, 0.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             Row(
@@ -119,37 +119,13 @@ fun HistoryScreen(
             }
 
             LazyColumn(
+                contentPadding = PaddingValues(bottom = 15.dp),
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-                val selectedDate = selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date
-
                 items(attendances.value.size) { index ->
-                    HistoryItem(
-                        selectedDate,
-                        attendances.value[index].name,
-                        attendances.value[index].section,
-                        attendances.value[index].studentId,
-                        attendances.value[index].isPresent,
-                        attendances.value[index].timestamp.toEpochMilliseconds()
-                    )
+                    HistoryItem(attendances.value[index])
                 }
             }
-
-            /*Column(
-                modifier = Modifier.verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(15.dp)
-            ) {
-                attendances.value.forEach {
-                    HistoryItem(
-                        selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                        it.name,
-                        it.section,
-                        it.studentId,
-                        it.isPresent,
-                        it.timestamp.toEpochMilliseconds()
-                    )
-                }
-            }*/
         }
     }
 
@@ -214,7 +190,7 @@ private fun PreviewHistoryScreen() {
     val attendanceFilterOptions = listOf("Present", "Absent", "Late", "All")
     val selectedDate = remember { mutableStateOf(System.now()) }
     val filter = remember { mutableStateOf(attendanceFilterOptions[0]) }
-    val attendances = remember { mutableStateOf<List<Attendance>>(listOf()) }
+    val attendances = remember { mutableStateOf<List<AttendanceUiModel>>(listOf()) }
 
     TardyScannerTheme {
         HistoryScreen(

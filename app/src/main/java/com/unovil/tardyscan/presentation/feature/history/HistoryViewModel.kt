@@ -11,8 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.format
+import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.time.Duration
@@ -24,11 +27,26 @@ class HistoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     val attendanceFilterOptions = listOf("On time", "Absent", "Late", "All")
+    private val timestampFormat = LocalDateTime.Format {
+        monthName(MonthNames.ENGLISH_ABBREVIATED)
+        chars(" ")
+        dayOfMonth()
+        chars(", ")
+        year()
+
+        chars(" ")
+
+        hour()
+        chars(":")
+        minute()
+        chars(":")
+        second()
+    }
 
     private var attendances = listOf<Attendance>()
 
-    private val _filteredAttendances = MutableStateFlow<List<Attendance>>(emptyList())
-    val filteredAttendances = _filteredAttendances.asStateFlow()
+    private val _filteredUiAttendances = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
+    val filteredUiAttendances = _filteredUiAttendances.asStateFlow()
 
     private val _selectedTimestamp = MutableStateFlow(Clock.System.now())
     val selectedTimestamp = _selectedTimestamp.asStateFlow()
@@ -43,16 +61,11 @@ class HistoryViewModel @Inject constructor(
                 ).date
             ))) {
                 is GetAttendancesUseCase.Output.Success -> {
-                    val datedAttendances = result.attendanceList.sortedWith(
-                        compareBy<Attendance> { it.name.trim() }
+                    val datedAttendances = result.attendanceList.sortedWith(comparator =
+                        compareBy<Attendance> { it.level }
+                            .thenBy { it.section.lowercase() }
+                            .thenBy { it.name.trim() }
                     )
-                        /*if (_selectedFilter.value == "All") {
-                            sortedWith( compareBy<Attendance> { it.name.trim() } )
-                        } else {
-                            sortedWith(compareByDescending<Attendance> { it.isPresent }
-                                .thenBy { it.name.trim() }
-                            )
-                        }*/
                     attendances = datedAttendances
 
                     onChangeFilter(_selectedFilter.value)
@@ -72,10 +85,6 @@ class HistoryViewModel @Inject constructor(
 
     fun onChangeFilter(newFilter: String) {
         _selectedFilter.value = newFilter
-        if (newFilter == "All") {
-            _filteredAttendances.value = attendances
-            return
-        }
 
         val startOfLate = _selectedTimestamp.value
             .toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -84,17 +93,31 @@ class HistoryViewModel @Inject constructor(
 
         Log.d("HistoryViewModel", "Start of late in onChangeFilter: $startOfLate")
 
-        if (newFilter !in attendanceFilterOptions) return
-        _filteredAttendances.value = attendances.filter {
-            if (it.studentId == 535317030410L)
-                Log.d("HistoryViewModel", "Test called in onChangeFilter, ${it.timestamp}")
+        _filteredUiAttendances.value = attendances.map { attendance ->
+            val presence = when (attendance.isPresent) {
+                true -> if (attendance.timestamp > startOfLate) Presence.LATE else Presence.PRESENT
+                false -> Presence.ABSENT
+            }
 
-            return@filter when (newFilter) {
-                "On time" -> (it.timestamp <= startOfLate && it.isPresent)
-                "Absent" -> (!it.isPresent)
-                "Late" -> (it.timestamp > startOfLate && it.isPresent)
+            AttendanceUiModel(
+                id = attendance.studentId,
+                name = attendance.name,
+                level = attendance.level,
+                section = attendance.section,
+                presence = presence,
+                displayTimestamp = attendance.timestamp
+                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                    .format(timestampFormat).toString()
+            )
+        }.filter { attendance ->
+            when (newFilter) {
+                "On time" -> attendance.presence == Presence.PRESENT
+                "Absent" -> attendance.presence == Presence.ABSENT
+                "Late" -> attendance.presence == Presence.LATE
+                "All" -> true
                 else -> false
             }
         }
+
     }
 }

@@ -7,8 +7,6 @@ import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 
 class GetAttendancesUseCaseImpl @Inject constructor(
@@ -24,7 +22,23 @@ class GetAttendancesUseCaseImpl @Inject constructor(
                 val presentList = attendanceRepository.getAttendances(input.date)
                 val presentListIds = presentList.map { it.studentId }.toSet() // Use Set for fast lookup
 
-                // Get full list of students expected in class
+                attendanceRepository.getAllStudentInfos().forEach { student ->
+                    val isPresent = student.id in presentListIds
+                    val timestamp = presentList.find { it.studentId == student.id }?.timestamp ?: Instant.DISTANT_PAST
+
+                    attendanceList.add(
+                        Attendance(
+                            studentId = student.id!!,
+                            timestamp = timestamp,
+                            name = "${student.lastName}, ${student.firstName} ${student.middleName.orEmpty()}",
+                            level = student.section.level,
+                            section = student.section.section,
+                            isPresent = isPresent
+                        )
+                    )
+                }
+
+                /*// Get full list of students expected in class
                 val allStudentIds = attendanceRepository.getAllStudentIds()
 
                 allStudentIds.forEach { studentId ->
@@ -46,7 +60,7 @@ class GetAttendancesUseCaseImpl @Inject constructor(
                             )
                         )
                     }
-                }
+                }*/
 
                 GetAttendancesUseCase.Output.Success(attendanceList)
             } catch (e: Exception) {

@@ -5,6 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -13,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
@@ -43,6 +49,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
+            val isSystemInDarkTheme = isSystemInDarkTheme()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
 
@@ -51,14 +58,34 @@ class MainActivity : ComponentActivity() {
                 isLoadingThemeFinished = true
             }
 
+            LaunchedEffect(isDarkTheme.value, isSystemInDarkTheme) {
+                val window = this@MainActivity.window
+                val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+                when (isDarkTheme.value) {
+                    true -> insetsController.isAppearanceLightStatusBars = false
+                    false -> insetsController.isAppearanceLightStatusBars = true
+                    null -> insetsController.isAppearanceLightStatusBars = !isSystemInDarkTheme
+                }
+            }
+
             if (isLoadingThemeFinished) {
-                TardyScannerTheme(darkTheme = isDarkTheme.value ?: isSystemInDarkTheme()) {
+                TardyScannerTheme(darkTheme = isDarkTheme.value ?: isSystemInDarkTheme) {
                     when (sessionStatus.value) {
                         is SessionStatus.Authenticated -> {
-                            if (scanMode) {
-                                ScanNavigation(cameraExecutor) { scanMode = false }
-                            } else {
-                                MainNavigation { scanMode = true }
+                            AnimatedContent(
+                                targetState = scanMode,
+                                label = "ScanFade",
+                                transitionSpec = {
+                                    fadeIn(tween(200)).togetherWith(
+                                        fadeOut(tween(200))
+                                    )
+                                }
+                            ) { isScanMode ->
+                                if (isScanMode) {
+                                    ScanNavigation(cameraExecutor) { scanMode = false }
+                                } else {
+                                    MainNavigation { scanMode = true }
+                                }
                             }
                         }
 
@@ -68,7 +95,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-
         }
     }
 

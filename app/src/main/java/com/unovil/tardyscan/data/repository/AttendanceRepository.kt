@@ -17,8 +17,9 @@ interface AttendanceRepository {
 
     suspend fun createAttendance(attendance: Attendance): CreateAttendanceResult
     suspend fun getAttendances(date: LocalDate): List<AttendanceDto>
-    suspend fun getAllStudentIds(): List<Long>
-    suspend fun deleteAttendance(id: Int)
+    // suspend fun getAllStudentIds(): List<Long>
+    suspend fun getAllStudentInfos(): List<StudentDto>
     suspend fun getStudentInfo(id: Long): StudentDto?
     suspend fun getDecryptionKey(schoolId: Int): String?
+    suspend fun deleteAttendance(id: Int)
 }
