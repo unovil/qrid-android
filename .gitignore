@@ -7,6 +7,10 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/AndroidProjectSystem.xml
+/.idea/ChatHistory_schema_v2.xml
+/.idea/androidTestResultsUserPreferences.xml
+/.kotlin
 .DS_Store
 /build
 /captures
