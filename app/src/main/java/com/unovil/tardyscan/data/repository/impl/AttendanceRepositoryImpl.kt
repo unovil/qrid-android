@@ -5,7 +5,6 @@ import com.unovil.tardyscan.data.network.dto.AttendanceDto
 import com.unovil.tardyscan.data.network.dto.SchoolDto
 import com.unovil.tardyscan.data.network.dto.StudentDto
 import com.unovil.tardyscan.data.repository.AttendanceRepository
-import com.unovil.tardyscan.data.repository.AttendanceRepository.CreateAttendanceResult
 import com.unovil.tardyscan.domain.model.Attendance
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -26,7 +25,7 @@ class AttendanceRepositoryImpl @Inject constructor(
     private val attendanceTable = postgrest["attendances"]
     private val studentTable = postgrest["students"]
 
-    override suspend fun createAttendance(attendance: Attendance): CreateAttendanceResult {
+    override suspend fun createAttendance(attendance: Attendance) {
         val startOfDay = attendance.timestamp
             .toLocalDateTime(TimeZone.currentSystemDefault()).date
             .atStartOfDayIn(TimeZone.UTC)
@@ -39,37 +38,31 @@ class AttendanceRepositoryImpl @Inject constructor(
 
         Log.d("AttendanceRepositoryImpl", "startOfDay: $endOfDay")
 
-        try {
-            val existingAttendance = attendanceTable.select {
-                filter {
-                    and {
-                        AttendanceDto::studentId eq attendance.studentId
-                        AttendanceDto::timestamp gte startOfDay
-                        AttendanceDto::timestamp lte endOfDay
-                    }
+        val existingAttendance = attendanceTable.select {
+            filter {
+                and {
+                    AttendanceDto::studentId eq attendance.studentId
+                    AttendanceDto::timestamp gte startOfDay
+                    AttendanceDto::timestamp lte endOfDay
                 }
-            }.decodeList<AttendanceDto>()
-
-            Log.d("AttendanceRepositoryImpl", "existingAttendance: $existingAttendance")
-
-            if (existingAttendance.isNotEmpty()) {
-                return CreateAttendanceResult.Failure.AttendanceExists
             }
+        }.decodeList<AttendanceDto>()
 
-            val userId = (auth.currentUserOrNull()!!.userMetadata!!["allowed_user_id"] as JsonPrimitive).content.toInt()
+        Log.d("AttendanceRepositoryImpl", "existingAttendance: $existingAttendance")
 
-            val attendanceDto = AttendanceDto(
-                studentId = attendance.studentId,
-                timestamp = attendance.timestamp,
-                senderId = userId
-            )
-            attendanceTable.insert(attendanceDto)
-
-            return CreateAttendanceResult.Success
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return CreateAttendanceResult.Failure.UnknownError(e)
+        if (existingAttendance.isNotEmpty()) {
+            throw IllegalAccessException("Attendance already exists")
         }
+
+        val userId = (auth.currentUserOrNull()!!.userMetadata!!["allowed_user_id"] as JsonPrimitive).content.toInt()
+
+        val attendanceDto = AttendanceDto(
+            studentId = attendance.studentId,
+            timestamp = attendance.timestamp,
+            senderId = userId
+        )
+
+        attendanceTable.insert(attendanceDto)
     }
 
     override suspend fun getAttendances(date: LocalDate): List<AttendanceDto> {
@@ -82,34 +75,17 @@ class AttendanceRepositoryImpl @Inject constructor(
             .plus(Duration.parse("24h"))
             .minus(Duration.parse("1ms"))
 
-        try {
-            val attendanceList = attendanceTable.select {
-                filter {
-                    and {
-                        AttendanceDto::timestamp gte startOfDay
-                        AttendanceDto::timestamp lte endOfDay
-                    }
+        val attendanceList = attendanceTable.select {
+            filter {
+                and {
+                    AttendanceDto::timestamp gte startOfDay
+                    AttendanceDto::timestamp lte endOfDay
                 }
-            }.decodeList<AttendanceDto>()
+            }
+        }.decodeList<AttendanceDto>()
 
-            return attendanceList
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return listOf()
-        }
+        return attendanceList
     }
-
-    /*override suspend fun getAllStudentIds(): List<Long> {
-        try {
-            return studentTable
-                .select(Columns.list("id")) {}
-                    .decodeAs<List<Map<String, Long>>>()
-                .map { it["id"]!! }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return listOf()
-        }
-    }*/
 
     override suspend fun deleteAttendance(id: Int) {
         attendanceTable.delete {

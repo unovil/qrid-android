@@ -9,6 +9,9 @@ import com.macasaet.fernet.TokenValidationException
 import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.domain.model.Student
 import com.unovil.tardyscan.domain.usecase.GetStudentInfoUseCase
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.temporal.ChronoUnit
@@ -26,17 +29,16 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
             return@withContext GetStudentInfoUseCase.Output.Failure.InvalidCode
         }
 
-        val decryptionKey = attendanceRepository.getDecryptionKey(qrMatch.groups[2]!!.value.toInt())
-        if (decryptionKey == null) {
-            Log.e("GetStudentInfoUseCaseImpl", "Decryption key not found for school code: ${qrMatch.groups[1]!!.value}")
-            return@withContext GetStudentInfoUseCase.Output.Failure.InvalidCode
-        }
-
-        val decryptedString : String
         try {
+            val decryptionKey = attendanceRepository.getDecryptionKey(qrMatch.groups[2]!!.value.toInt())
+            if (decryptionKey == null) {
+                Log.e("GetStudentInfoUseCaseImpl", "Decryption key not found for school code: ${qrMatch.groups[1]!!.value}")
+                return@withContext GetStudentInfoUseCase.Output.Failure.InvalidCode
+            }
+
             val fernetKey = Key(decryptionKey)
             Log.d("GetStudentInfoUseCaseImpl", "Decrypting QR Code: ${qrMatch.groups[1]!!.value}")
-            decryptedString = Token.fromString(qrMatch.groups[1]!!.value)
+            val decryptedString = Token.fromString(qrMatch.groups[1]!!.value)
                 .validateAndDecrypt(fernetKey, object : StringValidator {
                     override fun getTimeToLive(): TemporalAmount? = ChronoUnit.YEARS.duration
                 })
@@ -45,32 +47,46 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
                 Log.e("GetStudentInfoUseCaseImpl", "Invalid decrypted string: $decryptedString")
                 return@withContext GetStudentInfoUseCase.Output.Failure.InvalidDecryption
             }
-        } catch (e: Exception) {
-            if (e is TokenValidationException || e is IllegalArgumentException) {
-                e.printStackTrace()
-                return@withContext GetStudentInfoUseCase.Output.Failure.InvalidDecryption
+
+            val result = attendanceRepository.getStudentInfo(decryptedString.toLong())
+
+            if (result == null) {
+                Log.e("GetStudentInfoUseCaseImpl", "Student not found for ID: $decryptedString")
+                return@withContext GetStudentInfoUseCase.Output.Failure.NotFound
             }
 
-            throw e
+            val student = Student(
+                decryptedString.toLong(),
+                result.lastName,
+                result.firstName,
+                result.middleName,
+                result.section.level,
+                result.section.section,
+                result.section.school.name
+            )
+
+            return@withContext GetStudentInfoUseCase.Output.Success(student)
+
+        } catch(e: Exception) {
+            when (e) {
+                is TokenValidationException, is IllegalArgumentException ->
+                    return@withContext GetStudentInfoUseCase.Output.Failure.InvalidDecryption
+                is HttpRequestException ->
+                    return@withContext GetStudentInfoUseCase.Output.Failure.HttpRequestError
+                is HttpRequestTimeoutException ->
+                    return@withContext GetStudentInfoUseCase.Output.Failure.HttpRequestTimeout
+                is PostgrestRestException ->
+                    return@withContext GetStudentInfoUseCase.Output.Failure.PostgrestError(
+                        e.message ?: "Unknown Postgrest error."
+                    )
+                else ->
+                    return@withContext GetStudentInfoUseCase.Output.Failure.UnknownError(
+                        e.message ?: "Unknown error."
+                    )
+            }
         }
 
-        val result = attendanceRepository.getStudentInfo(decryptedString.toLong())
 
-        if (result == null) {
-            Log.e("GetStudentInfoUseCaseImpl", "Student not found for ID: $decryptedString")
-            return@withContext GetStudentInfoUseCase.Output.Failure.NotFound
-        }
 
-        val student = Student(
-            decryptedString.toLong(),
-            result.lastName,
-            result.firstName,
-            result.middleName,
-            result.section.level,
-            result.section.section,
-            result.section.school.name
-        )
-
-        return@withContext GetStudentInfoUseCase.Output.Success(student)
     }
 }

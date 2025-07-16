@@ -8,6 +8,11 @@ interface GetAttendancesUseCase : UseCase<GetAttendancesUseCase.Input, GetAttend
 
     sealed class Output {
         data class Success(val attendanceList: List<Attendance>) : Output()
-        class Failure(val e: Exception) : Output()
+        open class Failure : Output() {
+            object PostgrestException : Failure()
+            object HttpRequestException : Failure()
+            object HttpRequestTimeout : Failure()
+            data class Unknown(val throwable: Throwable) : Failure()
+        }
     }
 }

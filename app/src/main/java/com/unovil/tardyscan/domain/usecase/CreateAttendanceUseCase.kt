@@ -9,7 +9,10 @@ interface CreateAttendanceUseCase : UseCase<CreateAttendanceUseCase.Input, Creat
         object Success : Output()
         open class Failure : Output() {
             object Duplication : Failure()
-            data class Conflict(val message: String) : Failure()
+            object PostgrestException : Failure()
+            object HttpRequestException : Failure()
+            object HttpRequestTimeout : Failure()
+            data class Unknown(val message: String) : Failure()
         }
     }
 }

@@ -4,6 +4,9 @@ import android.util.Log
 import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
@@ -14,11 +17,10 @@ class GetAttendancesUseCaseImpl @Inject constructor(
 ) : GetAttendancesUseCase {
     override suspend fun execute(input: GetAttendancesUseCase.Input): GetAttendancesUseCase.Output =
         withContext(Dispatchers.IO) {
-            val attendanceList = mutableListOf<Attendance>()
-            Log.d("GetAttendancesUseCaseImpl", "execute with: ${input.date}")
+            try {
+                val attendanceList = mutableListOf<Attendance>()
+                Log.d("GetAttendancesUseCaseImpl", "execute with: ${input.date}")
 
-            return@withContext try {
-                // Get list of students who were marked present on the given date
                 val presentList = attendanceRepository.getAttendances(input.date)
                 val presentListIds = presentList.map { it.studentId }.toSet() // Use Set for fast lookup
 
@@ -38,34 +40,14 @@ class GetAttendancesUseCaseImpl @Inject constructor(
                     )
                 }
 
-                /*// Get full list of students expected in class
-                val allStudentIds = attendanceRepository.getAllStudentIds()
-
-                allStudentIds.forEach { studentId ->
-                    val studentInfo = attendanceRepository.getStudentInfo(studentId)
-                    if (studentInfo != null) {
-                        val isPresent = studentId in presentListIds
-                        val timestamp = presentList.find { it.studentId == studentId }?.timestamp ?: Instant.fromEpochMilliseconds(0)
-
-                        Log.d("GetAttendancesUseCaseImpl", "Student id: $studentId, timestamp in datetime: ${timestamp.toLocalDateTime(
-                            TimeZone.currentSystemDefault())}")
-
-                        attendanceList.add(
-                            Attendance(
-                                studentId = studentId,
-                                timestamp = timestamp,
-                                name = "${studentInfo.lastName}, ${studentInfo.firstName} ${studentInfo.middleName.orEmpty()}",
-                                section = "${studentInfo.section.level} - ${studentInfo.section.section}",
-                                isPresent = isPresent
-                            )
-                        )
-                    }
-                }*/
-
                 GetAttendancesUseCase.Output.Success(attendanceList)
             } catch (e: Exception) {
-                GetAttendancesUseCase.Output.Failure(e)
+                when (e) {
+                    is PostgrestRestException -> GetAttendancesUseCase.Output.Failure.PostgrestException
+                    is HttpRequestException -> GetAttendancesUseCase.Output.Failure.HttpRequestException
+                    is HttpRequestTimeoutException -> GetAttendancesUseCase.Output.Failure.HttpRequestTimeout
+                    else -> GetAttendancesUseCase.Output.Failure.Unknown(e)
+                }
             }
-
         }
 }

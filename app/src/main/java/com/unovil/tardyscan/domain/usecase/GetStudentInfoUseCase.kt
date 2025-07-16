@@ -11,6 +11,10 @@ interface GetStudentInfoUseCase : UseCase<GetStudentInfoUseCase.Input, GetStuden
             object InvalidCode : Failure()
             object InvalidDecryption : Failure()
             object NotFound : Failure()
+            object HttpRequestError : Failure()
+            object HttpRequestTimeout : Failure()
+            data class PostgrestError(val message: String) : Failure()
+            data class UnknownError(val message: String) : Failure()
         }
     }
 }
