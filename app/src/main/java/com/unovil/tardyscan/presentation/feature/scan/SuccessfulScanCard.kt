@@ -58,7 +58,7 @@ fun SuccessfulScanCard(
                 viewModel.onReset()
             },
             {
-                Toast.makeText(it, "Something went wrong. Please try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(it, "Please check your Internet connection and try again.", Toast.LENGTH_LONG).show()
             }
         )
     },
