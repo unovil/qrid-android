@@ -1,6 +1,7 @@
 package com.unovil.tardyscan
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,6 +12,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,9 +22,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.unovil.tardyscan.di.ThemeManager
+import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
 import com.unovil.tardyscan.presentation.navigation.ScanNavigation
@@ -70,29 +76,47 @@ class MainActivity : ComponentActivity() {
 
             if (isLoadingThemeFinished) {
                 TardyScannerTheme(darkTheme = isDarkTheme.value ?: isSystemInDarkTheme) {
-                    when (sessionStatus.value) {
-                        is SessionStatus.Authenticated -> {
-                            AnimatedContent(
-                                targetState = scanMode,
-                                label = "ScanFade",
-                                transitionSpec = {
-                                    fadeIn(tween(200)).togetherWith(
-                                        fadeOut(tween(200))
-                                    )
+                    Log.d("MainActivity", "Theme loaded with darkTheme value ${isDarkTheme.value}")
+                    Log.d("MainActivity", "Session value: ${sessionStatus.value}")
+
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        AnimatedContent(
+                            targetState = sessionStatus.value,
+                            label = "SessionFade",
+                        ) { status ->
+                            when (status) {
+                                is SessionStatus.Authenticated -> {
+                                    AnimatedContent(
+                                        targetState = scanMode,
+                                        label = "ScanFade",
+                                        transitionSpec = {
+                                            fadeIn(tween(200)).togetherWith(
+                                                fadeOut(tween(200))
+                                            )
+                                        }
+                                    ) { isScanMode ->
+                                        if (isScanMode) {
+                                            ScanNavigation(cameraExecutor) { scanMode = false }
+                                        } else {
+                                            MainNavigation { scanMode = true }
+                                        }
+                                    }
                                 }
-                            ) { isScanMode ->
-                                if (isScanMode) {
-                                    ScanNavigation(cameraExecutor) { scanMode = false }
-                                } else {
-                                    MainNavigation { scanMode = true }
+
+                                is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> {
+                                    LoadingScreen()
+                                }
+
+                                is SessionStatus.NotAuthenticated -> {
+                                    AuthNavigation {  }
                                 }
                             }
                         }
-
-                        is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> { /* splash */ }
-
-                        is SessionStatus.NotAuthenticated -> { AuthNavigation {  } }
                     }
+
                 }
             }
         }
