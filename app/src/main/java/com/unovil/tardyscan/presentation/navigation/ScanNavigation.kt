@@ -65,7 +65,10 @@ fun ScanNavigation(cameraExecutor: ExecutorService, onBack: () -> Unit) {
             dialog<Screen.SuccessfulScan> {
                 SuccessfulScanCard(
                     viewModel = scanViewModel,
-                    onNavigate = { navController.popBackStack() },
+                    onNavigate = {
+                        scanViewModel.resetNavigationFlag()
+                        navController.popBackStack()
+                                 },
                 )
             }
         }

@@ -24,6 +24,12 @@ class ScanViewModel @Inject constructor(
     private val _isScanningEnabled = MutableStateFlow(true)
     val isScanningEnabled = _isScanningEnabled.asStateFlow()
 
+    private val _hasNavigatedToDialog = MutableStateFlow(false)
+    val hasNavigatedToDialog = _hasNavigatedToDialog.asStateFlow()
+
+    private val _isSubmittingEnabled = MutableStateFlow(true)
+    val isSubmittingEnabled = _isSubmittingEnabled.asStateFlow()
+
     private val _scannedStudent = MutableStateFlow<Student?>(null)
     val scannedStudent = _scannedStudent.asStateFlow()
 
@@ -31,6 +37,8 @@ class ScanViewModel @Inject constructor(
     val returnColor = _returnColor.asStateFlow()
 
     fun onQrCodeScanned(qrCode: String, actionOnSuccess: () -> Unit) {
+        if (_hasNavigatedToDialog.value) return
+
         Log.d("ScanViewModel", "qr code string is: $qrCode")
         _isScanningEnabled.value = false
         viewModelScope.launch {
@@ -38,6 +46,7 @@ class ScanViewModel @Inject constructor(
             if (studentInfo is GetStudentInfoUseCase.Output.Success) {
                 Log.d("ScanViewModel", "Success! Student info: ${studentInfo.student}")
                 _scannedStudent.value = studentInfo.student
+                _hasNavigatedToDialog.value = true
                 actionOnSuccess()
             } else {
                 _isScanningEnabled.value = true
@@ -48,27 +57,33 @@ class ScanViewModel @Inject constructor(
 
     fun onSubmitAttendance(onSuccess: () -> Unit, onDuplicate: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch {
-            val isSubmitted = createAttendanceUseCase.execute(
-                CreateAttendanceUseCase.Input(
-                    Attendance(_scannedStudent.value!!.id, Clock.System.now())
-                )
-            )
+            _isSubmittingEnabled.value = false
 
-            when (isSubmitted) {
-                is CreateAttendanceUseCase.Output.Success -> {
-                    _returnColor.value = Color.Green
-                    onSuccess()
+            try {
+                val isSubmitted = createAttendanceUseCase.execute(
+                    CreateAttendanceUseCase.Input(
+                        Attendance(_scannedStudent.value!!.id, Clock.System.now())
+                    )
+                )
+
+                when (isSubmitted) {
+                    is CreateAttendanceUseCase.Output.Success -> {
+                        _returnColor.value = Color.Green
+                        onSuccess()
+                    }
+                    is CreateAttendanceUseCase.Output.Failure.Duplication -> {
+                        Log.e("ScanViewModel", "Duplicate attendance already exists!")
+                        _returnColor.value = Color.Yellow
+                        onDuplicate()
+                    }
+                    is CreateAttendanceUseCase.Output.Failure -> {
+                        Log.e("ScanViewModel", "Failed to submit attendance")
+                        _returnColor.value = Color.Red
+                        onFailure()
+                    }
                 }
-                is CreateAttendanceUseCase.Output.Failure.Duplication -> {
-                    Log.e("ScanViewModel", "Duplicate attendance already exists!")
-                    _returnColor.value = Color.Yellow
-                    onDuplicate()
-                }
-                is CreateAttendanceUseCase.Output.Failure -> {
-                    Log.e("ScanViewModel", "Failed to submit attendance")
-                    _returnColor.value = Color.Red
-                    onFailure()
-                }
+            } finally {
+                _isSubmittingEnabled.value = true
             }
         }
     }
@@ -78,7 +93,12 @@ class ScanViewModel @Inject constructor(
     }
 
     fun onReset() {
+        _isSubmittingEnabled.value = true
         _isScanningEnabled.value = true
         _scannedStudent.value = null
+    }
+
+    fun resetNavigationFlag() {
+        _hasNavigatedToDialog.value = false
     }
 }

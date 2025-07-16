@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.filterNotNull
 @Composable
 fun SuccessfulScanCard(
     viewModel: ScanViewModel? = hiltViewModel(),
+    isSubmittingEnabled: State<Boolean> = viewModel!!.isSubmittingEnabled.collectAsState(),
     scannedStudent: State<Student> = viewModel!!.scannedStudent.filterNotNull().collectAsState(
         Student(100_000_000_000, "", "", "", 0, "", "")
     ),
@@ -113,6 +114,7 @@ fun SuccessfulScanCard(
                         Color.Gray,
                         Color.Black
                     ),
+                    enabled = isSubmittingEnabled.value,
                     onClick = { onSubmit(context) }
                 ) {
                     Text("Accept attendance")
@@ -126,6 +128,7 @@ fun SuccessfulScanCard(
                         Color.Gray,
                         Color.Black
                     ),
+                    enabled = isSubmittingEnabled.value,
                     onClick = onReset
                 ) {
                     Text("Reject attendance")
