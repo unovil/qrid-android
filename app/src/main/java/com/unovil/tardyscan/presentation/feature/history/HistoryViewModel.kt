@@ -44,6 +44,8 @@ class HistoryViewModel @Inject constructor(
     }
 
     private var attendances = listOf<Attendance>()
+    private val _isAttendancesLoaded = MutableStateFlow(true)
+    val isAttendancesLoaded = _isAttendancesLoaded.asStateFlow()
 
     private val _filteredUiAttendances = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
     val filteredUiAttendances = _filteredUiAttendances.asStateFlow()
@@ -69,9 +71,11 @@ class HistoryViewModel @Inject constructor(
                     attendances = datedAttendances
 
                     onChangeFilter(_selectedFilter.value)
+                    _isAttendancesLoaded.value = true
                 }
                 is GetAttendancesUseCase.Output.Failure -> {
-                    Log.e("HistoryViewModel", "Failed to load attendances: ${result.e.message}")
+                    _isAttendancesLoaded.value = false
+                    Log.e("HistoryViewModel", "Failed to load attendances: ${result::class}")
                 }
             }
         }

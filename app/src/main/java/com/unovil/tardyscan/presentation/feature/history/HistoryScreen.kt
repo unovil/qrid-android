@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.presentation.feature.history
 
 import android.util.Log
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,11 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +60,7 @@ fun HistoryScreen(
     attendanceFilters: List<String> = historyViewModel!!.attendanceFilterOptions,
     selectedFilter: State<String> = historyViewModel!!.selectedFilter.collectAsState(),
     onChangeFilter: (String) -> Unit = historyViewModel!!::onChangeFilter,
+    isAttendancesLoaded: State<Boolean> = historyViewModel!!.isAttendancesLoaded.collectAsState(),
     loadAttendances: () -> Unit = historyViewModel!!::onLoadAttendances,
     onDateSelected: (LocalDate) -> Unit = historyViewModel!!::onChangeDate,
     attendances: State<List<AttendanceUiModel>> = historyViewModel!!.filteredUiAttendances.collectAsState()
@@ -118,12 +122,28 @@ fun HistoryScreen(
                 }
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 15.dp),
-                verticalArrangement = Arrangement.spacedBy(15.dp)
-            ) {
-                items(attendances.value.size) { index ->
-                    HistoryItem(attendances.value[index])
+            Crossfade(targetState = isAttendancesLoaded.value) { isAttendancesLoaded ->
+                if (isAttendancesLoaded) {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 15.dp),
+                        verticalArrangement = Arrangement.spacedBy(15.dp)
+                    ) {
+                        items(attendances.value.size) { index ->
+                            HistoryItem(attendances.value[index])
+                        }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(vertical = 16.dp, horizontal = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("Cannot fetch attendance records from the server.", textAlign = TextAlign.Center)
+                        Spacer(Modifier.height(16.dp))
+                        Button(onClick = loadAttendances) {
+                            Text("Refresh!")
+                        }
+                    }
                 }
             }
         }
