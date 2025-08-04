@@ -123,7 +123,7 @@ fun HistoryScreen(
             }
 
             Crossfade(targetState = isAttendancesLoaded.value) { isAttendancesLoaded ->
-                if (isAttendancesLoaded) {
+                if (isAttendancesLoaded && attendances.value.isNotEmpty()) {
                     LazyColumn(
                         contentPadding = PaddingValues(bottom = 15.dp),
                         verticalArrangement = Arrangement.spacedBy(15.dp)
@@ -131,6 +131,14 @@ fun HistoryScreen(
                         items(attendances.value.size) { index ->
                             HistoryItem(attendances.value[index])
                         }
+                    }
+                } else if (isAttendancesLoaded && attendances.value.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(vertical = 16.dp, horizontal = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text("No attendance records exist with this filter. Try with a different filter!", textAlign = TextAlign.Center)
                     }
                 } else {
                     Column(

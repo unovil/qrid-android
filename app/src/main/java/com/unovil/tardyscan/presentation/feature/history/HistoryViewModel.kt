@@ -22,7 +22,6 @@ import kotlin.time.Duration
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    // private val getStudentInfoUseCase: GetStudentInfoUseCase,
     private val getAttendancesUseCase: GetAttendancesUseCase
 ) : ViewModel() {
 
