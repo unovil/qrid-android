@@ -11,8 +11,10 @@ import com.unovil.tardyscan.domain.model.Student
 import com.unovil.tardyscan.domain.usecase.GetStudentInfoUseCase
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
+import io.github.jan.supabase.storage.DownloadStatus
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.withContext
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAmount
@@ -28,6 +30,15 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
             Log.e("GetStudentInfoUseCaseImpl", "Invalid QR Code format: ${input.qrCode}")
             return@withContext GetStudentInfoUseCase.Output.Failure.InvalidCode
         }
+
+        val id: Long
+        val lastName: String
+        val firstName: String
+        val middleName: String?
+        val level: Int
+        val section: String
+        val school: String
+        val avatarLink: String?
 
         try {
             val decryptionKey = attendanceRepository.getDecryptionKey(qrMatch.groups[2]!!.value.toInt())
@@ -55,19 +66,17 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
                 return@withContext GetStudentInfoUseCase.Output.Failure.NotFound
             }
 
-            val student = Student(
-                decryptedString.toLong(),
-                result.lastName,
-                result.firstName,
-                result.middleName,
-                result.section.level,
-                result.section.section,
-                result.section.school.name
-            )
-
-            return@withContext GetStudentInfoUseCase.Output.Success(student)
+            id = decryptedString.toLong()
+            lastName = result.lastName
+            firstName = result.firstName
+            middleName = result.middleName
+            level = result.section.level
+            section = result.section.section
+            school = result.section.school.name
+            avatarLink = result.avatarLink
 
         } catch(e: Exception) {
+            Log.e("GetStudentInfoUseCaseImpl", "Error getting student info: ${e.message}")
             when (e) {
                 is TokenValidationException, is IllegalArgumentException ->
                     return@withContext GetStudentInfoUseCase.Output.Failure.InvalidDecryption
@@ -86,7 +95,18 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
             }
         }
 
+        val avatar = try {
+            if (avatarLink == null) null else attendanceRepository.getAvatarFlow(avatarLink).catch { e ->
+                Log.e("GetStudentInfoUseCaseImpl", "Error getting avatar: ${e.message}")
+                emit(DownloadStatus.Progress(-1,-1))
+            }
+        } catch(e: Exception) {
+            Log.d("GetStudentInfoUseCaseImpl", "Error getting avatar: ${e.message}")
+            null
+        }
 
+        val student = Student(id, lastName, firstName, middleName, level, section, school, avatar)
 
+        return@withContext GetStudentInfoUseCase.Output.Success(student)
     }
 }

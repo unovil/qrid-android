@@ -9,6 +9,10 @@ import com.unovil.tardyscan.domain.model.Attendance
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.storage.DownloadStatus
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.downloadAuthenticatedAsFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -20,10 +24,12 @@ import kotlin.time.Duration
 class AttendanceRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val auth: Auth,
+    private val storage: Storage
 ) : AttendanceRepository {
 
     private val attendanceTable = postgrest["attendances"]
     private val studentTable = postgrest["students"]
+    private val avatarsBucket = storage["avatars"]
 
     override suspend fun createAttendance(attendance: Attendance) {
         val startOfDay = attendance.timestamp
@@ -95,6 +101,7 @@ class AttendanceRepositoryImpl @Inject constructor(
         }
     }
 
+    // no need for avatar, this one is used for history
     override suspend fun getAllStudentInfos(): List<StudentDto> {
         return studentTable.select(columns =
             Columns.raw("""
@@ -114,7 +121,7 @@ class AttendanceRepositoryImpl @Inject constructor(
 
         return studentTable.select(columns =
             Columns.raw("""
-                id, last_name, first_name, middle_name,
+                id, last_name, first_name, middle_name, avatar,
                 sections (
                     level, section,
                     schools (
@@ -125,6 +132,10 @@ class AttendanceRepositoryImpl @Inject constructor(
         ) {
             filter { StudentDto::id eq id }
         }.decodeSingleOrNull<StudentDto>()
+    }
+
+    override suspend fun getAvatarFlow(avatarLink: String): Flow<DownloadStatus> {
+        return avatarsBucket.downloadAuthenticatedAsFlow(avatarLink)
     }
 
     override suspend fun getDecryptionKey(schoolId: Int): String? {

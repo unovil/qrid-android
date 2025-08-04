@@ -12,6 +12,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
@@ -29,6 +31,7 @@ object SupabaseModule {
                 propertyConversionMethod = PropertyConversionMethod.SERIAL_NAME
             }
             install(Auth)
+            install(Storage)
         }
     }
 
@@ -42,6 +45,12 @@ object SupabaseModule {
     @Singleton
     fun provideSupabaseAuth(client: SupabaseClient): Auth {
         return client.auth
+    }
+
+    @Provides
+    @Singleton
+    fun provideSupabaseStorage(client: SupabaseClient): Storage {
+        return client.storage
     }
 
 }

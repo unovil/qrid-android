@@ -42,6 +42,7 @@ class GetAttendancesUseCaseImpl @Inject constructor(
 
                 GetAttendancesUseCase.Output.Success(attendanceList)
             } catch (e: Exception) {
+                Log.e("GetAttendancesUseCaseImpl", "Error fetching attendances: ${e.message}")
                 when (e) {
                     is PostgrestRestException -> GetAttendancesUseCase.Output.Failure.PostgrestException
                     is HttpRequestException -> GetAttendancesUseCase.Output.Failure.HttpRequestException

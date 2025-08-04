@@ -1,6 +1,8 @@
 package com.unovil.tardyscan.domain.model
 
 import androidx.annotation.IntRange
+import io.github.jan.supabase.storage.DownloadStatus
+import kotlinx.coroutines.flow.Flow
 
 data class Student (
     // student
@@ -14,5 +16,8 @@ data class Student (
     val section: String,
 
     // school
-    val school: String
+    val school: String,
+
+    // avatar
+    val avatar: Flow<DownloadStatus>?
 )
