@@ -2,6 +2,12 @@ package com.unovil.tardyscan.presentation.feature.scan
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +20,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -29,11 +33,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.decodeToImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -80,6 +85,37 @@ fun SuccessfulScanCard(
     },
 ) {
     val context = LocalContext.current
+    val avatarState = scannedStudent.value.avatar?.collectAsState(
+        DownloadStatus.Progress(0, 0)
+    )
+
+    val infiniteTransition = rememberInfiniteTransition("pulse")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseAlpha"
+    )
+
+    val imageModifier = Modifier
+        .fillMaxWidth()
+        .height(240.dp)
+        .background(Color.LightGray)
+        .then(other =
+            if (avatarState?.value !is DownloadStatus.ByteData) Modifier.alpha(pulseAlpha)
+            else Modifier
+        )
+
+    val imagePainter = if (avatarState?.value is DownloadStatus.ByteData) {
+        val byteData = (avatarState.value as DownloadStatus.ByteData).data
+        val decodedBitmap = byteData.decodeToImageBitmap()
+        BitmapPainter(decodedBitmap)
+    } else {
+        rememberVectorPainter(Icons.Default.Person)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -91,6 +127,13 @@ fun SuccessfulScanCard(
                 .padding(16.dp)
                 .statusBarsPadding()
         ) {
+            Image(
+                modifier = imageModifier,
+                painter = imagePainter,
+                contentScale = ContentScale.Crop,
+                contentDescription = "Student picture"
+            )
+
             Column(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -106,38 +149,6 @@ fun SuccessfulScanCard(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
-
-                val avatarState = scannedStudent.value.avatar?.collectAsState(
-                    DownloadStatus.Progress(0, 0)
-                )
-
-                if (avatarState?.value is DownloadStatus.ByteData) {
-                    val byteData = (avatarState.value as DownloadStatus.ByteData).data
-                    val decodedBitmap = byteData.decodeToImageBitmap()
-
-                    Image(
-                        modifier = Modifier.clip(CircleShape)
-                            .size(128.dp)
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray),
-                        painter = BitmapPainter(decodedBitmap),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "Student picture"
-                    )
-                } else {
-                    Image(
-                        modifier = Modifier.clip(CircleShape)
-                            .size(128.dp)
-                            .padding(2.dp)
-                            .clip(CircleShape)
-                            .background(Color.LightGray),
-                        painter = rememberVectorPainter(Icons.Default.Person),
-                        contentDescription = "Student picture"
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
