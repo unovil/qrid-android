@@ -32,6 +32,7 @@ import com.unovil.tardyscan.presentation.feature.settings.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation(
+    authName: String?,
     onScan: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -70,7 +71,7 @@ fun MainNavigation(
                 HistoryScreen(historyViewModel)
             }
             composable(Screen.Settings.routeName) {
-                SettingsScreen(settingsViewModel)
+                SettingsScreen(settingsViewModel, authName = authName)
             }
         }
     }

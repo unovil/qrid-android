@@ -3,7 +3,10 @@ package com.unovil.tardyscan.presentation.feature.settings
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.data.network.dto.AllowedUserDto
+import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
+import com.unovil.tardyscan.domain.usecase.GetSignedUserUseCase
 import com.unovil.tardyscan.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +17,17 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val themeManager: ThemeManager,
+    private val authNameManager: AuthNameManager,
+    private val getSignedUserUseCase: GetSignedUserUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
     val appearanceList = listOf("☀️ Light mode", "🌙 Dark mode", "⚙️ Follow system setting")
 
     private val _selectedAppearance = MutableStateFlow(appearanceList[2])
     val selectedAppearance = _selectedAppearance.asStateFlow()
+
+    private val _userProfile = MutableStateFlow(AllowedUserDto(0, "", "", "", ""))
+    val userProfile = _userProfile.asStateFlow()
 
     private val _newAppearance = MutableStateFlow(appearanceList[2])
     val newAppearance = _newAppearance.asStateFlow()
@@ -36,6 +44,19 @@ class SettingsViewModel @Inject constructor(
 
             _selectedAppearance.value = currentAppearance
             _newAppearance.value = currentAppearance
+        }
+    }
+
+    fun onCheckProfile(onFailure: () -> Unit) {
+        viewModelScope.launch {
+            val result = getSignedUserUseCase.execute(GetSignedUserUseCase.Input())
+
+            if (result !is GetSignedUserUseCase.Output.Success) {
+                Log.e("SettingsViewModel", "Failed to get user profile, ${result::class}")
+                onFailure()
+            } else {
+                _userProfile.value = authNameManager.allowedUser.value!!
+            }
         }
     }
 

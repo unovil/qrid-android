@@ -14,9 +14,15 @@ class AllowedUserDto (
     @SerialName("org_id")
     val domainId: String,
 
-    @SerialName("given_password")
+    /*@SerialName("given_password")
     val givenPassword: String,
 
     @SerialName("is_registered")
-    val isRegistered: Boolean
+    val isRegistered: Boolean,*/
+
+    @SerialName("name")
+    val name: String?,
+
+    @SerialName("role")
+    val role: String
 )

@@ -82,7 +82,7 @@ fun HistoryScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "History",
+                    "History ⌚",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.weight(0.5f)
                 )

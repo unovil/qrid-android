@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
@@ -43,6 +44,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject lateinit var supabaseClient: SupabaseClient
     @Inject lateinit var themeManager: ThemeManager
+    @Inject lateinit var authNameManager: AuthNameManager
     private lateinit var cameraExecutor: ExecutorService
 
     @ExperimentalPermissionsApi
@@ -55,6 +57,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
+            val authName = authNameManager.allowedUserName.collectAsState()
             val isSystemInDarkTheme = isSystemInDarkTheme()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
@@ -62,6 +65,8 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 themeManager.loadTheme()
                 isLoadingThemeFinished = true
+
+                authNameManager.loadAllowedUserName()
             }
 
             LaunchedEffect(isDarkTheme.value, isSystemInDarkTheme) {
@@ -101,7 +106,7 @@ class MainActivity : ComponentActivity() {
                                         if (isScanMode) {
                                             ScanNavigation(cameraExecutor) { scanMode = false }
                                         } else {
-                                            MainNavigation { scanMode = true }
+                                            MainNavigation(authName = authName.value) { scanMode = true }
                                         }
                                     }
                                 }

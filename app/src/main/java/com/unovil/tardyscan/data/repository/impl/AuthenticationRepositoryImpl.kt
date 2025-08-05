@@ -1,14 +1,17 @@
 package com.unovil.tardyscan.data.repository.impl
 
 import android.util.Log
+import com.unovil.tardyscan.data.network.dto.AllowedUserDto
 import com.unovil.tardyscan.data.network.dto.VerifyAllowedUserRpcDto
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult
+import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.domain.model.AllowedUser
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -21,10 +24,13 @@ import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
-    private val auth: Auth
+    private val auth: Auth,
+    private val nameManager: AuthNameManager
 ) : AuthenticationRepository {
 
-    override suspend fun getAllowedUser(allowedUser: AllowedUser): AllowedUserResult {
+    val allowedUsersTable = postgrest["allowed_users"]
+
+    override suspend fun getAllowedUserResult(allowedUser: AllowedUser): AllowedUserResult {
         val allowedUserDto = allowedUser.let { VerifyAllowedUserRpcDto(it.domain, it.domainId) }
 
         val functionCall = postgrest.rpc(
@@ -44,12 +50,22 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllowedUser() {
+        val allowedUser = allowedUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+            limit(1)
+            single()
+        }.decodeAs<AllowedUserDto>()
+
+        nameManager.setAllowedUser(allowedUser)
+        nameManager.setAllowedUserName(allowedUser.name ?: "")
+    }
+
     override suspend fun signUp(
         allowedUser: AllowedUser,
         newEmail: String,
         newPassword: String
     ) {
-        val allowedUserResult = getAllowedUser(allowedUser)
+        val allowedUserResult = getAllowedUserResult(allowedUser)
         if (allowedUserResult !is AllowedUserResult.Success) {
             throw IllegalAccessException("User is not allowed to sign up.")
         }
@@ -84,6 +100,13 @@ class AuthenticationRepositoryImpl @Inject constructor(
             password = enteredPassword
         }
         auth.signOut(SignOutScope.OTHERS)
+
+        val allowedUser = allowedUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+            limit(1)
+            single()
+        }.decodeAs<AllowedUserDto>()
+
+        nameManager.setAllowedUserName(allowedUser.name ?: "")
     }
 
     override suspend fun signOut() {

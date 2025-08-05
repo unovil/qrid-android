@@ -15,7 +15,7 @@ class VerifyAllowedUserUseCaseImpl @Inject constructor(
     private val argon2: Argon2Kt
 ) : VerifyAllowedUserUseCase {
     override suspend fun execute(input: VerifyAllowedUserUseCase.Input): VerifyAllowedUserUseCase.Output = withContext(Dispatchers.IO) {
-        val result = authenticationRepository.getAllowedUser(input.allowedUser)
+        val result = authenticationRepository.getAllowedUserResult(input.allowedUser)
 
         return@withContext when (result) {
             is Failure.Unknown -> VerifyAllowedUserUseCase.Output.Failure.Conflict

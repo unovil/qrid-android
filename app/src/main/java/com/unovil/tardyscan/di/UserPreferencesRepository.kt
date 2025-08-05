@@ -16,15 +16,26 @@ class UserPreferencesRepository @Inject constructor(
 ) {
     companion object {
         val THEME_KEY = stringPreferencesKey("theme")
+        val NAME_KEY = stringPreferencesKey("name")
     }
 
     val themeFlow: Flow<String> = context.userDataStore.data.map { settings ->
         settings[THEME_KEY] ?: "SYSTEM"
     }
 
+    val nameFlow: Flow<String> = context.userDataStore.data.map { settings ->
+        settings[NAME_KEY] ?: ""
+    }
+
     suspend fun setTheme(theme: String) {
         context.userDataStore.edit { settings ->
             settings[THEME_KEY] = theme
+        }
+    }
+
+    suspend fun setName(name: String) {
+        context.userDataStore.edit { settings ->
+            settings[NAME_KEY] = name
         }
     }
 }
