@@ -1,7 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.scan
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -62,23 +61,7 @@ fun SuccessfulScanCard(
         Student(100_000_000_000, "", "", "", 0, "", "", null)
     ),
     onNavigate: () -> Unit = { },
-    onSubmit: (Context) -> Unit = {
-        viewModel!!.onSubmitAttendance (
-            {
-                Toast.makeText(it, "Submitted attendance!", Toast.LENGTH_SHORT).show()
-                onNavigate()
-                viewModel.onReset()
-            },
-            {
-                Toast.makeText(it, "Duplicate attendance!", Toast.LENGTH_SHORT).show()
-                onNavigate()
-                viewModel.onReset()
-            },
-            {
-                Toast.makeText(it, "Please check your Internet connection and try again.", Toast.LENGTH_LONG).show()
-            }
-        )
-    },
+    onSubmit: (Context) -> Unit = { },
     onReset: () -> Unit = {
         viewModel!!.onReset()
         onNavigate()

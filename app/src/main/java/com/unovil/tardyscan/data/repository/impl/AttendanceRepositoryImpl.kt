@@ -33,7 +33,7 @@ class AttendanceRepositoryImpl @Inject constructor(
 
     override suspend fun createAttendance(attendance: Attendance) {
         val startOfDay = attendance.timestamp
-            .toLocalDateTime(TimeZone.currentSystemDefault()).date
+            .toLocalDateTime(TimeZone.UTC).date
             .atStartOfDayIn(TimeZone.UTC)
 
         Log.d("AttendanceRepositoryImpl", "startOfDay: $startOfDay")
@@ -42,7 +42,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             .plus(Duration.parse("24h"))
             .minus(Duration.parse("1ms"))
 
-        Log.d("AttendanceRepositoryImpl", "startOfDay: $endOfDay")
+        Log.d("AttendanceRepositoryImpl", "endOfDay: $endOfDay")
 
         val existingAttendance = attendanceTable.select {
             filter {
