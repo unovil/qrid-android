@@ -50,7 +50,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getAllowedUser() {
+    override suspend fun updateAllowedUser() {
         val allowedUser = allowedUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
             limit(1)
             single()
@@ -111,5 +111,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signOut() {
         auth.signOut(SignOutScope.LOCAL)
+        nameManager.setAllowedUser(AllowedUserDto(0, "", "", "", ""))
+        nameManager.setAllowedUserName("")
     }
 }

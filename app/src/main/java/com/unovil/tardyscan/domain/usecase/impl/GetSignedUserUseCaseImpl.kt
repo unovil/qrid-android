@@ -16,7 +16,7 @@ class GetSignedUserUseCaseImpl @Inject constructor(
     override suspend fun execute(input: GetSignedUserUseCase.Input): GetSignedUserUseCase.Output =
         withContext(Dispatchers.IO) {
             try {
-                authenticationRepository.getAllowedUser()
+                authenticationRepository.updateAllowedUser()
 
                 GetSignedUserUseCase.Output.Success
             } catch (e: Exception) {

@@ -14,7 +14,7 @@ interface AuthenticationRepository {
     }
 
     suspend fun getAllowedUserResult(allowedUser: AllowedUser): AllowedUserResult
-    suspend fun getAllowedUser()
+    suspend fun updateAllowedUser()
     suspend fun signUp(allowedUser: AllowedUser, email: String, password: String)
     suspend fun signIn(email: String, password: String)
     suspend fun signOut()

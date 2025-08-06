@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,7 +63,12 @@ fun ScanNavigation(cameraExecutor: ExecutorService, onBack: () -> Unit) {
                 )
             }
 
-            dialog<Screen.SuccessfulScan> {
+            dialog<Screen.SuccessfulScan>(
+                dialogProperties = DialogProperties(
+                    dismissOnClickOutside = false,
+                    dismissOnBackPress = false,
+                )
+            ) {
                 SuccessfulScanCard(
                     viewModel = scanViewModel,
                     onNavigate = {
