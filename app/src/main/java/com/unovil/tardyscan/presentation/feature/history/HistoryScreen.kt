@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.presentation.feature.history
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -66,6 +68,7 @@ fun HistoryScreen(
     attendances: State<List<AttendanceUiModel>> = historyViewModel!!.filteredUiAttendances.collectAsState()
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -119,6 +122,20 @@ fun HistoryScreen(
                         selected = selectedFilter.value == label,
                         label = { Text(label, style = MaterialTheme.typography.labelMedium) }
                     )
+                }
+            }
+
+            // hardcode muna, to fix later
+            LaunchedEffect(isAttendancesLoaded.value, selectedFilter.value) {
+                val size = attendances.value.size
+                if (isAttendancesLoaded.value) {
+                    when (selectedFilter.value) {
+                        "On time" -> Toast.makeText(context, "$size student${if (size != 1) "s" else ""} on time", Toast.LENGTH_SHORT).show()
+                        "Absent" -> Toast.makeText(context, "$size absent student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
+                        "Late" -> Toast.makeText(context, "$size late student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
+                        "All" -> Toast.makeText(context, "$size total student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
+                        else -> false
+                    }
                 }
             }
 
