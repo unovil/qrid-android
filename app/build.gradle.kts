@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.secrets)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.protobuf)
 }
 
 kotlin {
@@ -95,14 +96,14 @@ dependencies {
     implementation(libs.supabase.storage.kt)
     implementation(libs.ktor.client.android)
     implementation(libs.hilt)
-    androidTestImplementation(libs.hilt.android.testing)
     ksp(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
 
     // pref datastore
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.protobuf.kotlin.lite)
 
     // hashing
     implementation(libs.argon2kt)
@@ -113,4 +114,20 @@ dependencies {
     testImplementation(libs.kotlin.faker)
     testImplementation(libs.kotlin.faker.edu)
     testImplementation(project(":app"))
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.32.1"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin")
+            }
+        }
+    }
 }

@@ -24,3 +24,11 @@ plugins {
 
 rootProject.name = "Tardy Scanner"
 include(":app")
+include(":core")
+include(":core:common")
+include(":core:ui")
+include(":core:data")
+include(":core:domain")
+include(":core:designsystem")
+include(":core:datastore")
+include(":core:model")

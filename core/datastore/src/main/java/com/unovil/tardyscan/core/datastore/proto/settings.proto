@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_package = "com.unovil.tardyscan.core.datastore.proto";
+option java_multiple_files = true;
+
+import "datastore/src/main/java/com/unovil/tardyscan/core/datastore/proto/theme_config.proto";
+
+message Settings {
+  ThemeConfig theme = 1;
+
+  // TODO: find other settings key-value pairs (for verification)
+}
