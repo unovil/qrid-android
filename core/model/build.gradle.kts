@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    alias(libs.plugins.jetbrains.kotlin.jvm)
+    id(libs.plugins.jetbrains.kotlin.jvm.get().pluginId)
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11

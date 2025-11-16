@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.core.domain
 
-import com.unovil.tardyscan.domain.model.Attendance
+import com.unovil.tardyscan.core.model.Attendance
 import kotlinx.datetime.LocalDate
 
 interface GetAttendancesUseCase : UseCase<GetAttendancesUseCase.Input, GetAttendancesUseCase.Output> {

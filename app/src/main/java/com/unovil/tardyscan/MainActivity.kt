@@ -25,13 +25,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.unovil.tardyscan.di.AuthNameManager
+import com.unovil.tardyscan.core.data.di.AuthNameManager
+import com.unovil.tardyscan.core.designsystem.theme.TardyScannerTheme
 import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
 import com.unovil.tardyscan.presentation.navigation.ScanNavigation
-import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth

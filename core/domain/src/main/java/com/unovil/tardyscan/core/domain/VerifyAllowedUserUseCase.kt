@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.core.domain
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.core.model.AllowedUser
 
 interface VerifyAllowedUserUseCase : UseCase<VerifyAllowedUserUseCase.Input, VerifyAllowedUserUseCase.Output> {
     class Input(val allowedUser: AllowedUser)

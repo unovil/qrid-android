@@ -6,9 +6,9 @@ import com.macasaet.fernet.Key
 import com.macasaet.fernet.StringValidator
 import com.macasaet.fernet.Token
 import com.macasaet.fernet.TokenValidationException
+import com.unovil.tardyscan.core.data.repository.AttendanceRepository
 import com.unovil.tardyscan.core.domain.GetStudentInfoUseCase
-import com.unovil.tardyscan.data.repository.AttendanceRepository
-import com.unovil.tardyscan.domain.model.Student
+import com.unovil.tardyscan.core.model.Student
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.storage.DownloadStatus

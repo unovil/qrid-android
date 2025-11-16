@@ -1,6 +1,9 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    id(libs.plugins.android.library.get().pluginId)
+    id(libs.plugins.kotlin.android.get().pluginId)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -30,9 +33,14 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
+    implementation(project(":core:model"))
+    implementation(project(":core:datastore"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -40,4 +48,20 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // supabase
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.auth.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.supabase.storage.kt)
+    implementation(libs.ktor.client.android)
+    implementation(libs.hilt)
+    ksp(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.kotlinx.datetime)
+
+    // hashing
+    implementation(libs.argon2kt)
 }

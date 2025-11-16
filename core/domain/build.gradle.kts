@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.ksp)
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    id(libs.plugins.android.library.get().pluginId)
+    id(libs.plugins.kotlin.android.get().pluginId)
 }
 
 android {
@@ -24,6 +24,11 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -34,10 +39,15 @@ android {
 }
 
 dependencies {
-    api(project(":core:model"))
+    implementation(project(":core:model"))
+    implementation(project(":core:data"))
 
     implementation(libs.hilt)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.supabase.storage.kt)
+    implementation(libs.fernet.java8)
+    implementation(libs.argon2kt)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

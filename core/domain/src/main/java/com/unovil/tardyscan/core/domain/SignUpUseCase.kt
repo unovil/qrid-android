@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.core.domain
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.core.model.AllowedUser
 
 interface SignUpUseCase : UseCase<SignUpUseCase.Input, SignUpUseCase.Output> {
     class Input(

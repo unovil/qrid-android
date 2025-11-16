@@ -1,7 +1,7 @@
 package com.unovil.tardyscan.core.domain.impl
 
+import com.unovil.tardyscan.core.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.core.domain.SignOutUseCase
-import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.ktor.client.plugins.HttpRequestTimeoutException

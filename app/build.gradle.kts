@@ -1,12 +1,11 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id(libs.plugins.android.application.get().pluginId)
+    id(libs.plugins.kotlin.android.get().pluginId)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.secrets)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.google.protobuf)
 }
 
 kotlin {
@@ -56,6 +55,15 @@ secrets {
 }
 
 dependencies {
+
+    implementation(project(":core:domain"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:ui"))
+    implementation(project(":core:data"))
+    implementation(project(":core:model"))
+    implementation(project(":core:common"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -102,9 +110,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
 
-    // pref datastore
-    implementation(libs.protobuf.kotlin.lite)
-
     // hashing
     implementation(libs.argon2kt)
 
@@ -114,20 +119,4 @@ dependencies {
     testImplementation(libs.kotlin.faker)
     testImplementation(libs.kotlin.faker.edu)
     testImplementation(project(":app"))
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:4.32.1"
-    }
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin")
-            }
-        }
-    }
 }

@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.core.data.repository
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.core.model.AllowedUser
 
 interface AuthenticationRepository {
     sealed class AllowedUserResult {

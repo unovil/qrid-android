@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.core.domain
 
-import com.unovil.tardyscan.domain.model.Student
+import com.unovil.tardyscan.core.model.Student
 
 interface GetStudentInfoUseCase : UseCase<GetStudentInfoUseCase.Input, GetStudentInfoUseCase.Output> {
     class Input (val qrCode: String)

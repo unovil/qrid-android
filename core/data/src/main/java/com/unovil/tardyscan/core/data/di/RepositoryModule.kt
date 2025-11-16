@@ -1,5 +1,14 @@
 package com.unovil.tardyscan.core.data.di
 
+import com.unovil.tardyscan.core.data.repository.AttendanceRepository
+import com.unovil.tardyscan.core.data.repository.AuthenticationRepository
+import com.unovil.tardyscan.core.data.repository.impl.AttendanceRepositoryImpl
+import com.unovil.tardyscan.core.data.repository.impl.AuthenticationRepositoryImpl
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
 @InstallIn(SingletonComponent::class)
 @Module
 abstract class RepositoryModule {

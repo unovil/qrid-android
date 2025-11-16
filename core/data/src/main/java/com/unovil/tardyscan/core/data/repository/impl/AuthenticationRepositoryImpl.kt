@@ -1,11 +1,11 @@
 package com.unovil.tardyscan.core.data.repository.impl
 
 import android.util.Log
+import com.unovil.tardyscan.core.data.di.AuthNameManager
+import com.unovil.tardyscan.core.data.dto.AllowedUserDto
+import com.unovil.tardyscan.core.data.dto.VerifyAllowedUserRpcDto
 import com.unovil.tardyscan.core.data.repository.AuthenticationRepository
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
-import com.unovil.tardyscan.data.network.dto.VerifyAllowedUserRpcDto
-import com.unovil.tardyscan.di.AuthNameManager
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.core.model.AllowedUser
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email

@@ -1,9 +1,9 @@
 package com.unovil.tardyscan.core.domain.impl
 
 import android.util.Log
+import com.unovil.tardyscan.core.data.repository.AttendanceRepository
 import com.unovil.tardyscan.core.domain.GetAttendancesUseCase
-import com.unovil.tardyscan.data.repository.AttendanceRepository
-import com.unovil.tardyscan.domain.model.Attendance
+import com.unovil.tardyscan.core.model.Attendance
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.ktor.client.plugins.HttpRequestTimeoutException

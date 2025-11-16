@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.di
 
+import com.unovil.tardyscan.core.datastore.di.SettingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -8,7 +9,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ThemeManager @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingsRepository: SettingsRepository
 ) {
     private val _isDarkTheme: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     val isDarkTheme = _isDarkTheme.asStateFlow()
@@ -16,7 +17,7 @@ class ThemeManager @Inject constructor(
     enum class ThemeMode { LIGHT, DARK, SYSTEM }
 
     suspend fun loadTheme() {
-        val themeString = userPreferencesRepository.themeFlow.first()
+        val themeString = settingsRepository.themeFlow.first()
         _isDarkTheme.value = when (themeString) {
             "LIGHT" -> false
             "DARK" -> true
@@ -30,6 +31,6 @@ class ThemeManager @Inject constructor(
             ThemeMode.DARK -> true
             ThemeMode.SYSTEM -> null
         }
-        userPreferencesRepository.setTheme(theme.name)
+        settingsRepository.setTheme(theme.name)
     }
 }

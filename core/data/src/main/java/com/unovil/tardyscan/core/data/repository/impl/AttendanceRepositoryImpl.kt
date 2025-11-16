@@ -1,11 +1,11 @@
 package com.unovil.tardyscan.core.data.repository.impl
 
 import android.util.Log
+import com.unovil.tardyscan.core.data.dto.AttendanceDto
+import com.unovil.tardyscan.core.data.dto.SchoolDto
+import com.unovil.tardyscan.core.data.dto.StudentDto
 import com.unovil.tardyscan.core.data.repository.AttendanceRepository
-import com.unovil.tardyscan.data.network.dto.AttendanceDto
-import com.unovil.tardyscan.data.network.dto.SchoolDto
-import com.unovil.tardyscan.data.network.dto.StudentDto
-import com.unovil.tardyscan.domain.model.Attendance
+import com.unovil.tardyscan.core.model.Attendance
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Columns

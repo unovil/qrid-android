@@ -2,10 +2,10 @@ package com.unovil.tardyscan.core.domain.impl
 
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2Mode
+import com.unovil.tardyscan.core.data.repository.AuthenticationRepository
+import com.unovil.tardyscan.core.data.repository.AuthenticationRepository.AllowedUserResult.Failure
+import com.unovil.tardyscan.core.data.repository.AuthenticationRepository.AllowedUserResult.Success
 import com.unovil.tardyscan.core.domain.VerifyAllowedUserUseCase
-import com.unovil.tardyscan.data.repository.AuthenticationRepository
-import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult.Failure
-import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult.Success
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

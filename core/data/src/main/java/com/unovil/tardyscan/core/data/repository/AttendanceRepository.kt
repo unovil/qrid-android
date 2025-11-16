@@ -1,8 +1,8 @@
 package com.unovil.tardyscan.core.data.repository
 
-import com.unovil.tardyscan.data.network.dto.AttendanceDto
-import com.unovil.tardyscan.data.network.dto.StudentDto
-import com.unovil.tardyscan.domain.model.Attendance
+import com.unovil.tardyscan.core.data.dto.AttendanceDto
+import com.unovil.tardyscan.core.data.dto.StudentDto
+import com.unovil.tardyscan.core.model.Attendance
 import io.github.jan.supabase.storage.DownloadStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
