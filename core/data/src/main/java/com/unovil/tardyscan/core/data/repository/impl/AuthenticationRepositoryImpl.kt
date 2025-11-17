@@ -61,8 +61,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signUp(
         allowedUser: AllowedUser,
-        newEmail: String,
-        newPassword: String
+        email: String,
+        password: String
     ) {
         val allowedUserResult = getAllowedUserResult(allowedUser)
         if (allowedUserResult !is AuthenticationRepository.AllowedUserResult.Success) {
@@ -72,8 +72,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
         Log.d("AuthenticationRepository", "allowedUserId: ${allowedUserResult.allowedUserId}")
 
         auth.signUpWith(Email) {
-            email = newEmail
-            password = newPassword
+            this.email = email
+            this.password = password
             data = buildJsonObject {
                 put("allowed_user_id", JsonPrimitive(allowedUserResult.allowedUserId))
             }
@@ -93,10 +93,10 @@ class AuthenticationRepositoryImpl @Inject constructor(
         if (markRegisteredResult != 0) throw IllegalStateException("Failed to mark user as registered.")
     }
 
-    override suspend fun signIn(enteredEmail: String, enteredPassword: String) {
+    override suspend fun signIn(email: String, password: String) {
         auth.signInWith(Email) {
-            email = enteredEmail
-            password = enteredPassword
+            this.email = email
+            this.password = password
         }
         auth.signOut(SignOutScope.OTHERS)
 

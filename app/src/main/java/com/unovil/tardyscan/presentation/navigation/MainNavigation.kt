@@ -20,16 +20,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.unovil.tardyscan.presentation.feature.history.HistoryScreen
-import com.unovil.tardyscan.presentation.feature.history.HistoryViewModel
-import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
-import com.unovil.tardyscan.presentation.feature.settings.SettingsViewModel
+import com.unovil.tardyscan.feature.history.HistoryScreen
+import com.unovil.tardyscan.feature.history.HistoryViewModel
+import com.unovil.tardyscan.feature.settings.SettingsScreen
+import com.unovil.tardyscan.feature.settings.SettingsViewModel
+import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun MainNavigation(
     authName: String?,

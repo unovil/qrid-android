@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -24,11 +24,11 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.unovil.tardyscan.R
-import com.unovil.tardyscan.presentation.feature.scan.CameraPermissionScreen
-import com.unovil.tardyscan.presentation.feature.scan.ScanViewModel
-import com.unovil.tardyscan.presentation.feature.scan.ScanningScreen
-import com.unovil.tardyscan.presentation.feature.scan.SuccessfulScanCard
+import com.unovil.tardyscan.core.ui.R
+import com.unovil.tardyscan.feature.scan.CameraPermissionScreen
+import com.unovil.tardyscan.feature.scan.ScanViewModel
+import com.unovil.tardyscan.feature.scan.ScanningScreen
+import com.unovil.tardyscan.feature.scan.SuccessfulScanCard
 import java.util.concurrent.ExecutorService
 
 @ExperimentalPermissionsApi

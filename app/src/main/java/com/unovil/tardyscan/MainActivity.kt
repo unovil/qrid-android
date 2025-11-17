@@ -26,9 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.unovil.tardyscan.core.data.di.AuthNameManager
+import com.unovil.tardyscan.core.data.di.ThemeManager
 import com.unovil.tardyscan.core.designsystem.theme.TardyScannerTheme
-import com.unovil.tardyscan.di.ThemeManager
-import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
+import com.unovil.tardyscan.feature.history.LoadingScreen
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
 import com.unovil.tardyscan.presentation.navigation.ScanNavigation

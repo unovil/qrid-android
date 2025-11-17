@@ -11,10 +11,8 @@ import com.unovil.tardyscan.core.domain.GetStudentInfoUseCase
 import com.unovil.tardyscan.core.model.Student
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
-import io.github.jan.supabase.storage.DownloadStatus
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.withContext
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAmount
@@ -38,7 +36,7 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
         val level: Int
         val section: String
         val school: String
-        val avatarLink: String?
+        val avatarUrl: String?
 
         try {
             val decryptionKey = attendanceRepository.getDecryptionKey(qrMatch.groups[2]!!.value.toInt())
@@ -73,7 +71,7 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
             level = result.section.level
             section = result.section.section
             school = result.section.school.name
-            avatarLink = result.avatarLink
+            avatarUrl = result.avatarUrl
 
         } catch(e: Exception) {
             Log.e("GetStudentInfoUseCaseImpl", "Error getting student info: ${e.message}")
@@ -95,17 +93,7 @@ class GetStudentInfoUseCaseImpl @Inject constructor(
             }
         }
 
-        val avatar = try {
-            if (avatarLink == null) null else attendanceRepository.getAvatarFlow(avatarLink).catch { e ->
-                Log.e("GetStudentInfoUseCaseImpl", "Error getting avatar: ${e.message}")
-                emit(DownloadStatus.Progress(-1,-1))
-            }
-        } catch(e: Exception) {
-            Log.d("GetStudentInfoUseCaseImpl", "Error getting avatar: ${e.message}")
-            null
-        }
-
-        val student = Student(id, lastName, firstName, middleName, level, section, school, avatar)
+        val student = Student(id, lastName, firstName, middleName, level, section, school, avatarUrl)
 
         return@withContext GetStudentInfoUseCase.Output.Success(student)
     }

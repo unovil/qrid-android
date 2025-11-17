@@ -9,7 +9,7 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.unovil.tardyscan.R
+import com.unovil.tardyscan.core.ui.R
 
 data class BottomNavigationItems(
     val label: String = "",

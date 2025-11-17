@@ -14,7 +14,7 @@ kotlin {
 
 android {
     namespace = "com.unovil.tardyscan"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.unovil.tardyscan"
@@ -63,6 +63,11 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
+
+    implementation(project(":feature:history"))
+    implementation(project(":feature:onboarding"))
+    implementation(project(":feature:scan"))
+    implementation(project(":feature:settings"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -119,4 +124,7 @@ dependencies {
     testImplementation(libs.kotlin.faker)
     testImplementation(libs.kotlin.faker.edu)
     testImplementation(project(":app"))
+
+    // load bearing hilt dependency
+    implementation(libs.javapoet)
 }

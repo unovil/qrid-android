@@ -12,7 +12,7 @@ interface AttendanceRepository {
     suspend fun getAttendances(date: LocalDate): List<AttendanceDto>
     suspend fun getAllStudentInfos(): List<StudentDto>
     suspend fun getStudentInfo(id: Long): StudentDto?
-    suspend fun getAvatarFlow(avatarLink: String): Flow<DownloadStatus>
+    suspend fun getAvatarFlow(avatarUrl: String): Flow<DownloadStatus>
     suspend fun getDecryptionKey(schoolId: Int): String?
     suspend fun deleteAttendance(id: Int)
 }

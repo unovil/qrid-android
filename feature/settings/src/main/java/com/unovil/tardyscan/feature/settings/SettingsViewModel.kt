@@ -4,10 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.core.data.di.AuthNameManager
+import com.unovil.tardyscan.core.data.di.ThemeManager
 import com.unovil.tardyscan.core.data.dto.AllowedUserDto
 import com.unovil.tardyscan.core.domain.GetSignedUserUseCase
 import com.unovil.tardyscan.core.domain.SignOutUseCase
-import com.unovil.tardyscan.di.ThemeManager
+import com.unovil.tardyscan.core.model.Theme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,10 +71,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onSetAppearance() {
         val themeMode = when (_newAppearance.value) {
-            "☀️ Light mode" -> ThemeManager.ThemeMode.LIGHT
-            "🌙 Dark mode" -> ThemeManager.ThemeMode.DARK
-            "⚙️ Follow system setting" -> ThemeManager.ThemeMode.SYSTEM
-            else -> ThemeManager.ThemeMode.SYSTEM
+            "☀️ Light mode" -> Theme.LIGHT
+            "🌙 Dark mode" -> Theme.DARK
+            "⚙️ Follow system setting" -> Theme.FOLLOW_SYSTEM
+            else -> Theme.UNSPECIFIED
         }
 
         viewModelScope.launch {

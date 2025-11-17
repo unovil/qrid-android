@@ -20,6 +20,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.JsonPrimitive
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 class AttendanceRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
@@ -31,6 +32,7 @@ class AttendanceRepositoryImpl @Inject constructor(
     private val studentTable = postgrest["students"]
     private val avatarsBucket = storage["avatars"]
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun createAttendance(attendance: Attendance) {
         val startOfDay = attendance.timestamp
             .toLocalDateTime(TimeZone.UTC).date
@@ -71,6 +73,7 @@ class AttendanceRepositoryImpl @Inject constructor(
         attendanceTable.insert(attendanceDto)
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun getAttendances(date: LocalDate): List<AttendanceDto> {
         // return attendanceDao.getAttendances()
         Log.d("AttendanceRepositoryImpl", "localdate: $date")
@@ -134,8 +137,8 @@ class AttendanceRepositoryImpl @Inject constructor(
         }.decodeSingleOrNull<StudentDto>()
     }
 
-    override suspend fun getAvatarFlow(avatarLink: String): Flow<DownloadStatus> {
-        return avatarsBucket.downloadAuthenticatedAsFlow(avatarLink)
+    override suspend fun getAvatarFlow(avatarUrl: String): Flow<DownloadStatus> {
+        return avatarsBucket.downloadAuthenticatedAsFlow(avatarUrl)
     }
 
     override suspend fun getDecryptionKey(schoolId: Int): String? {

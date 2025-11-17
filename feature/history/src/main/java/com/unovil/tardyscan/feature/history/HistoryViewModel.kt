@@ -9,7 +9,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -18,9 +17,12 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 @HiltViewModel
+@OptIn(ExperimentalTime::class)
 class HistoryViewModel @Inject constructor(
     private val getAttendancesUseCase: GetAttendancesUseCase
 ) : ViewModel() {
@@ -29,7 +31,7 @@ class HistoryViewModel @Inject constructor(
     private val timestampFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         chars(" ")
-        dayOfMonth()
+        day()
         chars(", ")
         year()
 

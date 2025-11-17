@@ -2,7 +2,6 @@ package com.unovil.tardyscan.feature.scan
 
 import android.util.Log
 import android.util.Size
-import android.view.View
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
@@ -40,7 +39,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.delay
 import java.util.concurrent.ExecutorService
@@ -88,6 +87,7 @@ fun ScanningScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
         AndroidView(factory = { context ->
             val cameraController = LifecycleCameraController(context).apply {
                 cameraSelector = CameraSelector.Builder()
@@ -114,7 +114,7 @@ fun ScanningScreen(
                 bindToLifecycle(context as LifecycleOwner)
             }
             val previewView = PreviewView(context).apply {
-                View.setLayoutParams = ViewGroup.LayoutParams(
+                layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )

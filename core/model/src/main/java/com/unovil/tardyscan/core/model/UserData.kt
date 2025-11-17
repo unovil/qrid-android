@@ -1,7 +1,7 @@
 package com.unovil.tardyscan.core.model
 
 data class UserData (
-    val themeConfig: ThemeConfig,
+    val theme: Theme,
     val useDynamicColors: Boolean,
     val showOnboarding: Boolean
 )

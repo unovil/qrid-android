@@ -18,7 +18,7 @@ data class StudentDto (
     val middleName: String?,
 
     @SerialName("avatar")
-    val avatarLink: String? = null,
+    val avatarUrl: String? = null,
 
     @SerialName("sections")
     val section: SectionDto

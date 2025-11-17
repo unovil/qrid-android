@@ -39,7 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.decodeToImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -48,9 +48,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.core.model.Student
-import io.github.jan.supabase.storage.DownloadStatus
 import kotlinx.coroutines.flow.filterNotNull
 
 @Composable
@@ -60,6 +59,7 @@ fun SuccessfulScanCard(
     scannedStudent: State<Student> = viewModel!!.scannedStudent.filterNotNull().collectAsState(
         Student(100_000_000_000, "", "", "", 0, "", "", null)
     ),
+    avatarBitmap: State<ImageBitmap?> = viewModel!!.avatarBitmap.collectAsState(),
     onNavigate: () -> Unit = { },
     onSubmit: (Context) -> Unit = { },
     onReset: () -> Unit = {
@@ -68,9 +68,6 @@ fun SuccessfulScanCard(
     },
 ) {
     val context = LocalContext.current
-    val avatarState = scannedStudent.value.avatar?.collectAsState(
-        DownloadStatus.Progress(0, 0)
-    )
 
     val infiniteTransition = rememberInfiniteTransition("pulse")
     val pulseAlpha by infiniteTransition.animateFloat(
@@ -88,17 +85,12 @@ fun SuccessfulScanCard(
         .height(240.dp)
         .background(Color.LightGray)
         .then(other =
-            if (avatarState?.value !is DownloadStatus.ByteData) Modifier.alpha(pulseAlpha)
+            if (avatarBitmap.value == null) Modifier.alpha(pulseAlpha)
             else Modifier
         )
 
-    val imagePainter = if (avatarState?.value is DownloadStatus.ByteData) {
-        val byteData = (avatarState.value as DownloadStatus.ByteData).data
-        val decodedBitmap = byteData.decodeToImageBitmap()
-        BitmapPainter(decodedBitmap)
-    } else {
-        rememberVectorPainter(Icons.Default.Person)
-    }
+    val imagePainter = avatarBitmap.value?.let { BitmapPainter(it) }
+        ?: rememberVectorPainter(Icons.Default.Person)
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -178,7 +170,7 @@ fun SuccessfulScanCard(
     }
 }
 
-@PreviewLightDark()
+@PreviewLightDark
 @Composable
 private fun Preview() {
     val student = remember { mutableStateOf(

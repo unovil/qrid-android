@@ -45,15 +45,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.core.designsystem.theme.TardyScannerTheme
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalMaterial3Api
 @Composable
 fun HistoryScreen(
@@ -228,6 +230,7 @@ fun DatePickerModal(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalMaterial3Api
 @PreviewLightDark
 @Composable

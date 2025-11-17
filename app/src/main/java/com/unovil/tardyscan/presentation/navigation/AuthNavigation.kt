@@ -9,14 +9,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.unovil.tardyscan.presentation.feature.signin.SignIn
-import com.unovil.tardyscan.presentation.feature.signup.SignUp
-import com.unovil.tardyscan.presentation.feature.signup.SignUpViewModel
-import com.unovil.tardyscan.presentation.feature.signup.VerifyGivenCredentials
+import com.unovil.tardyscan.feature.onboarding.signin.SignIn
+import com.unovil.tardyscan.feature.onboarding.signup.SignUp
+import com.unovil.tardyscan.feature.onboarding.signup.SignUpViewModel
+import com.unovil.tardyscan.feature.onboarding.signup.VerifyGivenCredentials
 
 @Composable
 fun AuthNavigation(

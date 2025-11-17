@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SettingsRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+    @get:ApplicationContext private val context: Context
 ) {
     val themeFlow: Flow<ThemeConfig> = context.dataStore.data.map { settings ->
         settings.theme

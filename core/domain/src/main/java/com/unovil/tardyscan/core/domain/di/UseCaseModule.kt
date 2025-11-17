@@ -3,6 +3,7 @@ package com.unovil.tardyscan.core.domain.di
 import com.unovil.tardyscan.core.domain.CreateAttendanceUseCase
 import com.unovil.tardyscan.core.domain.GetAttendancesUseCase
 import com.unovil.tardyscan.core.domain.GetSignedUserUseCase
+import com.unovil.tardyscan.core.domain.GetStudentAvatarUseCase
 import com.unovil.tardyscan.core.domain.GetStudentInfoUseCase
 import com.unovil.tardyscan.core.domain.SignInUseCase
 import com.unovil.tardyscan.core.domain.SignOutUseCase
@@ -11,6 +12,7 @@ import com.unovil.tardyscan.core.domain.VerifyAllowedUserUseCase
 import com.unovil.tardyscan.core.domain.impl.CreateAttendanceUseCaseImpl
 import com.unovil.tardyscan.core.domain.impl.GetAttendancesUseCaseImpl
 import com.unovil.tardyscan.core.domain.impl.GetSignedUserUseCaseImpl
+import com.unovil.tardyscan.core.domain.impl.GetStudentAvatarUseCaseImpl
 import com.unovil.tardyscan.core.domain.impl.GetStudentInfoUseCaseImpl
 import com.unovil.tardyscan.core.domain.impl.SignInUseCaseImpl
 import com.unovil.tardyscan.core.domain.impl.SignOutUseCaseImpl
@@ -48,5 +50,8 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun bindGetSignedUserUseCase(impl: GetSignedUserUseCaseImpl): GetSignedUserUseCase
+
+    @Binds
+    abstract fun bindGetStudentAvatarUseCase(impl: GetStudentAvatarUseCaseImpl): GetStudentAvatarUseCase
 
 }

@@ -15,5 +15,5 @@ data class Student (
     val school: String,
 
     // avatar
-    val avatarUrl: String
+    val avatarUrl: String?
 )

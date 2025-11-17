@@ -1,8 +1,9 @@
 package com.unovil.tardyscan.core.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class Attendance (
+data class Attendance @OptIn(ExperimentalTime::class) constructor(
     val studentId: Long,
     val timestamp: Instant,
 
