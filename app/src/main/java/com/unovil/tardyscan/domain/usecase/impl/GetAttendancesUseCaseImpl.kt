@@ -9,12 +9,14 @@ import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
 
 class GetAttendancesUseCaseImpl @Inject constructor(
     private val attendanceRepository: AttendanceRepository
 ) : GetAttendancesUseCase {
+    @OptIn(ExperimentalTime::class)
     override suspend fun execute(input: GetAttendancesUseCase.Input): GetAttendancesUseCase.Output =
         withContext(Dispatchers.IO) {
             try {

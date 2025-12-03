@@ -15,8 +15,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import javax.inject.Inject
+import kotlin.time.ExperimentalTime
 
 @HiltViewModel
 class ScanViewModel @Inject constructor(
@@ -67,6 +68,7 @@ class ScanViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     fun onSubmitAttendance(onSuccess: () -> Unit, onDuplicate: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch {
             _isSubmittingEnabled.value = false

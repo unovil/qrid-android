@@ -45,15 +45,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
-import kotlinx.datetime.Clock.System
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock.System
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalMaterial3Api
 @Composable
 fun HistoryScreen(
@@ -134,7 +136,6 @@ fun HistoryScreen(
                         "Absent" -> Toast.makeText(context, "$size absent student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
                         "Late" -> Toast.makeText(context, "$size late student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
                         "All" -> Toast.makeText(context, "$size total student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
-                        else -> false
                     }
                 }
             }
@@ -228,6 +229,7 @@ fun DatePickerModal(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @ExperimentalMaterial3Api
 @PreviewLightDark
 @Composable

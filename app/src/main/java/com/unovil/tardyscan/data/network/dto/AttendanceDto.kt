@@ -1,11 +1,12 @@
 package com.unovil.tardyscan.data.network.dto
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
 
 @Serializable
-data class AttendanceDto (
+data class AttendanceDto @OptIn(ExperimentalTime::class) constructor(
     @SerialName("id")
     val id: Int? = null,
 

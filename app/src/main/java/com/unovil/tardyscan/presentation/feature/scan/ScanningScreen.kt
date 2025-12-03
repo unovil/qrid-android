@@ -39,7 +39,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.hilt.navigation.compose.hiltViewModel
+// Calling a UI Composable composable function where a androidx.compose.ui.UiComposable composable was expected
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.delay
 import java.util.concurrent.ExecutorService

@@ -10,16 +10,19 @@ plugins {
 
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 android {
     namespace = "com.unovil.tardyscan"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.unovil.tardyscan"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 5
         versionName = "1.1.1"
 
