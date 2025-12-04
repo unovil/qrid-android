@@ -2,7 +2,11 @@ package com.unovil.tardyscan
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.dataStore
+import com.unovil.tardyscan.data.datastore.SettingsSerializer
+import com.unovil.tardyscan.proto.Settings
 
-val Context.userDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+val Context.dataStore: DataStore<Settings> by dataStore(
+    fileName = "settings.pb",
+    serializer = SettingsSerializer
+)

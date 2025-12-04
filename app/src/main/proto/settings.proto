@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.unovil.tardyscan.proto";
+option java_multiple_files = true;
+
+import "theme_config.proto";
+
+message Settings {
+  ThemeConfig theme = 1;
+  string name = 2;
+
+  // TODO: find other settings key-value pairs (for verification)
+}

@@ -1,5 +1,7 @@
 package com.unovil.tardyscan.di
 
+import com.unovil.tardyscan.domain.model.Theme
+import com.unovil.tardyscan.proto.ThemeConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -8,28 +10,34 @@ import javax.inject.Singleton
 
 @Singleton
 class ThemeManager @Inject constructor(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingsRepository: SettingsRepository
 ) {
     private val _isDarkTheme: MutableStateFlow<Boolean?> = MutableStateFlow(null)
     val isDarkTheme = _isDarkTheme.asStateFlow()
 
-    enum class ThemeMode { LIGHT, DARK, SYSTEM }
-
     suspend fun loadTheme() {
-        val themeString = userPreferencesRepository.themeFlow.first()
-        _isDarkTheme.value = when (themeString) {
-            "LIGHT" -> false
-            "DARK" -> true
+        val themeConfig = settingsRepository.themeFlow.first()
+        _isDarkTheme.value = when (themeConfig) {
+            ThemeConfig.THEME_CONFIG_LIGHT -> false
+            ThemeConfig.THEME_CONFIG_DARK -> true
             else -> null
         }
     }
 
-    suspend fun setTheme(theme: ThemeMode) {
+    suspend fun setTheme(theme: Theme) {
         _isDarkTheme.value = when (theme) {
-            ThemeMode.LIGHT -> false
-            ThemeMode.DARK -> true
-            ThemeMode.SYSTEM -> null
+            Theme.LIGHT -> false
+            Theme.DARK -> true
+            Theme.FOLLOW_SYSTEM -> null
+            else -> null
         }
-        userPreferencesRepository.setTheme(theme.name)
+
+        val themeConfig = when (theme) {
+            Theme.LIGHT -> ThemeConfig.THEME_CONFIG_LIGHT
+            Theme.DARK -> ThemeConfig.THEME_CONFIG_DARK
+            Theme.FOLLOW_SYSTEM -> ThemeConfig.THEME_CONFIG_SYSTEM
+            else -> ThemeConfig.THEME_CONFIG_UNSPECIFIED
+        }
+        settingsRepository.setTheme(themeConfig)
     }
 }
