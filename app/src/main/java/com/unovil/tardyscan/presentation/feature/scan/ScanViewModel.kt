@@ -59,11 +59,11 @@ class ScanViewModel @Inject constructor(
                         R.string.scan_qr_invalid
                     )
                     is GetStudentInfoUseCase.Output.Failure.NotFound -> context.getString(R.string.scan_qr_not_found)
-                    is GetStudentInfoUseCase.Output.Failure.HttpRequestError -> context.getString(R.string.scan_qr_connection_error)
+                    is GetStudentInfoUseCase.Output.Failure.HttpRequestError -> context.getString(R.string.error_network)
                     is GetStudentInfoUseCase.Output.Failure.HttpRequestTimeout -> context.getString(
-                        R.string.scan_qr_timeout
+                        R.string.error_timeout
                     )
-                    else -> context.getString(R.string.scan_qr_unknown_error)
+                    else -> context.getString(R.string.error_unknown)
                 }
 
                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()

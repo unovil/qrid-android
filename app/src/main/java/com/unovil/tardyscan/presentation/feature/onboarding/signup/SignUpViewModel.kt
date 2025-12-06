@@ -122,13 +122,13 @@ class SignUpViewModel @Inject constructor(
                     ""
                 }
                 is VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered -> {
-                    context.getString(R.string.auth_valid_creds_already_registered)
+                    context.getString(R.string.error_duplicate_credentials)
                 }
                 is VerifyAllowedUserUseCase.Output.Failure.NotFound -> {
-                    context.getString(R.string.auth_no_valid_creds_found)
+                    context.getString(R.string.error_invalid_credentials)
                 }
                 else -> {
-                    context.getString(R.string.auth_unknown_error)
+                    context.getString(R.string.error_unknown)
                 }
             }
 
@@ -168,7 +168,7 @@ class SignUpViewModel @Inject constructor(
                 }
 
                 is SignUpUseCase.Output.Failure.Unknown -> {
-                    context.getString(R.string.signup_error_unknown)
+                    context.getString(R.string.error_unknown)
                 }
 
                 is SignUpUseCase.Output.Failure.AlreadyExists -> {

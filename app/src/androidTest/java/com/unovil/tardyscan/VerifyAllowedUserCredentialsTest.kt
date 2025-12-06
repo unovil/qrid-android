@@ -91,10 +91,10 @@ class VerifyAllowedUserCredentialsTest {
         verifyButton.performClick()
 
         // wait for running tasks
-        rule.waitForRunningTasks(R.string.auth_no_valid_creds_found)
+        rule.waitForRunningTasks(R.string.error_invalid_credentials)
 
         // result: should be false
-        rule.onNodeWithText(context.getString(R.string.auth_no_valid_creds_found))
+        rule.onNodeWithText(context.getString(R.string.error_invalid_credentials))
             .assertExists()
         assertTrue(!success)
 
@@ -112,10 +112,10 @@ class VerifyAllowedUserCredentialsTest {
         passwordBox.performTextInput("something something")
 
         // wait for running tasks
-        rule.waitForRunningTasks(R.string.auth_valid_creds_already_registered)
+        rule.waitForRunningTasks(R.string.error_duplicate_credentials)
 
         // result: should be false
-        rule.onNodeWithText(context.getString(R.string.auth_valid_creds_already_registered))
+        rule.onNodeWithText(context.getString(R.string.error_duplicate_credentials))
             .assertExists()
         assertTrue(!success)
 

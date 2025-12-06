@@ -93,7 +93,7 @@ fun SettingsScreen(
             ) {
                 onCheckProfile {
                     Toast.makeText(context,
-                        context.getString(R.string.settings_unknown_error), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
                 }.also { isOpenedAboutUser = !isOpenedAboutUser }
             }
 
@@ -115,7 +115,7 @@ fun SettingsScreen(
                 subLabel = stringResource(R.string.settings_logout_sub),
                 color = Color.Red,
             ) { onLogOut {
-                Toast.makeText(context, context.getString(R.string.settings_unknown_error), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
             }}
         }
     }

@@ -45,10 +45,10 @@ class SignInViewModel @Inject constructor(
             val result = signInUseCase.execute(SignInUseCase.Input(_email.value, _password.value))
 
             _signInErrorMessage.value = when (result) {
-                is SignInUseCase.Output.Failure.AuthError -> context.getString(R.string.auth_failed)
-                is SignInUseCase.Output.Failure.HttpNetworkError -> context.getString(R.string.auth_network_error)
-                is SignInUseCase.Output.Failure.HttpTimeout -> context.getString(R.string.auth_network_timeout)
-                is SignInUseCase.Output.Failure.Unknown -> context.getString(R.string.auth_unknown_error)
+                is SignInUseCase.Output.Failure.AuthError -> context.getString(R.string.error_failed_auth)
+                is SignInUseCase.Output.Failure.HttpNetworkError -> context.getString(R.string.error_network)
+                is SignInUseCase.Output.Failure.HttpTimeout -> context.getString(R.string.error_timeout)
+                is SignInUseCase.Output.Failure.Unknown -> context.getString(R.string.error_unknown)
                 is SignInUseCase.Output.Success -> ""
             }
 

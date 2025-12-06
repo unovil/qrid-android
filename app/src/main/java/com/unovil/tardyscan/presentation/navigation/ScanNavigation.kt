@@ -144,7 +144,7 @@ fun ScanNavigation(cameraExecutor: ExecutorService, onBack: () -> Unit) {
                             {
                                 Log.d("ScanNavigation", "onNavigate ran from SuccessfulScanCard (fail)")
                                 Toast.makeText(context,
-                                    context.getString(R.string.scan_failed_attendance), Toast.LENGTH_LONG).show()
+                                    context.getString(R.string.error_network), Toast.LENGTH_LONG).show()
                             }
                         )
                     },

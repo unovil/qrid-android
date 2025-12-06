@@ -48,7 +48,7 @@ fun SignIn(
     ) {
 
         Text(
-            text = stringResource(R.string.signin_title),
+            text = stringResource(R.string.sign_in),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )

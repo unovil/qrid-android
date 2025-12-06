@@ -58,7 +58,7 @@ fun SignUp(
     ) {
 
         Text(
-            text = stringResource(R.string.signup_title),
+            text = stringResource(R.string.sign_up),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
