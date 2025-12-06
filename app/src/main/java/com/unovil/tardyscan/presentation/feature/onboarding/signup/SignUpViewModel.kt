@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.presentation.feature.signup
+package com.unovil.tardyscan.presentation.feature.onboarding.signup
 
 import android.content.Context
 import android.util.Log
@@ -50,12 +50,13 @@ class SignUpViewModel @Inject constructor(
     val isSuccessfulSignUp = _isSuccessfulSignUp.asStateFlow()
 
     private val _passwordValidations = MutableStateFlow(mapOf(
-        "Must be at least 8 characters" to false,
-        "Must contain at least one lowercase letter" to false,
-        "Must contain at least one uppercase letter" to false,
-        "Must contain at least one number" to false,
-        "Must contain at least one special character" to false
+        context.getString(R.string.password_requirement_length) to false,
+        context.getString(R.string.password_requirement_lowercase) to false,
+        context.getString(R.string.password_requirement_uppercase) to false,
+        context.getString(R.string.password_requirement_number) to false,
+        context.getString(R.string.password_requirement_special) to false
     ))
+    
     val passwordValidations = _passwordValidations.asStateFlow()
     
     private val _isSignUpButtonEnabled = MutableStateFlow(false)
@@ -156,21 +157,22 @@ class SignUpViewModel @Inject constructor(
 
             _signUpErrorMessage.value = when (result) {
                 is SignUpUseCase.Output.Failure.Unverified -> {
-                    "An error has occurred while verifying your credentials. " +
-                            "Please exit and relaunch the app to try again."
+                    context.getString(R.string.signup_error_unverified)
                 }
 
                 is SignUpUseCase.Output.Failure.WeakPassword -> {
-                    "Your password is too weak. Please ensure it meets the required security standards:\n" +
-                            result.reasons.joinToString("\n")
+                    context.getString(
+                        R.string.signup_error_weak_password,
+                        result.reasons.joinToString("\n")
+                    )
                 }
 
                 is SignUpUseCase.Output.Failure.Unknown -> {
-                    "An unknown error occurred. Please try again later."
+                    context.getString(R.string.signup_error_unknown)
                 }
 
                 is SignUpUseCase.Output.Failure.AlreadyExists -> {
-                    "This user already exists. Try to sign up with a different email address."
+                    context.getString(R.string.signup_error_duplicate)
                 }
 
                 is SignUpUseCase.Output.Success -> {

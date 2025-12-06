@@ -128,20 +128,23 @@ fun ScanNavigation(cameraExecutor: ExecutorService, onBack: () -> Unit) {
                             {
                                 Log.d("ScanNavigation", "onNavigate ran from SuccessfulScanCard")
                                 onAttendanceAcceptSound.play(onAttendanceAcceptSoundId, 1f, 1f, 0, 0, 1f)
-                                Toast.makeText(context, "Submitted attendance!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.scan_submitted_attendance), Toast.LENGTH_SHORT).show()
                                 onNavigate()
                                 scanViewModel.onReset()
                             },
                             {
                                 Log.d("ScanNavigation", "onNavigate ran from SuccessfulScanCard")
                                 onAttendanceAcceptSound.play(onAttendanceAcceptSoundId, 1f, 1f, 0, 0, 1f)
-                                Toast.makeText(context, "Duplicate attendance!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.scan_duplicate_attendance), Toast.LENGTH_SHORT).show()
                                 onNavigate()
                                 scanViewModel.onReset()
                             },
                             {
                                 Log.d("ScanNavigation", "onNavigate ran from SuccessfulScanCard (fail)")
-                                Toast.makeText(context, "Please check your Internet connection and try again.", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.scan_failed_attendance), Toast.LENGTH_LONG).show()
                             }
                         )
                     },

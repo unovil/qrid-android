@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.presentation.feature.signin
+package com.unovil.tardyscan.presentation.feature.onboarding.signin
 
 import android.content.Context
 import androidx.lifecycle.ViewModel

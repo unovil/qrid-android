@@ -1,12 +1,15 @@
 package com.unovil.tardyscan.presentation.feature.history
 
+import android.content.Context
 import android.util.Log
 import kotlin.OptIn
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.domain.usecase.GetAttendancesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,10 +28,16 @@ import kotlin.time.ExperimentalTime
 @HiltViewModel
 @OptIn(ExperimentalTime::class)
 class HistoryViewModel @Inject constructor(
-    private val getAttendancesUseCase: GetAttendancesUseCase
+    private val getAttendancesUseCase: GetAttendancesUseCase,
+    @ApplicationContext val context: Context
 ) : ViewModel() {
 
-    val attendanceFilterOptions = listOf("On time", "Absent", "Late", "All")
+    val attendanceFilterOptions = listOf(
+        context.getString(R.string.history_filter_on_time),
+        context.getString(R.string.history_filter_absent),
+        context.getString(R.string.history_filter_late),
+        context.getString(R.string.history_filter_all)
+    )
     private val timestampFormat = LocalDateTime.Format {
         monthName(MonthNames.ENGLISH_ABBREVIATED)
         chars(" ")
@@ -117,10 +126,10 @@ class HistoryViewModel @Inject constructor(
             )
         }.filter { attendance ->
             when (newFilter) {
-                "On time" -> attendance.presence == Presence.PRESENT
-                "Absent" -> attendance.presence == Presence.ABSENT
-                "Late" -> attendance.presence == Presence.LATE
-                "All" -> true
+                context.getString(R.string.history_filter_on_time) -> attendance.presence == Presence.PRESENT
+                context.getString(R.string.history_filter_absent) -> attendance.presence == Presence.ABSENT
+                context.getString(R.string.history_filter_late) -> attendance.presence == Presence.LATE
+                context.getString(R.string.history_filter_all) -> true
                 else -> false
             }
         }

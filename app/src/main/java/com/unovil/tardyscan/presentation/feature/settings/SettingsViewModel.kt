@@ -1,15 +1,18 @@
 package com.unovil.tardyscan.presentation.feature.settings
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.data.network.dto.AllowedUserDto
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
-import com.unovil.tardyscan.domain.model.Theme
+import com.unovil.tardyscan.domain.model.ThemeOptions
 import com.unovil.tardyscan.domain.usecase.GetSignedUserUseCase
 import com.unovil.tardyscan.domain.usecase.SignOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,9 +23,15 @@ class SettingsViewModel @Inject constructor(
     private val themeManager: ThemeManager,
     private val authNameManager: AuthNameManager,
     private val getSignedUserUseCase: GetSignedUserUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val signOutUseCase: SignOutUseCase,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
-    val appearanceList = listOf("☀️ Light mode", "🌙 Dark mode", "⚙️ Follow system setting")
+    // val appearanceList = listOf("☀️ Light mode", "🌙 Dark mode", "⚙️ Follow system setting")
+    val appearanceList = listOf(
+        context.getString(R.string.settings_appearance_option_light),
+        context.getString(R.string.settings_appearance_option_dark),
+        context.getString(R.string.settings_appearance_option_system),
+    )
 
     private val _selectedAppearance = MutableStateFlow(appearanceList[2])
     val selectedAppearance = _selectedAppearance.asStateFlow()
@@ -71,10 +80,10 @@ class SettingsViewModel @Inject constructor(
 
     fun onSetAppearance() {
         val themeMode = when (_newAppearance.value) {
-            "☀️ Light mode" -> Theme.LIGHT
-            "🌙 Dark mode" -> Theme.DARK
-            "⚙️ Follow system setting" -> Theme.FOLLOW_SYSTEM
-            else -> Theme.FOLLOW_SYSTEM
+            context.getString(R.string.settings_appearance_option_light) -> ThemeOptions.LIGHT
+            context.getString(R.string.settings_appearance_option_dark) -> ThemeOptions.DARK
+            context.getString(R.string.settings_appearance_option_system) -> ThemeOptions.FOLLOW_SYSTEM
+            else -> ThemeOptions.FOLLOW_SYSTEM
         }
 
         viewModelScope.launch {

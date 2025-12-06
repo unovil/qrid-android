@@ -58,7 +58,9 @@ fun PasswordTextField(value: String, onValueChange: (String) -> Unit) {
 
             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                 Icon(imageVector = image, contentDescription =
-                    if (passwordVisible) "Hide password" else "Show password"
+                    if (passwordVisible) stringResource(R.string.content_desc_hide_password) else stringResource(
+                        R.string.content_desc_show_password
+                    )
                 )
             }
         }
@@ -129,7 +131,9 @@ fun PasswordValidationFeedbackItem(
     ) {
         Icon(
             imageVector = if (isRuleMet) picOnSuccess.first else picOnFailure.first,
-            contentDescription = if (isRuleMet) "Success" else "Failure",
+            contentDescription = if (isRuleMet) stringResource(R.string.content_desc_success) else stringResource(
+                R.string.content_desc_failure
+            ),
             tint = if (isRuleMet) picOnSuccess.second else picOnFailure.second,
             modifier = Modifier.size(24.dp)
         )

@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.unovil.tardyscan.R
 
 @Composable
 fun HistoryItem(attendanceUi: AttendanceUiModel) {
@@ -40,7 +42,7 @@ fun HistoryItem(attendanceUi: AttendanceUiModel) {
         ) {
             Row {
                 Column(Modifier.weight(0.5f)) {
-                    Text("Name", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.history_name), fontWeight = FontWeight.Bold)
                     Text(attendanceUi.name)
                 }
                 Column(
@@ -54,16 +56,16 @@ fun HistoryItem(attendanceUi: AttendanceUiModel) {
             Spacer(Modifier.padding(6.dp))
             Row {
                 Column(Modifier.weight(0.5f)) {
-                    Text("Section", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.history_section), fontWeight = FontWeight.Bold)
                     Text("${attendanceUi.level} - ${attendanceUi.section}")
                 }
                 Column(
                     modifier = Modifier.weight(0.5f),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Text("Timestamp", fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
+                    Text(stringResource(R.string.history_timestamp), fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
                     if (attendanceUi.presence == Presence.ABSENT) {
-                        Text("Not yet scanned", fontStyle = FontStyle.Italic, textAlign = TextAlign.End)
+                        Text(stringResource(R.string.history_not_yet_scanned), fontStyle = FontStyle.Italic, textAlign = TextAlign.End)
                     } else {
                         Text(
                             attendanceUi.displayTimestamp,

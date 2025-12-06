@@ -19,11 +19,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.presentation.feature.history.HistoryScreen
 import com.unovil.tardyscan.presentation.feature.history.HistoryViewModel
 import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
@@ -47,9 +49,11 @@ fun MainNavigation(
             ExtendedFloatingActionButton(
                 onClick = onScan
             ) {
-                Icon(Icons.Default.QrCodeScanner, "QR Scan Service")
+                Icon(Icons.Default.QrCodeScanner,
+                    stringResource(R.string.content_desc_qr_scan_service)
+                )
                 Spacer(modifier = Modifier.width(10.dp))
-                Text("Scan")
+                Text(stringResource(R.string.navigation_scan))
             }
         },
         floatingActionButtonPosition = FabPosition.Center

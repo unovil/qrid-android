@@ -13,10 +13,10 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.unovil.tardyscan.presentation.feature.signin.SignIn
-import com.unovil.tardyscan.presentation.feature.signup.SignUp
-import com.unovil.tardyscan.presentation.feature.signup.SignUpViewModel
-import com.unovil.tardyscan.presentation.feature.signup.VerifyGivenCredentials
+import com.unovil.tardyscan.presentation.feature.onboarding.signin.SignIn
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.SignUp
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.SignUpViewModel
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyGivenCredentials
 
 @Composable
 fun AuthNavigation(

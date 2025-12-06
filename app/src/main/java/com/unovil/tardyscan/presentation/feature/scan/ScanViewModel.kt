@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.model.Attendance
 import com.unovil.tardyscan.domain.model.Student
 import com.unovil.tardyscan.domain.usecase.CreateAttendanceUseCase
@@ -23,7 +24,7 @@ import kotlin.time.ExperimentalTime
 class ScanViewModel @Inject constructor(
     private val getStudentInfoUseCase: GetStudentInfoUseCase,
     private val createAttendanceUseCase: CreateAttendanceUseCase,
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _isScanningEnabled = MutableStateFlow(true)
@@ -54,14 +55,18 @@ class ScanViewModel @Inject constructor(
                 actionOnSuccess()
             } else {
                 val errorMessage = when (studentInfo) {
-                    is GetStudentInfoUseCase.Output.Failure.InvalidCode, is GetStudentInfoUseCase.Output.Failure.InvalidDecryption -> "Invalid QR Code!"
-                    is GetStudentInfoUseCase.Output.Failure.NotFound -> "Student not found!"
-                    is GetStudentInfoUseCase.Output.Failure.HttpRequestError -> "Can't connect. Please use a stable connection!"
-                    is GetStudentInfoUseCase.Output.Failure.HttpRequestTimeout -> "Request timed out! Please try again."
-                    else -> "Something happened on our end. Please try again."
+                    is GetStudentInfoUseCase.Output.Failure.InvalidCode, is GetStudentInfoUseCase.Output.Failure.InvalidDecryption -> context.getString(
+                        R.string.scan_qr_invalid
+                    )
+                    is GetStudentInfoUseCase.Output.Failure.NotFound -> context.getString(R.string.scan_qr_not_found)
+                    is GetStudentInfoUseCase.Output.Failure.HttpRequestError -> context.getString(R.string.scan_qr_connection_error)
+                    is GetStudentInfoUseCase.Output.Failure.HttpRequestTimeout -> context.getString(
+                        R.string.scan_qr_timeout
+                    )
+                    else -> context.getString(R.string.scan_qr_unknown_error)
                 }
 
-                Toast.makeText(appContext, errorMessage, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 _returnColor.value = Color.Red
                 _isScanningEnabled.value = true
             }

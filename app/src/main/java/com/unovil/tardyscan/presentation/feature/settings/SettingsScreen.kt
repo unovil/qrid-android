@@ -34,11 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.data.network.dto.AllowedUserDto
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +77,7 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.fillMaxHeight(0.15f))
             Text(
-                "Settings ⚙️",
+                stringResource(R.string.settings_title),
                 modifier = Modifier.padding(horizontal = 20.dp),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineLarge
@@ -83,55 +85,62 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             SettingsItem(
-                mainLabel = "Account information",
-                subLabel = if (authName?.isNotEmpty() == true) "Hello, $authName! 👋" else ""
+                mainLabel = stringResource(R.string.settings_account_information),
+                subLabel = if (authName?.isNotEmpty() == true) stringResource(
+                    R.string.settings_account_information_sub,
+                    authName
+                ) else ""
             ) {
                 onCheckProfile {
-                    Toast.makeText(context, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.settings_unknown_error), Toast.LENGTH_SHORT).show()
                 }.also { isOpenedAboutUser = !isOpenedAboutUser }
             }
 
             SettingsItem(
-                mainLabel = "Appearance",
-                subLabel = "Currently set to: ${selectedAppearance.value}",
+                mainLabel = stringResource(R.string.settings_appearance),
+                subLabel = stringResource(
+                    R.string.settings_appearance_sub,
+                    selectedAppearance.value
+                ),
             ) { isOpenedAppearanceDialog = !isOpenedAppearanceDialog }
 
             SettingsItem(
-                mainLabel = "About the QR-ID App",
-                subLabel = "Made with 💖 through Android Studio and Git."
+                mainLabel = stringResource(R.string.settings_about),
+                subLabel = stringResource(R.string.settings_about_sub)
             ) { context.startActivity(aboutIntent) }
 
             SettingsItem(
-                mainLabel = "Log out",
-                subLabel = "End your current login session.",
+                mainLabel = stringResource(R.string.settings_logout),
+                subLabel = stringResource(R.string.settings_logout_sub),
                 color = Color.Red,
             ) { onLogOut {
-                Toast.makeText(context, "Something went wrong.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.settings_unknown_error), Toast.LENGTH_SHORT).show()
             }}
         }
     }
 
     if (isOpenedAboutUser) {
         AlertDialog(
-            icon = { Icon(Icons.Default.Person, contentDescription = "About user") },
-            title = { Text("About user") },
+            icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.content_desc_about_user)) },
+            title = { Text(stringResource(R.string.settings_profile_title)) },
             text = {
                 Column { 
-                    Text("Name:", style = MaterialTheme.typography.labelMedium)
-                    Text(allowedUser.value.name ?: "Unknown", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.settings_profile_name), style = MaterialTheme.typography.labelMedium)
+                    Text(allowedUser.value.name ?: stringResource(R.string.settings_profile_name_error), style = MaterialTheme.typography.bodyLarge)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Access Level:", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.settings_profile_access_level), style = MaterialTheme.typography.labelMedium)
                     Text(when (allowedUser.value.role) {
-                        "FULL" -> "Access to entire school"
-                        "CLASS" -> "Access to only your class"
-                        "LEVEL" -> "Access to multiple classes on your level"
-                        else -> "Unknown access"
+                        "FULL" -> stringResource(R.string.settings_profile_access_level_full)
+                        "CLASS" -> stringResource(R.string.settings_profile_access_level_class)
+                        "LEVEL" -> stringResource(R.string.settings_profile_access_level_level)
+                        else -> stringResource(R.string.settings_profile_access_level_error)
                     }, style = MaterialTheme.typography.bodyLarge)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Domain:", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.settings_profile_domain), style = MaterialTheme.typography.labelMedium)
                     Text(allowedUser.value.domain, style = MaterialTheme.typography.bodyLarge)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text("Domain ID:", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.settings_profile_domain_id), style = MaterialTheme.typography.labelMedium)
                     Text(allowedUser.value.domainId, style = MaterialTheme.typography.bodyLarge)
                 }
             },
@@ -146,8 +155,8 @@ fun SettingsScreen(
 
     if (isOpenedAppearanceDialog) {
         AlertDialog(
-            icon = { Icon(Icons.Default.Palette, contentDescription = "Appearance") },
-            title = { Text("Appearance") },
+            icon = { Icon(Icons.Default.Palette, contentDescription = stringResource(R.string.content_desc_appearance)) },
+            title = { Text(stringResource(R.string.settings_appearance_title)) },
             text = {
                 Column(
                     modifier = Modifier.selectableGroup(),
@@ -155,10 +164,12 @@ fun SettingsScreen(
                 ) {
                     appearanceList.forEach { text ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().selectable(
-                                selected = (text == newAppearance.value),
-                                onClick = { onUpdateAppearance(text) }
-                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = (text == newAppearance.value),
+                                    onClick = { onUpdateAppearance(text) }
+                                ),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -182,7 +193,7 @@ fun SettingsScreen(
                     isOpenedAppearanceDialog = false
                     onSetAppearance()
                 }) {
-                    Text("Confirm")
+                    Text(stringResource(R.string.settings_appearance_confirm))
                 }
             },
             dismissButton = {
@@ -190,7 +201,7 @@ fun SettingsScreen(
                     isOpenedAppearanceDialog = false
                     onCancelAppearance()
                 }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.settings_appearance_cancel))
                 }
             }
         )
@@ -200,7 +211,10 @@ fun SettingsScreen(
 @Composable
 @Preview
 fun SettingsScreenPreview() {
-    val appearanceList = listOf("☀️ Light mode", "🌙 Dark mode", "⚙️ Follow system setting")
+    val appearanceList = listOf(stringResource(R.string.settings_appearance_option_light),
+        stringResource(R.string.settings_appearance_option_dark),
+        stringResource(R.string.settings_appearance_option_system)
+    )
     val selectedAppearance = MutableStateFlow(appearanceList[0])
 
     TardyScannerTheme {

@@ -15,7 +15,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
-import com.unovil.tardyscan.presentation.feature.signup.VerifyGivenCredentials
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyGivenCredentials
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

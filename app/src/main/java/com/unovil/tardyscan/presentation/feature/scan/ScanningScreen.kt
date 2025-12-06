@@ -37,11 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 // Calling a UI Composable composable function where a androidx.compose.ui.UiComposable composable was expected
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.LifecycleOwner
+import com.unovil.tardyscan.R
 import kotlinx.coroutines.delay
 import java.util.concurrent.ExecutorService
 
@@ -168,7 +170,7 @@ fun ScanningScreen(
             enabled = isScanningEnabled.value,
             onClick = onBack
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.content_desc_back))
         }
     }
 }

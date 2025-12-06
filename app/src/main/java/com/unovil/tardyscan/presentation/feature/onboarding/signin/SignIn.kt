@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.presentation.feature.signin
+package com.unovil.tardyscan.presentation.feature.onboarding.signin
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,7 +48,7 @@ fun SignIn(
     ) {
 
         Text(
-            text = "Sign in",
+            text = stringResource(R.string.signin_title),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )

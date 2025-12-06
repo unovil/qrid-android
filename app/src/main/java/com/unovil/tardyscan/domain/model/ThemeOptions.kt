@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.domain.model
 
-enum class Theme {
+enum class ThemeOptions {
     LIGHT,
     DARK,
     FOLLOW_SYSTEM,

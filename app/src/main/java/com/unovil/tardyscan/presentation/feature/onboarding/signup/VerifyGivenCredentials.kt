@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.presentation.feature.signup
+package com.unovil.tardyscan.presentation.feature.onboarding.signup
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -51,7 +51,7 @@ fun VerifyGivenCredentials(
     ) {
 
         Text(
-            text = "Verify Credentials",
+            text = stringResource(R.string.signup_verify_credentials),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )

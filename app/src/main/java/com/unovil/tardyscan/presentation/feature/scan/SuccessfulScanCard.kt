@@ -44,11 +44,13 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.model.Student
 import io.github.jan.supabase.storage.DownloadStatus
 import kotlinx.coroutines.flow.filterNotNull
@@ -87,9 +89,10 @@ fun SuccessfulScanCard(
         .fillMaxWidth()
         .height(240.dp)
         .background(Color.LightGray)
-        .then(other =
-            if (avatarState?.value !is DownloadStatus.ByteData) Modifier.alpha(pulseAlpha)
-            else Modifier
+        .then(
+            other =
+                if (avatarState?.value !is DownloadStatus.ByteData) Modifier.alpha(pulseAlpha)
+                else Modifier
         )
 
     val imagePainter = if (avatarState?.value is DownloadStatus.ByteData) {
@@ -114,7 +117,7 @@ fun SuccessfulScanCard(
                 modifier = imageModifier,
                 painter = imagePainter,
                 contentScale = ContentScale.Crop,
-                contentDescription = "Student picture"
+                contentDescription = stringResource(R.string.content_desc_student_picture)
             )
 
             Column(
@@ -126,7 +129,7 @@ fun SuccessfulScanCard(
             ) {
                 Text(
                     modifier = Modifier.padding(bottom = 12.dp),
-                    text = "Student scanned!",
+                    text = stringResource(R.string.scan_card_student_scanned),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineMedium
                 )
@@ -138,9 +141,9 @@ fun SuccessfulScanCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     scannedStudent.value.let {
-                        InfoRow("Name:", "${it.lastName}, ${it.firstName} ${it.middleName}")
-                        InfoRow("Section:", "${it.level} - ${it.section}")
-                        InfoRow("ID #:", "${it.id}")
+                        InfoRow(stringResource(R.string.scan_card_name), "${it.lastName}, ${it.firstName} ${it.middleName}")
+                        InfoRow(stringResource(R.string.scan_card_section), "${it.level} - ${it.section}")
+                        InfoRow(stringResource(R.string.scan_card_id), "${it.id}")
                     }
                 }
 
@@ -157,7 +160,7 @@ fun SuccessfulScanCard(
                     enabled = isSubmittingEnabled.value,
                     onClick = { onSubmit(context) }
                 ) {
-                    Text("Accept attendance")
+                    Text(stringResource(R.string.scan_card_accept_attendance))
                 }
                 Button(
                     modifier = Modifier.fillMaxWidth(),
@@ -171,7 +174,7 @@ fun SuccessfulScanCard(
                     enabled = isSubmittingEnabled.value,
                     onClick = onReset
                 ) {
-                    Text("Reject attendance")
+                    Text(stringResource(R.string.scan_card_reject_attendance))
                 }
             }
         }

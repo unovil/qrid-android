@@ -41,11 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -83,11 +85,13 @@ fun HistoryScreen(
             horizontalAlignment = Alignment.Start,
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "History ⌚",
+                    stringResource(R.string.history_title),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.weight(0.5f)
                 )
@@ -98,7 +102,7 @@ fun HistoryScreen(
                     shape = MaterialTheme.shapes.medium,
                     onClick = { showDatePicker = true }
                 ) {
-                    Icon(Icons.Default.CalendarMonth, "Choose date")
+                    Icon(Icons.Default.CalendarMonth, stringResource(R.string.history_choose_date))
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         "${selectedTimestamp.value.toLocalDateTime(TimeZone.currentSystemDefault()).date}",
@@ -132,10 +136,28 @@ fun HistoryScreen(
                 val size = attendances.value.size
                 if (isAttendancesLoaded.value) {
                     when (selectedFilter.value) {
-                        "On time" -> Toast.makeText(context, "$size student${if (size != 1) "s" else ""} on time", Toast.LENGTH_SHORT).show()
-                        "Absent" -> Toast.makeText(context, "$size absent student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
-                        "Late" -> Toast.makeText(context, "$size late student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
-                        "All" -> Toast.makeText(context, "$size total student${if (size != 1) "s" else ""}", Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.history_filter_on_time) -> Toast.makeText(context,
+                            context.getString(
+                                R.string.history_toast_student_on_time,
+                                size,
+                                if (size != 1) "s" else ""
+                            ), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.history_filter_absent) -> Toast.makeText(context,
+                            context.getString(
+                                R.string.history_toast_student_absent,
+                                size,
+                                if (size != 1) "s" else ""
+                            ), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.history_filter_late) -> Toast.makeText(context,
+                            context.getString(
+                                R.string.history_toast_student_late,
+                                size,
+                                if (size != 1) "s" else ""
+                            ), Toast.LENGTH_SHORT).show()
+                        context.getString(R.string.history_filter_all) -> Toast.makeText(context,
+                            context.getString(
+                                R.string.history_toast_student_all, size, if (size != 1) "s" else ""
+                            ), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -152,22 +174,26 @@ fun HistoryScreen(
                     }
                 } else if (isAttendancesLoaded && attendances.value.isEmpty()) {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(vertical = 16.dp, horizontal = 48.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 16.dp, horizontal = 48.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("No attendance records exist with this filter. Try with a different filter!", textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.history_no_attendance_records_exist), textAlign = TextAlign.Center)
                     }
                 } else {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(vertical = 16.dp, horizontal = 48.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(vertical = 16.dp, horizontal = 48.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("Cannot fetch attendance records from the server.", textAlign = TextAlign.Center)
+                        Text(stringResource(R.string.history_cannot_fetch_attendance), textAlign = TextAlign.Center)
                         Spacer(Modifier.height(16.dp))
                         Button(onClick = loadAttendances) {
-                            Text("Refresh!")
+                            Text(stringResource(R.string.history_refresh))
                         }
                     }
                 }
@@ -221,7 +247,7 @@ fun DatePickerModal(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.history_cancel))
             }
         }
     ) {

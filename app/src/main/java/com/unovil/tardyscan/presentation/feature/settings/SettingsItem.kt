@@ -16,10 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unovil.tardyscan.R
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
@@ -29,7 +31,9 @@ fun SettingsItem(mainLabel: String, subLabel: String? = null, showChevron: Boole
         onClick = onClick
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 28.dp, vertical = 15.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp, vertical = 15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -54,7 +58,7 @@ fun SettingsItem(mainLabel: String, subLabel: String? = null, showChevron: Boole
                 Icon(
                     Icons.Default.ChevronRight,
                     tint = if (color == Color.Unspecified) LocalContentColor.current else color,
-                    contentDescription = "View setting"
+                    contentDescription = stringResource(R.string.content_desc_view_setting)
                 )
             }
         }

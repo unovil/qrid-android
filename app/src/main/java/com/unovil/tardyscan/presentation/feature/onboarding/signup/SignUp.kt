@@ -1,4 +1,4 @@
-package com.unovil.tardyscan.presentation.feature.signup
+package com.unovil.tardyscan.presentation.feature.onboarding.signup
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,6 +31,7 @@ import com.unovil.tardyscan.presentation.common.PasswordStrengthIndicator
 import com.unovil.tardyscan.presentation.common.PasswordTextField
 import com.unovil.tardyscan.presentation.common.PasswordValidationFeedbackItem
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
+import kotlin.collections.iterator
 
 @Composable
 fun SignUp(
@@ -56,7 +58,7 @@ fun SignUp(
     ) {
 
         Text(
-            text = "Sign up",
+            text = stringResource(R.string.signup_title),
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -99,6 +101,8 @@ fun SignUp(
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun SignUpPreview() {
+    val context = LocalContext.current
+
     TardyScannerTheme {
         Surface {
             Column(
@@ -114,11 +118,11 @@ fun SignUpPreview() {
                 val signUpErrorMessage = remember { mutableStateOf("") }
                 val isSuccessfulSignUp = remember { mutableStateOf(false) }
                 val passwordValidations = remember { mutableStateOf(mapOf(
-                    "Must be at least 8 characters" to false,
-                    "Must contain at least one lowercase letter" to false,
-                    "Must contain at least one uppercase letter" to false,
-                    "Must contain at least one number" to false,
-                    "Must contain at least one special character" to false
+                    context.getString(R.string.password_requirement_length) to false,
+                    context.getString(R.string.password_requirement_lowercase) to false,
+                    context.getString(R.string.password_requirement_uppercase) to false,
+                    context.getString(R.string.password_requirement_number) to false,
+                    context.getString(R.string.password_requirement_special) to false
                 )) }
                 val isSignUpButtonEnabled = remember { mutableStateOf(false) }
 
@@ -138,11 +142,11 @@ fun SignUpPreview() {
                     {
                         password.value = it
                         passwordValidations.value = mapOf(
-                            "Must be at least 8 characters" to PasswordValidation.hasMinimumLength(it),
-                            "Must contain at least one lowercase letter" to PasswordValidation.hasLowercase(it),
-                            "Must contain at least one uppercase letter" to PasswordValidation.hasUppercase(it),
-                            "Must contain at least one number" to PasswordValidation.hasNumber(it),
-                            "Must contain at least one special character" to PasswordValidation.hasSpecialCharacter(it)
+                            context.getString(R.string.password_requirement_length) to PasswordValidation.hasMinimumLength(it),
+                            context.getString(R.string.password_requirement_lowercase) to PasswordValidation.hasLowercase(it),
+                            context.getString(R.string.password_requirement_uppercase) to PasswordValidation.hasUppercase(it),
+                            context.getString(R.string.password_requirement_number) to PasswordValidation.hasNumber(it),
+                            context.getString(R.string.password_requirement_special) to PasswordValidation.hasSpecialCharacter(it)
                         )
                     },
                 )

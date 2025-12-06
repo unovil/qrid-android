@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.di
 
-import com.unovil.tardyscan.domain.model.Theme
+import com.unovil.tardyscan.domain.model.ThemeOptions
 import com.unovil.tardyscan.proto.ThemeConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,18 +24,18 @@ class ThemeManager @Inject constructor(
         }
     }
 
-    suspend fun setTheme(theme: Theme) {
-        _isDarkTheme.value = when (theme) {
-            Theme.LIGHT -> false
-            Theme.DARK -> true
-            Theme.FOLLOW_SYSTEM -> null
+    suspend fun setTheme(themeOptions: ThemeOptions) {
+        _isDarkTheme.value = when (themeOptions) {
+            ThemeOptions.LIGHT -> false
+            ThemeOptions.DARK -> true
+            ThemeOptions.FOLLOW_SYSTEM -> null
             else -> null
         }
 
-        val themeConfig = when (theme) {
-            Theme.LIGHT -> ThemeConfig.THEME_CONFIG_LIGHT
-            Theme.DARK -> ThemeConfig.THEME_CONFIG_DARK
-            Theme.FOLLOW_SYSTEM -> ThemeConfig.THEME_CONFIG_SYSTEM
+        val themeConfig = when (themeOptions) {
+            ThemeOptions.LIGHT -> ThemeConfig.THEME_CONFIG_LIGHT
+            ThemeOptions.DARK -> ThemeConfig.THEME_CONFIG_DARK
+            ThemeOptions.FOLLOW_SYSTEM -> ThemeConfig.THEME_CONFIG_SYSTEM
             else -> ThemeConfig.THEME_CONFIG_UNSPECIFIED
         }
         settingsRepository.setTheme(themeConfig)
