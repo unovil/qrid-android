@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.di
 
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
+import com.unovil.tardyscan.data.network.dto.AdminUserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -14,14 +14,14 @@ class AuthNameManager @Inject constructor(
     private val _allowedUserName: MutableStateFlow<String?> = MutableStateFlow(null)
     val allowedUserName = _allowedUserName.asStateFlow()
 
-    private val _allowedUser: MutableStateFlow<AllowedUserDto?> = MutableStateFlow(null)
+    private val _allowedUser: MutableStateFlow<AdminUserDto?> = MutableStateFlow(null)
     val allowedUser = _allowedUser.asStateFlow()
 
     suspend fun loadAllowedUserName() {
         _allowedUserName.value = settingsRepository.nameFlow.first()
     }
 
-    suspend fun setAllowedUser(user: AllowedUserDto) {
+    suspend fun setAllowedUser(user: AdminUserDto) {
         _allowedUser.value = user
         _allowedUserName.value = user.name ?: ""
         settingsRepository.setName(user.name ?: "")

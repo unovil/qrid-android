@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class VerifyAllowedUserRpcDto (
+class GetAdminUserRpcDto (
     @SerialName("domain")
     val domain: String,
 

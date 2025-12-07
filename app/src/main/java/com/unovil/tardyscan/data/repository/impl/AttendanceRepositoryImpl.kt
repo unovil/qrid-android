@@ -62,7 +62,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             throw IllegalAccessException("Attendance already exists")
         }
 
-        val userId = (auth.currentUserOrNull()!!.userMetadata!!["allowed_user_id"] as JsonPrimitive).content.toInt()
+        val userId = (auth.currentUserOrNull()!!.userMetadata!!["admin_user_id"] as JsonPrimitive).content.toInt()
 
         val attendanceDto = AttendanceDto(
             studentId = attendance.studentId,

@@ -1,21 +1,21 @@
 package com.unovil.tardyscan.data.repository
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.AdministratorUser
 
 interface AuthenticationRepository {
-    sealed class AllowedUserResult {
-        class Success(val allowedUserId: Int, val hashedPassword: String) : AllowedUserResult()
+    sealed class UserRpcResult {
+        class Success(val allowedUserId: Int, val hashedPassword: String) : UserRpcResult()
 
-        sealed class Failure : AllowedUserResult() {
+        sealed class Failure : UserRpcResult() {
             object NotFound : Failure()
             object AlreadyRegistered : Failure()
             object Unknown : Failure()
         }
     }
 
-    suspend fun getAllowedUserResult(allowedUser: AllowedUser): AllowedUserResult
+    suspend fun getUserResult(administratorUser: AdministratorUser): UserRpcResult
     suspend fun updateAllowedUser()
-    suspend fun signUp(allowedUser: AllowedUser, email: String, password: String)
+    suspend fun signUp(administratorUser: AdministratorUser, email: String, password: String)
     suspend fun signIn(email: String, password: String)
     suspend fun signOut()
 }

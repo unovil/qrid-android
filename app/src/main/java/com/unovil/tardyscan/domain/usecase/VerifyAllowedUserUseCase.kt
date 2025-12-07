@@ -1,9 +1,9 @@
 package com.unovil.tardyscan.domain.usecase
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.AdministratorUser
 
 interface VerifyAllowedUserUseCase : UseCase<VerifyAllowedUserUseCase.Input, VerifyAllowedUserUseCase.Output> {
-    class Input(val allowedUser: AllowedUser)
+    class Input(val administratorUser: AdministratorUser)
 
     sealed class Output {
         object Success : Output()

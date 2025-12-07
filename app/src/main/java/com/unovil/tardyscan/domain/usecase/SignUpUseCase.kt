@@ -1,10 +1,10 @@
 package com.unovil.tardyscan.domain.usecase
 
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.AdministratorUser
 
 interface SignUpUseCase : UseCase<SignUpUseCase.Input, SignUpUseCase.Output> {
     class Input(
-        val allowedUser: AllowedUser,
+        val administratorUser: AdministratorUser,
         val email: String,
         val password: String
     )

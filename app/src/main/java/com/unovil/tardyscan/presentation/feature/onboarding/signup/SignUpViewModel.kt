@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.helpers.PasswordValidation
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.AdministratorUser
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,7 +110,7 @@ class SignUpViewModel @Inject constructor(
     fun onVerifyCredentials() {
         viewModelScope.launch {
             val result = verifyAllowedUserUseCase.execute(
-                VerifyAllowedUserUseCase.Input(AllowedUser(
+                VerifyAllowedUserUseCase.Input(AdministratorUser(
                     domain = _domain.value,
                     domainId = _domainId.value,
                     givenPassword = _rawPassword.value
@@ -145,7 +145,7 @@ class SignUpViewModel @Inject constructor(
 
             val result = signUpUseCase.execute(
                 SignUpUseCase.Input(
-                    AllowedUser(
+                    AdministratorUser(
                         domain = _domain.value,
                         domainId = _domainId.value,
                         givenPassword = _rawPassword.value

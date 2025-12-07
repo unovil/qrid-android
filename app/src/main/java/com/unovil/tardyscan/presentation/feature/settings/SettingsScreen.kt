@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.R
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
+import com.unovil.tardyscan.data.network.dto.AdminUserDto
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -56,7 +56,7 @@ fun SettingsScreen(
     onSetAppearance: () -> Unit = settingsViewModel!!::onSetAppearance,
     onLogOut: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onLogOut,
     onCheckProfile: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onCheckProfile,
-    allowedUser: State<AllowedUserDto> = settingsViewModel!!.userProfile.collectAsState(),
+    allowedUser: State<AdminUserDto> = settingsViewModel!!.userProfile.collectAsState(),
     authName: String?
 ) {
     var isOpenedAppearanceDialog by remember { mutableStateOf(false) }

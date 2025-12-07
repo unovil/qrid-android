@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.R
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
+import com.unovil.tardyscan.data.network.dto.AdminUserDto
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.domain.model.ThemeOptions
@@ -36,7 +36,7 @@ class SettingsViewModel @Inject constructor(
     private val _selectedAppearance = MutableStateFlow(appearanceList[2])
     val selectedAppearance = _selectedAppearance.asStateFlow()
 
-    private val _userProfile = MutableStateFlow(AllowedUserDto(0, "", "", "", ""))
+    private val _userProfile = MutableStateFlow(AdminUserDto(0, "", "", "", ""))
     val userProfile = _userProfile.asStateFlow()
 
     private val _newAppearance = MutableStateFlow(appearanceList[2])
