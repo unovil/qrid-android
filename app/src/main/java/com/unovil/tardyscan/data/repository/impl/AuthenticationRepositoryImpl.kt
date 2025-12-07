@@ -3,10 +3,14 @@ package com.unovil.tardyscan.data.repository.impl
 import android.util.Log
 import com.unovil.tardyscan.data.network.dto.AdminUserDto
 import com.unovil.tardyscan.data.network.dto.GetAdminUserRpcDto
+import com.unovil.tardyscan.data.network.dto.GetStudentUserRpcDto
+import com.unovil.tardyscan.data.network.dto.StudentUserDto
+import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.UserRpcResult
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.domain.model.AdministratorUser
+import com.unovil.tardyscan.domain.model.StudentUser
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -25,10 +29,12 @@ import javax.inject.Inject
 class AuthenticationRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val auth: Auth,
-    private val nameManager: AuthNameManager
+    private val nameManager: AuthNameManager,
+    private val attendanceRepository: AttendanceRepository
 ) : AuthenticationRepository {
 
     val adminUsersTable = postgrest["admin_users"]
+    val studentUsersTable = postgrest["student_users"]
 
     override suspend fun getUserResult(administratorUser: AdministratorUser): UserRpcResult {
         val adminUserDto = administratorUser.let { GetAdminUserRpcDto(it.domain, it.domainId) }
@@ -50,14 +56,46 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateAllowedUser() {
-        val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-            limit(1)
-            single()
-        }.decodeAs<AdminUserDto>()
+    override suspend fun getUserResult(studentUser: StudentUser): UserRpcResult {
+        val studentUserDto = GetStudentUserRpcDto(studentUser.lrn)
 
-        nameManager.setAllowedUser(allowedUser)
-        nameManager.setAllowedUserName(allowedUser.name ?: "")
+        val functionCall = postgrest.rpc(
+            function = "get_admin_user_json",
+            parameters = Json.encodeToJsonElement(GetStudentUserRpcDto.serializer(), studentUserDto) as JsonObject
+        ).data
+
+        val functionCallJson = Json.parseToJsonElement(functionCall).jsonObject
+        val status = functionCallJson["status"]?.jsonPrimitive?.int
+        val hashedPassword = functionCallJson["hashedPassword"]?.jsonPrimitive?.contentOrNull
+
+        return when (status) {
+            -1 -> UserRpcResult.Failure.NotFound
+            0 -> UserRpcResult.Failure.AlreadyRegistered
+            null -> UserRpcResult.Failure.Unknown
+            else -> UserRpcResult.Success(status, hashedPassword!!)
+        }
+    }
+
+    override suspend fun updateAllowedUser() {
+        val user = auth.retrieveUserForCurrentSession(true)
+        if (user.userMetadata?.get("admin_user_id") != null) {
+            val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+                limit(1)
+                single()
+            }.decodeAs<AdminUserDto>()
+
+            nameManager.setAllowedUser(allowedUser)
+            nameManager.setAllowedUserName(allowedUser.name ?: "")
+        } else if (user.userMetadata?.get("student_user_id") != null) {
+            val allowedStudentUser = studentUsersTable.select(Columns.list("id, lrn")) {
+                limit(1)
+                single()
+            }.decodeAs<StudentUserDto>()
+
+            val student = attendanceRepository.getStudentInfo(allowedStudentUser.lrn)
+
+            TODO("Name manager for student users not yet implemented.")
+        }
     }
 
     override suspend fun signUp(
@@ -87,6 +125,36 @@ class AuthenticationRepositoryImpl @Inject constructor(
             function = "admin_mark_as_registered",
             parameters = buildJsonObject {
                 put("admin_id", JsonPrimitive(adminUserId))
+            }
+        ).decodeAs<Int>()
+
+        // registered result of 0: success, -1: failure
+        if (markRegisteredResult != 0) throw IllegalStateException("Failed to mark user as registered.")
+    }
+
+    override suspend fun signUp(studentUser: StudentUser, email: String, password: String) {
+        val userResult = getUserResult(studentUser)
+        if (userResult !is UserRpcResult.Success) {
+            throw IllegalAccessException("User is not allowed to sign up.")
+        }
+
+        Log.d("AuthenticationRepository", "studentUserId: ${userResult.allowedUserId}")
+
+        auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+            data = buildJsonObject {
+                put("student_user_id", JsonPrimitive(userResult.allowedUserId))
+            }
+        }
+
+        val user = auth.currentUserOrNull()
+        val studentUserId = (user?.userMetadata?.get("student_user_id") as JsonPrimitive).content.toInt()
+
+        val markRegisteredResult = postgrest.rpc(
+            function = "student_mark_as_registered",
+            parameters = buildJsonObject {
+                put("student_id", JsonPrimitive(studentUserId))
             }
         ).decodeAs<Int>()
 

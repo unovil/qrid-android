@@ -1,4 +1,6 @@
 package com.unovil.tardyscan.domain.model
 
-class StudentUser {
-}
+data class StudentUser (
+    val lrn: Long,
+    val givenPassword: String
+)
