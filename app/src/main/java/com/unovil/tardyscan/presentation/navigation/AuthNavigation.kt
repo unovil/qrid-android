@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -15,8 +16,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.unovil.tardyscan.presentation.feature.onboarding.signin.SignIn
 import com.unovil.tardyscan.presentation.feature.onboarding.signup.SignUp
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.SignUpUserMode
 import com.unovil.tardyscan.presentation.feature.onboarding.signup.SignUpViewModel
-import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyGivenCredentials
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyCredentialsAdmin
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyCredentialsStudent
 
 @Composable
 fun AuthNavigation(
@@ -42,12 +45,27 @@ fun AuthNavigation(
                     composable<Screen.SignIn> {
                         SignIn(
                             onSuccess = onSuccess,
-                            onSwitchToSignUp = { navController.navigate(Screen.VerifyGivenCredentials) }
+                            onSwitchToSignUp = { navController.navigate(Screen.VerifyCredentialsAdmin) }
                         )
                     }
 
-                    composable<Screen.VerifyGivenCredentials> {
-                        VerifyGivenCredentials(
+                    composable<Screen.VerifyCredentialsAdmin> {
+                        LaunchedEffect(Unit) {
+                            signUpViewModel.onUserModeChange(SignUpUserMode.STUDENT)
+                        }
+
+                        VerifyCredentialsAdmin(
+                            viewModel = signUpViewModel,
+                            onSuccess = { navController.navigate(Screen.SignUp) }
+                        )
+                    }
+
+                    composable<Screen.VerifyCredentialsStudent> {
+                        LaunchedEffect(Unit) {
+                            signUpViewModel.onUserModeChange(SignUpUserMode.STUDENT)
+                        }
+
+                        VerifyCredentialsStudent(
                             viewModel = signUpViewModel,
                             onSuccess = { navController.navigate(Screen.SignUp) }
                         )
@@ -62,7 +80,5 @@ fun AuthNavigation(
                 }
             }
         }
-
-
     }
 }

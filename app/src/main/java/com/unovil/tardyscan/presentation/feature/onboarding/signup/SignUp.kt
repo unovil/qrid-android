@@ -1,6 +1,5 @@
 package com.unovil.tardyscan.presentation.feature.onboarding.signup
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -21,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.R
@@ -31,7 +30,6 @@ import com.unovil.tardyscan.presentation.common.PasswordStrengthIndicator
 import com.unovil.tardyscan.presentation.common.PasswordTextField
 import com.unovil.tardyscan.presentation.common.PasswordValidationFeedbackItem
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
-import kotlin.collections.iterator
 
 @Composable
 fun SignUp(
@@ -96,9 +94,7 @@ fun SignUp(
     }
 }
 
-
-@Preview(showBackground = true)
-@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@PreviewLightDark
 @Composable
 fun SignUpPreview() {
     val context = LocalContext.current
