@@ -9,8 +9,11 @@ import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.UserRpcResult
 import com.unovil.tardyscan.di.AuthNameManager
-import com.unovil.tardyscan.domain.model.AdministratorUser
-import com.unovil.tardyscan.domain.model.StudentUser
+import com.unovil.tardyscan.domain.model.Administrator
+import com.unovil.tardyscan.domain.model.SignUpAdministratorUser
+import com.unovil.tardyscan.domain.model.SignUpStudentUser
+import com.unovil.tardyscan.domain.model.Student
+import com.unovil.tardyscan.domain.model.User
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -36,8 +39,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
     val adminUsersTable = postgrest["admin_users"]
     val studentUsersTable = postgrest["student_users"]
 
-    override suspend fun getUserResult(administratorUser: AdministratorUser): UserRpcResult {
-        val adminUserDto = administratorUser.let { GetAdminUserRpcDto(it.domain, it.domainId) }
+    override suspend fun getUserResult(signUpAdministratorUser: SignUpAdministratorUser): UserRpcResult {
+        val adminUserDto = signUpAdministratorUser.let { GetAdminUserRpcDto(it.domain, it.domainId) }
 
         val functionCall = postgrest.rpc(
             function = "get_admin_user_json",
@@ -56,8 +59,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserResult(studentUser: StudentUser): UserRpcResult {
-        val studentUserDto = GetStudentUserRpcDto(studentUser.lrn)
+    override suspend fun getUserResult(signUpStudentUser: SignUpStudentUser): UserRpcResult {
+        val studentUserDto = GetStudentUserRpcDto(signUpStudentUser.lrn)
 
         val functionCall = postgrest.rpc(
             function = "get_admin_user_json",
@@ -79,31 +82,50 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override suspend fun updateAllowedUser() {
         val user = auth.retrieveUserForCurrentSession(true)
         if (user.userMetadata?.get("admin_user_id") != null) {
-            val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+            val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
                 limit(1)
                 single()
             }.decodeAs<AdminUserDto>()
+            
+            val allowedUser = User.Administrator(Administrator(
+                adminResponse.domain,
+                adminResponse.domainId,
+                adminResponse.name,
+                adminResponse.role
+            ))
 
             nameManager.setAllowedUser(allowedUser)
-            nameManager.setAllowedUserName(allowedUser.name ?: "")
+            nameManager.setAllowedUserName(allowedUser.admin.name ?: "")
         } else if (user.userMetadata?.get("student_user_id") != null) {
-            val allowedStudentUser = studentUsersTable.select(Columns.list("id, lrn")) {
+            val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
                 limit(1)
                 single()
-            }.decodeAs<StudentUserDto>()
+            }.decodeAs<StudentUserDto>().let { attendanceRepository.getStudentInfo(it.lrn) }
 
-            val student = attendanceRepository.getStudentInfo(allowedStudentUser.lrn)
+            val name = "${studentResponse?.lastName}, ${studentResponse?.firstName} ${studentResponse?.middleName}"
 
-            TODO("Name manager for student users not yet implemented.")
+            val allowedUser = User.Student(Student(
+                studentResponse?.id ?: 0L,
+                studentResponse?.lastName ?: "",
+                studentResponse?.firstName ?: "",
+                studentResponse?.middleName,
+                studentResponse?.section?.level ?: 0,
+                studentResponse?.section?.section ?: "",
+                studentResponse?.section?.school?.name ?: "",
+                attendanceRepository.getAvatarFlow(studentResponse?.avatarLink ?: "")
+            ))
+
+            nameManager.setAllowedUser(allowedUser)
+            nameManager.setAllowedUserName(name)
         }
     }
 
     override suspend fun signUp(
-        administratorUser: AdministratorUser,
+        signUpAdministratorUser: SignUpAdministratorUser,
         email: String,
         password: String
     ) {
-        val userResult = getUserResult(administratorUser)
+        val userResult = getUserResult(signUpAdministratorUser)
         if (userResult !is UserRpcResult.Success) {
             throw IllegalAccessException("User is not allowed to sign up.")
         }
@@ -132,8 +154,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
         if (markRegisteredResult != 0) throw IllegalStateException("Failed to mark user as registered.")
     }
 
-    override suspend fun signUp(studentUser: StudentUser, email: String, password: String) {
-        val userResult = getUserResult(studentUser)
+    override suspend fun signUp(signUpStudentUser: SignUpStudentUser, email: String, password: String) {
+        val userResult = getUserResult(signUpStudentUser)
         if (userResult !is UserRpcResult.Success) {
             throw IllegalAccessException("User is not allowed to sign up.")
         }
@@ -179,7 +201,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun signOut() {
         auth.signOut(SignOutScope.LOCAL)
-        nameManager.setAllowedUser(AdminUserDto(0, "", "", "", ""))
+        nameManager.setAllowedUser(null)
         nameManager.setAllowedUserName("")
     }
 }

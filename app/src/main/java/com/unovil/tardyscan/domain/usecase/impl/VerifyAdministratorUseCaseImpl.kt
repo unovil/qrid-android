@@ -16,14 +16,14 @@ class VerifyAdministratorUseCaseImpl @Inject constructor(
     private val argon2: Argon2Kt
 ) : VerifyAdministratorUseCase {
     override suspend fun execute(input: VerifyAdministratorUseCase.Input): VerifyUserUseCase.Output = withContext(Dispatchers.IO) {
-        val result = authenticationRepository.getUserResult(input.administratorUser)
+        val result = authenticationRepository.getUserResult(input.signUpAdministratorUser)
 
         return@withContext when (result) {
             is Failure.Unknown -> VerifyUserUseCase.Output.Failure.Conflict
             is Failure.NotFound -> VerifyUserUseCase.Output.Failure.NotFound
             is Failure.AlreadyRegistered -> VerifyUserUseCase.Output.Failure.AlreadyRegistered
             is Success -> {
-                if (argon2.verify(Argon2Mode.ARGON2_I,result.hashedPassword, input.administratorUser.givenPassword.toByteArray()))
+                if (argon2.verify(Argon2Mode.ARGON2_I,result.hashedPassword, input.signUpAdministratorUser.givenPassword.toByteArray()))
                     VerifyUserUseCase.Output.Success
                 else
                     VerifyUserUseCase.Output.Failure.NotFound

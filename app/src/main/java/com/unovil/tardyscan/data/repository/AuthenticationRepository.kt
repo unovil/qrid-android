@@ -1,7 +1,7 @@
 package com.unovil.tardyscan.data.repository
 
-import com.unovil.tardyscan.domain.model.AdministratorUser
-import com.unovil.tardyscan.domain.model.StudentUser
+import com.unovil.tardyscan.domain.model.SignUpAdministratorUser
+import com.unovil.tardyscan.domain.model.SignUpStudentUser
 
 interface AuthenticationRepository {
     sealed class UserRpcResult {
@@ -14,11 +14,11 @@ interface AuthenticationRepository {
         }
     }
 
-    suspend fun getUserResult(administratorUser: AdministratorUser): UserRpcResult
-    suspend fun getUserResult(studentUser: StudentUser): UserRpcResult
+    suspend fun getUserResult(signUpAdministratorUser: SignUpAdministratorUser): UserRpcResult
+    suspend fun getUserResult(signUpStudentUser: SignUpStudentUser): UserRpcResult
     suspend fun updateAllowedUser()
-    suspend fun signUp(administratorUser: AdministratorUser, email: String, password: String)
-    suspend fun signUp(studentUser: StudentUser, email: String, password: String)
+    suspend fun signUp(signUpAdministratorUser: SignUpAdministratorUser, email: String, password: String)
+    suspend fun signUp(signUpStudentUser: SignUpStudentUser, email: String, password: String)
     suspend fun signIn(email: String, password: String)
     suspend fun signOut()
 }

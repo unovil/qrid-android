@@ -1,7 +1,8 @@
 package com.unovil.tardyscan.domain.model
 
-data class AdministratorUser (
+class Administrator (
     val domain: String,
     val domainId: String,
-    val givenPassword: String
+    val name: String?,
+    val role: String
 )

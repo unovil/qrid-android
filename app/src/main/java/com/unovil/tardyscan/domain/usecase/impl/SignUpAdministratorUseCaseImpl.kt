@@ -18,7 +18,7 @@ class SignUpAdministratorUseCaseImpl @Inject constructor(
     ) {
         try {
             authenticationRepository.signUp(
-                input.administratorUser, input.email, input.password
+                input.signUpAdministratorUser, input.email, input.password
             )
             SignUpUseCase.Output.Success
         } catch (e: Exception) {

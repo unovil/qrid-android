@@ -1,7 +1,6 @@
 package com.unovil.tardyscan.di
 
-import com.unovil.tardyscan.data.network.dto.AdminUserDto
-import com.unovil.tardyscan.data.network.dto.StudentUserDto
+import com.unovil.tardyscan.domain.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -15,21 +14,30 @@ class AuthNameManager @Inject constructor(
     private val _allowedUserName: MutableStateFlow<String?> = MutableStateFlow(null)
     val allowedUserName = _allowedUserName.asStateFlow()
 
-    private val _allowedUser: MutableStateFlow<AdminUserDto?> = MutableStateFlow(null)
+    private val _allowedUser: MutableStateFlow<User?> = MutableStateFlow(null)
     val allowedUser = _allowedUser.asStateFlow()
 
     suspend fun loadAllowedUserName() {
         _allowedUserName.value = settingsRepository.nameFlow.first()
     }
 
-    suspend fun setAllowedUser(user: AdminUserDto) {
+    suspend fun setAllowedUser(user: User?) {
         _allowedUser.value = user
-        _allowedUserName.value = user.name ?: ""
-        settingsRepository.setName(user.name ?: "")
-    }
-
-    suspend fun setAllowedUser(user: StudentUserDto) {
-        TODO("Not yet implemented")
+        when (user) {
+            is User.Student -> {
+                val name = "${user.student.lastName}, ${user.student.firstName} ${user.student.middleName}"
+                _allowedUserName.value = name
+                settingsRepository.setName(name)
+            }
+            is User.Administrator -> {
+                _allowedUserName.value = user.admin.name
+                settingsRepository.setName(user.admin.name ?: "")
+            }
+            null -> {
+                _allowedUserName.value = ""
+                settingsRepository.setName("")
+            }
+        }
     }
 
     suspend fun setAllowedUserName(name: String) {

@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.helpers.PasswordValidation
-import com.unovil.tardyscan.domain.model.AdministratorUser
-import com.unovil.tardyscan.domain.model.StudentUser
+import com.unovil.tardyscan.domain.model.SignUpAdministratorUser
+import com.unovil.tardyscan.domain.model.SignUpStudentUser
 import com.unovil.tardyscan.domain.usecase.SignUpAdministratorUseCase
 import com.unovil.tardyscan.domain.usecase.SignUpStudentUseCase
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
@@ -30,7 +30,7 @@ class SignUpViewModel @Inject constructor(
     private val signUpStudentUseCase: SignUpStudentUseCase
 ) : ViewModel() {
     private val _userMode = MutableStateFlow(SignUpUserMode.ADMINISTRATOR)
-    val userMode = _userMode.asStateFlow()
+    // val userMode = _userMode.asStateFlow()
 
     private val _domain = MutableStateFlow("")
     val domain = _domain.asStateFlow()
@@ -141,7 +141,7 @@ class SignUpViewModel @Inject constructor(
             val result = when (mode) {
                 SignUpUserMode.ADMINISTRATOR -> {
                     verifyAdministratorUseCase.execute(
-                        VerifyAdministratorUseCase.Input(AdministratorUser(
+                        VerifyAdministratorUseCase.Input(SignUpAdministratorUser(
                             domain = _domain.value,
                             domainId = _domainId.value,
                             givenPassword = _rawPassword.value
@@ -150,7 +150,7 @@ class SignUpViewModel @Inject constructor(
                 }
                 SignUpUserMode.STUDENT -> {
                     verifyStudentUseCase.execute(
-                        VerifyStudentUseCase.Input(StudentUser(
+                        VerifyStudentUseCase.Input(SignUpStudentUser(
                             lrn = _lrn.value.toLong(),
                             givenPassword = _rawPassword.value
                         ))
@@ -193,7 +193,7 @@ class SignUpViewModel @Inject constructor(
                 SignUpUserMode.ADMINISTRATOR -> {
                     signUpAdministratorUseCase.execute(
                         SignUpAdministratorUseCase.Input(
-                            AdministratorUser(
+                            SignUpAdministratorUser(
                                 domain = _domain.value,
                                 domainId = _domainId.value,
                                 givenPassword = _rawPassword.value
@@ -206,7 +206,7 @@ class SignUpViewModel @Inject constructor(
                 SignUpUserMode.STUDENT -> {
                     signUpStudentUseCase.execute(
                         SignUpStudentUseCase.Input(
-                            StudentUser(
+                            SignUpStudentUser(
                                 lrn = _lrn.value.toLong(),
                                 givenPassword = _rawPassword.value
                             ),

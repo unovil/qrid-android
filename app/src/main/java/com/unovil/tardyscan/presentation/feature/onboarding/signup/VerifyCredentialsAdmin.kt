@@ -7,25 +7,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.R
 import com.unovil.tardyscan.presentation.common.AuthorizeButton
 import com.unovil.tardyscan.presentation.common.PasswordTextField
-import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 
 @Composable
 fun VerifyCredentialsAdmin(
@@ -88,42 +83,6 @@ fun VerifyCredentialsAdmin(
             stringResource(R.string.verify_credentials)
         ) {
             onVerifyCredentials()
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun Preview() {
-    TardyScannerTheme {
-        Surface {
-            Column(
-                modifier = Modifier
-                    .width(IntrinsicSize.Min)
-                    .padding(40.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                val domain = remember { mutableStateOf("") }
-                val domainId = remember { mutableStateOf("") }
-                val rawPassword = remember { mutableStateOf("") }
-                val verificationErrorMessage = remember { mutableStateOf("") }
-                val isVerified = remember { mutableStateOf(false) }
-
-                VerifyCredentialsAdmin(
-                    viewModel = null,
-                    domain,
-                    domainId,
-                    rawPassword,
-                    verificationErrorMessage,
-                    isVerified,
-                    { domain.value = it },
-                    { domainId.value = it },
-                    { rawPassword.value = it },
-                    { },
-                    { }
-                )
-            }
         }
     }
 }
