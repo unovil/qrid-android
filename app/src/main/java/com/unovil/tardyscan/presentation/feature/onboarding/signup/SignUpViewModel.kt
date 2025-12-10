@@ -30,7 +30,7 @@ class SignUpViewModel @Inject constructor(
     private val signUpStudentUseCase: SignUpStudentUseCase
 ) : ViewModel() {
     private val _userMode = MutableStateFlow(SignUpUserMode.ADMINISTRATOR)
-    // val userMode = _userMode.asStateFlow()
+    val userMode = _userMode.asStateFlow()
 
     private val _domain = MutableStateFlow("")
     val domain = _domain.asStateFlow()

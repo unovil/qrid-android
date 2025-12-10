@@ -51,12 +51,13 @@ fun AuthNavigation(
 
                     composable<Screen.VerifyCredentialsAdmin> {
                         LaunchedEffect(Unit) {
-                            signUpViewModel.onUserModeChange(SignUpUserMode.STUDENT)
+                            signUpViewModel.onUserModeChange(SignUpUserMode.ADMINISTRATOR)
                         }
 
                         VerifyCredentialsAdmin(
                             viewModel = signUpViewModel,
-                            onSuccess = { navController.navigate(Screen.SignUp) }
+                            onSuccess = { navController.navigate(Screen.SignUp) },
+                            onSwitchToStudent = { navController.navigate(Screen.VerifyCredentialsStudent) }
                         )
                     }
 
@@ -67,7 +68,8 @@ fun AuthNavigation(
 
                         VerifyCredentialsStudent(
                             viewModel = signUpViewModel,
-                            onSuccess = { navController.navigate(Screen.SignUp) }
+                            onSuccess = { navController.navigate(Screen.SignUp) },
+                            onSwitchToAdmin = { navController.navigate(Screen.VerifyCredentialsAdmin) }
                         )
                     }
 

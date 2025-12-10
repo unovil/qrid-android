@@ -9,6 +9,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.R
@@ -34,7 +36,8 @@ fun VerifyCredentialsStudent(
     onLrnChange: (String) -> Unit = { viewModel?.onLrnChange(it) },
     onPasswordChange: (String) -> Unit = { viewModel?.onPasswordChange(it) },
     onVerifyCredentials: () -> Unit = { viewModel?.onVerifyCredentials() },
-    onSuccess: () -> Unit
+    onSuccess: () -> Unit = { },
+    onSwitchToAdmin: () -> Unit = { }
 ) {
     LaunchedEffect(isVerified.value) {
         if (isVerified.value) onSuccess()
@@ -77,6 +80,13 @@ fun VerifyCredentialsStudent(
             stringResource(R.string.verify_credentials)
         ) {
             onVerifyCredentials()
+        }
+
+        TextButton(onClick = onSwitchToAdmin) {
+            Text(
+                text = "Not a student? Sign up as an administrator.",
+                textDecoration = TextDecoration.Underline
+            )
         }
     }
 }
