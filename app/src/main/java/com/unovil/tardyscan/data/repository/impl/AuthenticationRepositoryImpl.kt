@@ -63,7 +63,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
         val studentUserDto = GetStudentUserRpcDto(signUpStudentUser.lrn)
 
         val functionCall = postgrest.rpc(
-            function = "get_admin_user_json",
+            function = "get_student_user_json",
             parameters = Json.encodeToJsonElement(GetStudentUserRpcDto.serializer(), studentUserDto) as JsonObject
         ).data
 
@@ -105,7 +105,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
             val name = "${studentResponse?.lastName}, ${studentResponse?.firstName} ${studentResponse?.middleName}"
 
             val allowedUser = User.Student(Student(
-                studentResponse?.id ?: 0L,
+                studentResponse?.id ?: 100000000000,
                 studentResponse?.lastName ?: "",
                 studentResponse?.firstName ?: "",
                 studentResponse?.middleName,
