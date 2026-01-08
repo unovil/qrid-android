@@ -191,12 +191,26 @@ class AuthenticationRepositoryImpl @Inject constructor(
         }
         auth.signOut(SignOutScope.OTHERS)
 
-        val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-            limit(1)
-            single()
-        }.decodeAs<AdminUserDto>()
+        val userMetadata = auth.currentUserOrNull()?.userMetadata
+        if (userMetadata?.get("allowed_user_id") != null) {
+            val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+                limit(1)
+                single()
+            }.decodeAs<AdminUserDto>()
 
-        nameManager.setAllowedUserName(allowedUser.name ?: "")
+            nameManager.setAllowedUserName(allowedUser.name ?: "")
+        } else if (userMetadata?.get("student_user_id") != null) {
+            val studentUser = studentUsersTable.select(Columns.list("id, lrn")) {
+                limit(1)
+                single()
+            }.decodeAs<StudentUserDto>()
+
+            val student = attendanceRepository.getStudentInfo(studentUser.lrn)
+
+            nameManager.setAllowedUserName(student?.firstName ?: "")
+        }
+
+
     }
 
     override suspend fun signOut() {

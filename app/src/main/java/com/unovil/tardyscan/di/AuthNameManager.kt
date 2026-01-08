@@ -25,7 +25,7 @@ class AuthNameManager @Inject constructor(
         _allowedUser.value = user
         when (user) {
             is User.Student -> {
-                val name = "${user.student.lastName}, ${user.student.firstName} ${user.student.middleName}"
+                val name = user.student.firstName
                 _allowedUserName.value = name
                 settingsRepository.setName(name)
             }

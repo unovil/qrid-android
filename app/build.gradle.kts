@@ -82,6 +82,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    ksp(libs.kotlin.metadata)
 
     // scanning
     implementation(libs.barcode.scanning)

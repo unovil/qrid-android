@@ -58,6 +58,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onCheckProfile(onFailure: () -> Unit) {
+        if (_userProfile.value != null) return
+
         viewModelScope.launch {
             val result = getSignedUserUseCase.execute(GetSignedUserUseCase.Input())
 

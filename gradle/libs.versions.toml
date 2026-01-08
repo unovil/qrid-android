@@ -46,6 +46,7 @@ kotlin-faker-bom = { module = "io.github.serpro69:kotlin-faker-bom", version.ref
 kotlin-faker-edu = { module = "io.github.serpro69:kotlin-faker-edu" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
