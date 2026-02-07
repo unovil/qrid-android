@@ -58,6 +58,7 @@ class MainActivity : ComponentActivity() {
             val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
             val authName = authNameManager.allowedUserName.collectAsState()
+            val user = authNameManager.allowedUser.collectAsState()
             val isSystemInDarkTheme = isSystemInDarkTheme()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 themeManager.loadTheme()
                 isLoadingThemeFinished = true
 
-                authNameManager.loadAllowedUserName()
+                authNameManager.loadAllowedUser()
             }
 
             LaunchedEffect(isDarkTheme.value, isSystemInDarkTheme) {
@@ -106,7 +107,10 @@ class MainActivity : ComponentActivity() {
                                         if (isScanMode) {
                                             ScanNavigation(cameraExecutor) { scanMode = false }
                                         } else {
-                                            MainNavigation(authName = authName.value) { scanMode = true }
+                                            MainNavigation(
+                                                authName = authName.value,
+                                                user = user.value
+                                            ) { scanMode = true }
                                         }
                                     }
                                 }

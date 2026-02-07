@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +66,7 @@ fun SettingsScreen(
     val aboutIntent = Intent(Intent.ACTION_VIEW, "https://github.com/unovil/QR-ID".toUri())
 
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -92,8 +94,7 @@ fun SettingsScreen(
                 ) else ""
             ) {
                 onCheckProfile {
-                    Toast.makeText(context,
-                        context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resources.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
                 }.also { isOpenedAboutUser = !isOpenedAboutUser }
             }
 
@@ -115,7 +116,7 @@ fun SettingsScreen(
                 subLabel = stringResource(R.string.settings_logout_sub),
                 color = Color.Red,
             ) { onLogOut {
-                Toast.makeText(context, context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, resources.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
             }}
         }
     }

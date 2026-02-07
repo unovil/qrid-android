@@ -48,6 +48,7 @@ fun PasswordTextField(value: String, onValueChange: (String) -> Unit) {
 
     OutlinedTextField(
         value = value,
+        singleLine = true,
         onValueChange = onValueChange,
         label = { Text(stringResource(R.string.password)) },
         placeholder = { Text(stringResource(R.string.password)) },

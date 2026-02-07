@@ -80,13 +80,13 @@ class AuthenticationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateAllowedUser() {
-        val user = auth.retrieveUserForCurrentSession(true)
-        if (user.userMetadata?.get("admin_user_id") != null) {
+        val user = auth.currentUserOrNull()
+        if (user?.userMetadata?.get("admin_user_id") != null) {
             val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
                 limit(1)
                 single()
             }.decodeAs<AdminUserDto>()
-            
+
             val allowedUser = User.Administrator(Administrator(
                 adminResponse.domain,
                 adminResponse.domainId,
@@ -96,13 +96,11 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
             nameManager.setAllowedUser(allowedUser)
             nameManager.setAllowedUserName(allowedUser.admin.name ?: "")
-        } else if (user.userMetadata?.get("student_user_id") != null) {
+        } else if (user?.userMetadata?.get("student_user_id") != null) {
             val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
                 limit(1)
                 single()
             }.decodeAs<StudentUserDto>().let { attendanceRepository.getStudentInfo(it.lrn) }
-
-            val name = "${studentResponse?.lastName}, ${studentResponse?.firstName} ${studentResponse?.middleName}"
 
             val allowedUser = User.Student(Student(
                 studentResponse?.id ?: 100000000000,
@@ -116,7 +114,10 @@ class AuthenticationRepositoryImpl @Inject constructor(
             ))
 
             nameManager.setAllowedUser(allowedUser)
-            nameManager.setAllowedUserName(name)
+            nameManager.setAllowedUserName("${studentResponse?.firstName}")
+        } else {
+            nameManager.setAllowedUser(null)
+            nameManager.setAllowedUserName("")
         }
     }
 
@@ -152,6 +153,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
         // registered result of 0: success, -1: failure
         if (markRegisteredResult != 0) throw IllegalStateException("Failed to mark user as registered.")
+
+        updateAllowedUser()
     }
 
     override suspend fun signUp(signUpStudentUser: SignUpStudentUser, email: String, password: String) {
@@ -190,32 +193,11 @@ class AuthenticationRepositoryImpl @Inject constructor(
             this.password = password
         }
         auth.signOut(SignOutScope.OTHERS)
-
-        val userMetadata = auth.currentUserOrNull()?.userMetadata
-        if (userMetadata?.get("allowed_user_id") != null) {
-            val allowedUser = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-                limit(1)
-                single()
-            }.decodeAs<AdminUserDto>()
-
-            nameManager.setAllowedUserName(allowedUser.name ?: "")
-        } else if (userMetadata?.get("student_user_id") != null) {
-            val studentUser = studentUsersTable.select(Columns.list("id, lrn")) {
-                limit(1)
-                single()
-            }.decodeAs<StudentUserDto>()
-
-            val student = attendanceRepository.getStudentInfo(studentUser.lrn)
-
-            nameManager.setAllowedUserName(student?.firstName ?: "")
-        }
-
-
+        updateAllowedUser()
     }
 
     override suspend fun signOut() {
         auth.signOut(SignOutScope.LOCAL)
-        nameManager.setAllowedUser(null)
-        nameManager.setAllowedUserName("")
+        updateAllowedUser()
     }
 }

@@ -27,7 +27,7 @@ import kotlin.time.ExperimentalTime
 
 @HiltViewModel
 @OptIn(ExperimentalTime::class)
-class HistoryViewModel @Inject constructor(
+class HistoryAdminViewModel @Inject constructor(
     private val getAttendancesUseCase: GetAttendancesUseCase,
     @ApplicationContext val context: Context
 ) : ViewModel() {

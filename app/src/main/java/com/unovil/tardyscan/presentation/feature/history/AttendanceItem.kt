@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.unovil.tardyscan.R
 
 @Composable
-fun HistoryItem(attendanceUi: AttendanceUiModel) {
+fun AttendanceItem(attendanceUi: AttendanceUiModel) {
     val color = when (attendanceUi.presence) {
         Presence.PRESENT -> MaterialTheme.colorScheme.primaryContainer
         Presence.ABSENT -> MaterialTheme.colorScheme.errorContainer

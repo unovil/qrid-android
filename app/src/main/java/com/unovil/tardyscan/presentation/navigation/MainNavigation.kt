@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.presentation.navigation
 
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,8 +27,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.unovil.tardyscan.R
-import com.unovil.tardyscan.presentation.feature.history.HistoryScreen
-import com.unovil.tardyscan.presentation.feature.history.HistoryViewModel
+import com.unovil.tardyscan.domain.model.User
+import com.unovil.tardyscan.presentation.feature.history.HistoryAdminScreen
+import com.unovil.tardyscan.presentation.feature.history.HistoryAdminViewModel
+import com.unovil.tardyscan.presentation.feature.history.HistoryStudentScreen
 import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
 import com.unovil.tardyscan.presentation.feature.settings.SettingsViewModel
 import kotlin.time.ExperimentalTime
@@ -36,16 +39,19 @@ import kotlin.time.ExperimentalTime
 @Composable
 fun MainNavigation(
     authName: String?,
+    user: User?,
     onScan: () -> Unit
 ) {
     val navController = rememberNavController()
-    val historyViewModel: HistoryViewModel = hiltViewModel()
+    val historyAdminViewModel: HistoryAdminViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = { BottomNavigationBarMain(navController) },
         floatingActionButton = {
+            if (user !is User.Administrator) return@Scaffold
+
             ExtendedFloatingActionButton(
                 onClick = onScan
             ) {
@@ -73,7 +79,11 @@ fun MainNavigation(
         ) {
 
             composable(Screen.History.routeName) {
-                HistoryScreen(historyViewModel)
+                if (user is User.Administrator) HistoryAdminScreen(historyAdminViewModel)
+                else if (user is User.Student) {
+                    Log.d("MainNavigation", "User is Student")
+                    HistoryStudentScreen()
+                }
             }
             composable(Screen.Settings.routeName) {
                 SettingsScreen(settingsViewModel, authName = authName)

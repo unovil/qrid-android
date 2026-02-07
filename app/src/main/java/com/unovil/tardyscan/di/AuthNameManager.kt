@@ -1,6 +1,8 @@
 package com.unovil.tardyscan.di
 
+import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.domain.model.User
+import dagger.Lazy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -9,7 +11,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthNameManager @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val authenticationRepository: Lazy<AuthenticationRepository>
 ) {
     private val _allowedUserName: MutableStateFlow<String?> = MutableStateFlow(null)
     val allowedUserName = _allowedUserName.asStateFlow()
@@ -17,8 +20,9 @@ class AuthNameManager @Inject constructor(
     private val _allowedUser: MutableStateFlow<User?> = MutableStateFlow(null)
     val allowedUser = _allowedUser.asStateFlow()
 
-    suspend fun loadAllowedUserName() {
+    suspend fun loadAllowedUser() {
         _allowedUserName.value = settingsRepository.nameFlow.first()
+        authenticationRepository.get().updateAllowedUser()
     }
 
     suspend fun setAllowedUser(user: User?) {
