@@ -95,7 +95,6 @@ class AuthenticationRepositoryImpl @Inject constructor(
             ))
 
             nameManager.setAllowedUser(allowedUser)
-            nameManager.setAllowedUserName(allowedUser.admin.name ?: "")
         } else if (user?.userMetadata?.get("student_user_id") != null) {
             val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
                 limit(1)
@@ -114,10 +113,8 @@ class AuthenticationRepositoryImpl @Inject constructor(
             ))
 
             nameManager.setAllowedUser(allowedUser)
-            nameManager.setAllowedUserName("${studentResponse?.firstName}")
         } else {
             nameManager.setAllowedUser(null)
-            nameManager.setAllowedUserName("")
         }
     }
 

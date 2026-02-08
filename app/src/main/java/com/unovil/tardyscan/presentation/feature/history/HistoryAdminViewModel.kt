@@ -68,7 +68,7 @@ class HistoryAdminViewModel @Inject constructor(
 
     fun onLoadAttendances() {
         viewModelScope.launch {
-            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input(
+            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input.Admin(
                 _selectedTimestamp.value.toLocalDateTime(
                     TimeZone.currentSystemDefault()
                 ).date

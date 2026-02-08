@@ -29,9 +29,8 @@ class AuthNameManager @Inject constructor(
         _allowedUser.value = user
         when (user) {
             is User.Student -> {
-                val name = user.student.firstName
-                _allowedUserName.value = name
-                settingsRepository.setName(name)
+                _allowedUserName.value = user.student.firstName
+                settingsRepository.setName(user.student.firstName)
             }
             is User.Administrator -> {
                 _allowedUserName.value = user.admin.name
@@ -42,10 +41,5 @@ class AuthNameManager @Inject constructor(
                 settingsRepository.setName("")
             }
         }
-    }
-
-    suspend fun setAllowedUserName(name: String) {
-        _allowedUserName.value = name
-        settingsRepository.setName(name)
     }
 }
