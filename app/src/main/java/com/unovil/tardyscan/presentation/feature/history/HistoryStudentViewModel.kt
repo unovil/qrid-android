@@ -13,14 +13,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format
+import kotlinx.datetime.format.DayOfWeekNames
 import kotlinx.datetime.format.MonthNames
+import kotlinx.datetime.format.Padding
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 
@@ -37,15 +42,18 @@ class HistoryStudentViewModel @Inject constructor(
         context.getString(R.string.history_filter_absent),
         context.getString(R.string.history_filter_late),
     )
-    private val timestampFormat = LocalDateTime.Format {
-        monthName(MonthNames.ENGLISH_ABBREVIATED)
-        chars(" ")
-        day()
+
+    val attendanceViewOptions = listOf("Records", "Calendar")
+
+    private val dateFormat = LocalDate.Format {
+        dayOfWeek(DayOfWeekNames.ENGLISH_ABBREVIATED)
         chars(", ")
-        year()
-
+        monthName(MonthNames.ENGLISH_FULL)
         chars(" ")
+        day(Padding.NONE)
+    }
 
+    private val timestampFormat = LocalDateTime.Format {
         hour()
         chars(":")
         minute()
@@ -57,10 +65,10 @@ class HistoryStudentViewModel @Inject constructor(
     private val _isAttendancesLoaded = MutableStateFlow(true)
     val isAttendancesLoaded = _isAttendancesLoaded.asStateFlow()
 
-    private val _filteredUiAttendances = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
+    private val _filteredUiAttendances = MutableStateFlow<List<AttendanceDayUiModel>>(emptyList())
     val filteredUiAttendances = _filteredUiAttendances.asStateFlow()
 
-    private val _calendarPresences = MutableStateFlow<List<Presence>>(emptyList())
+    private val _calendarPresences = MutableStateFlow<Map<LocalDate, Presence>>(emptyMap())
     val calendarPresences = _calendarPresences.asStateFlow()
 
     private val _selectedMonth = MutableStateFlow(YearMonth.now())
@@ -69,16 +77,47 @@ class HistoryStudentViewModel @Inject constructor(
     private val _selectedFilter = MutableStateFlow(attendanceFilterOptions[0])
     val selectedFilter = _selectedFilter.asStateFlow()
 
+    private val _selectedAttendanceView = MutableStateFlow(attendanceViewOptions[0])
+    val selectedAttendanceView = _selectedAttendanceView.asStateFlow()
+
     fun onLoadAttendances() {
+        _calendarPresences.value = emptyMap()
+
         viewModelScope.launch {
             when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input.Student(
                 _selectedMonth.value
             ))) {
                 is GetAttendancesUseCase.Output.Success -> {
-                    val datedAttendances = result.attendanceList.sortedWith(comparator =
+                    attendances = result.attendanceList.sortedWith(comparator =
                         compareBy { it.timestamp }
                     )
-                    attendances = datedAttendances
+
+                    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+                    _selectedMonth.value.days.forEach { day ->
+                        if (day > today) return@forEach // don't add attendances after today
+                        if (day.dayOfWeek == DayOfWeek.SATURDAY || day.dayOfWeek == DayOfWeek.SUNDAY) return@forEach // don't add weekends
+
+                        val startOfLate = day
+                            .atStartOfDayIn(TimeZone.currentSystemDefault())
+                            .plus(Duration.parse("7h"))
+
+                        val dayFound = attendances.find {
+                            it.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == day
+                        }
+
+                        val presence = if (dayFound == null || !dayFound.isPresent) {
+                            Presence.ABSENT
+                        } else if (dayFound.timestamp > startOfLate) {
+                            Presence.LATE
+                        } else {
+                            Presence.PRESENT
+                        }
+
+                        _calendarPresences.value = _calendarPresences.value.plus(
+                            day to presence
+                        )
+                    }
 
                     onChangeFilter(_selectedFilter.value)
                     _isAttendancesLoaded.value = true
@@ -94,8 +133,11 @@ class HistoryStudentViewModel @Inject constructor(
     fun onChangeMonth(newMonth: YearMonth) {
         _selectedMonth.value = newMonth
         attendances = emptyList()
-        _calendarPresences.value = emptyList()
         onLoadAttendances()
+    }
+
+    fun onChangeAttendanceView(newAttendanceView: String) {
+        _selectedAttendanceView.value = newAttendanceView
     }
 
     fun onChangeFilter(newFilter: String) {
@@ -112,19 +154,13 @@ class HistoryStudentViewModel @Inject constructor(
                 false -> Presence.ABSENT
             }
 
-            // calendar presence will only obtain the non-weekend days of a month
-            // hence it is important to segregate which days get what!
-            _calendarPresences.value = _calendarPresences.value.plus(presence)
+            val localTimestamp = attendance.timestamp.toLocalDateTime(TimeZone.currentSystemDefault())
 
-            AttendanceUiModel(
-                id = attendance.studentId,
-                name = attendance.name,
-                level = attendance.level,
-                section = attendance.section,
+            AttendanceDayUiModel(
+                displayDate = localTimestamp.date.format(dateFormat),
                 presence = presence,
-                displayTimestamp = attendance.timestamp
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
-                    .format(timestampFormat)
+                displayTimestamp = localTimestamp.format(timestampFormat),
+                date = localTimestamp.date
             )
         }.filter { attendance ->
             when (newFilter) {

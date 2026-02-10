@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.di
 
+import android.util.Log
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.domain.model.User
 import dagger.Lazy
@@ -41,5 +42,7 @@ class AuthNameManager @Inject constructor(
                 settingsRepository.setName("")
             }
         }
+
+        Log.d("AuthNameManager", "name: ${settingsRepository.nameFlow.first()}")
     }
 }

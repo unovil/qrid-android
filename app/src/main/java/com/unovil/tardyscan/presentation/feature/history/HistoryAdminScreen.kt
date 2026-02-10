@@ -70,7 +70,7 @@ fun HistoryAdminScreen(
     isAttendancesLoaded: State<Boolean> = historyAdminViewModel!!.isAttendancesLoaded.collectAsState(),
     loadAttendances: () -> Unit = historyAdminViewModel!!::onLoadAttendances,
     onDateSelected: (LocalDate) -> Unit = historyAdminViewModel!!::onChangeDate,
-    attendances: State<List<AttendanceUiModel>> = historyAdminViewModel!!.filteredUiAttendances.collectAsState()
+    attendances: State<List<AttendanceStudentUiModel>> = historyAdminViewModel!!.filteredUiAttendances.collectAsState()
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -265,7 +265,7 @@ private fun PreviewHistoryAdminScreen() {
     val attendanceFilterOptions = listOf("Present", "Absent", "Late", "All")
     val selectedDate = remember { mutableStateOf(System.now()) }
     val filter = remember { mutableStateOf(attendanceFilterOptions[0]) }
-    val attendances = remember { mutableStateOf<List<AttendanceUiModel>>(listOf()) }
+    val attendances = remember { mutableStateOf<List<AttendanceStudentUiModel>>(listOf()) }
 
     TardyScannerTheme {
         HistoryAdminScreen(

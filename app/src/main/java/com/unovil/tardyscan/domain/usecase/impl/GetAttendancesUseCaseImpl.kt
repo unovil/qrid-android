@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
 import kotlin.time.Clock
@@ -71,7 +72,7 @@ class GetAttendancesUseCaseImpl @Inject constructor(
                         Log.d("GetAttendancesUseCaseImpl", "execute with: ${input.month.year} ${input.month.month.name}")
 
                         val presentList = attendanceRepository.getAttendances(input.month)
-                        val presentDays = presentList.map { it.timestamp.toLocalDateTime(TimeZone.UTC).date }.toSet() // set for fast lookup
+                        val presentDays = presentList.map { it.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date }.toSet() // set for fast lookup
 
                         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
@@ -80,7 +81,9 @@ class GetAttendancesUseCaseImpl @Inject constructor(
                             if (date.dayOfWeek in arrayOf(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)) return@forEach // don't add weekends
 
                             val isPresent = date in presentDays
-                            val timestamp = presentList.find { it.timestamp.toLocalDateTime(TimeZone.UTC).date == date }?.timestamp ?: Instant.DISTANT_PAST
+                            val timestamp = presentList.firstOrNull {
+                                it.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == date
+                            }?.timestamp ?: date.atStartOfDayIn(TimeZone.currentSystemDefault())
 
                             attendanceList.add(
                                 Attendance(

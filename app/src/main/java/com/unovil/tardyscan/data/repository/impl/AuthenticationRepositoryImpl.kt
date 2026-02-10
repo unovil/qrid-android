@@ -81,6 +81,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override suspend fun updateAllowedUser() {
         val user = auth.currentUserOrNull()
+        Log.d("AuthenticationRepository", "user: $user")
         if (user?.userMetadata?.get("admin_user_id") != null) {
             val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
                 limit(1)

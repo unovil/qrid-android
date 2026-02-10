@@ -18,11 +18,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.unovil.tardyscan.R
+import kotlinx.datetime.LocalDate
 
 @Composable
-fun AttendanceItem(attendanceUi: AttendanceUiModel) {
+fun AttendanceItem(attendanceUi: AttendanceStudentUiModel) {
     val color = when (attendanceUi.presence) {
         Presence.PRESENT -> MaterialTheme.colorScheme.primaryContainer
         Presence.ABSENT -> MaterialTheme.colorScheme.errorContainer
@@ -76,4 +78,70 @@ fun AttendanceItem(attendanceUi: AttendanceUiModel) {
             }
         }
     }
+}
+
+@Composable
+fun AttendanceItem(attendanceUi: AttendanceDayUiModel) {
+    val color = when (attendanceUi.presence) {
+        Presence.PRESENT -> MaterialTheme.colorScheme.primaryContainer
+        Presence.ABSENT -> MaterialTheme.colorScheme.errorContainer
+        Presence.LATE -> Color(0xFFA6A613)
+    }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        shape = RoundedCornerShape(6.dp),
+        color = color
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                attendanceUi.displayDate,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.padding(6.dp))
+
+            if (attendanceUi.presence != Presence.ABSENT) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Timestamp", fontWeight = FontWeight.Bold)
+
+                    Text(
+                        attendanceUi.displayTimestamp,
+                        textAlign = TextAlign.End
+                    )
+                }
+                Spacer(Modifier.padding(6.dp))
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Status", fontWeight = FontWeight.Bold)
+                Text(attendanceUi.presence.name.lowercase().replaceFirstChar { it.uppercase() })
+            }
+        }
+    }
+}
+
+@Composable
+@PreviewLightDark
+fun AttendanceItemPreview() {
+    AttendanceItem(
+        AttendanceDayUiModel(
+            LocalDate(2023, 2, 2),
+            "Mon, February 2",
+            Presence.LATE,
+            "07:00:00",
+        )
+    )
 }
