@@ -1,6 +1,5 @@
 package com.unovil.tardyscan.presentation.navigation
 
-import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,6 +30,7 @@ import com.unovil.tardyscan.domain.model.User
 import com.unovil.tardyscan.presentation.feature.history.HistoryAdminScreen
 import com.unovil.tardyscan.presentation.feature.history.HistoryAdminViewModel
 import com.unovil.tardyscan.presentation.feature.history.HistoryStudentScreen
+import com.unovil.tardyscan.presentation.feature.history.HistoryStudentViewModel
 import com.unovil.tardyscan.presentation.feature.settings.SettingsScreen
 import com.unovil.tardyscan.presentation.feature.settings.SettingsViewModel
 import kotlin.time.ExperimentalTime
@@ -44,6 +44,7 @@ fun MainNavigation(
 ) {
     val navController = rememberNavController()
     val historyAdminViewModel: HistoryAdminViewModel = hiltViewModel()
+    val historyStudentViewModel: HistoryStudentViewModel = hiltViewModel()
     val settingsViewModel: SettingsViewModel = hiltViewModel()
 
     Scaffold(
@@ -79,10 +80,10 @@ fun MainNavigation(
         ) {
 
             composable(Screen.History.routeName) {
-                if (user is User.Administrator) HistoryAdminScreen(historyAdminViewModel)
-                else if (user is User.Student) {
-                    Log.d("MainNavigation", "User is Student")
-                    HistoryStudentScreen()
+                when (user) {
+                    null -> { }
+                    is User.Administrator -> HistoryAdminScreen(historyAdminViewModel)
+                    is User.Student -> HistoryStudentScreen(historyStudentViewModel)
                 }
             }
             composable(Screen.Settings.routeName) {
