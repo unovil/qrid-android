@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.camera.core.ExperimentalGetImage
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,7 +25,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.unovil.tardyscan.data.network.internetcheck.AppUiState
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
 import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
@@ -49,25 +52,41 @@ class MainActivity : ComponentActivity() {
 
     @ExperimentalPermissionsApi
     @ExperimentalGetImage
+    @ExperimentalAnimationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         setContent {
-            val sessionStatus = supabaseClient.auth.sessionStatus.collectAsState()
+            val sessionStatus by supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
             val authName = authNameManager.allowedUserName.collectAsState()
             val user = authNameManager.allowedUser.collectAsState()
             val isSystemInDarkTheme = isSystemInDarkTheme()
+            val mainViewModel: MainViewModel = hiltViewModel()
+            val isConnected by mainViewModel.isConnected.collectAsState()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
+
+            val appUiState = when {
+                !isConnected -> AppUiState.NoInternet
+                sessionStatus is SessionStatus.Initializing -> AppUiState.Loading
+                sessionStatus is SessionStatus.RefreshFailure -> AppUiState.Loading
+                sessionStatus is SessionStatus.NotAuthenticated -> AppUiState.NotAuthenticated
+                sessionStatus is SessionStatus.Authenticated -> AppUiState.Authenticated
+                else -> AppUiState.Loading
+            }
 
             LaunchedEffect(Unit) {
                 themeManager.loadTheme()
                 isLoadingThemeFinished = true
+            }
 
-                authNameManager.loadAllowedUser()
+            LaunchedEffect(appUiState) {
+                if (appUiState !is AppUiState.Loading) {
+                    authNameManager.loadAllowedUser()
+                }
             }
 
             LaunchedEffect(isDarkTheme.value, isSystemInDarkTheme) {
@@ -83,25 +102,29 @@ class MainActivity : ComponentActivity() {
             if (isLoadingThemeFinished) {
                 TardyScannerTheme(darkTheme = isDarkTheme.value ?: isSystemInDarkTheme) {
                     Log.d("MainActivity", "Theme loaded with darkTheme value ${isDarkTheme.value}")
-                    Log.d("MainActivity", "Session value: ${sessionStatus.value}")
+                    Log.d("MainActivity", "Session value: $sessionStatus")
 
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
                         AnimatedContent(
-                            targetState = sessionStatus.value,
-                            label = "SessionFade",
-                        ) { status ->
-                            when (status) {
-                                is SessionStatus.Authenticated -> {
+                            targetState = appUiState,
+                            label = "AppUiAnimatedContent",
+                            transitionSpec = {
+                                fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                            }
+                        ) { state ->
+                            when (state) {
+                                AppUiState.NoInternet -> LoadingScreen()
+                                AppUiState.Loading -> LoadingScreen()
+                                AppUiState.NotAuthenticated -> AuthNavigation {  }
+                                AppUiState.Authenticated -> {
                                     AnimatedContent(
                                         targetState = scanMode,
                                         label = "ScanFade",
                                         transitionSpec = {
-                                            fadeIn(tween(200)).togetherWith(
-                                                fadeOut(tween(200))
-                                            )
+                                            fadeIn(tween(200)) togetherWith fadeOut(tween(200))
                                         }
                                     ) { isScanMode ->
                                         if (isScanMode) {
@@ -114,18 +137,9 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
                                 }
-
-                                is SessionStatus.Initializing, is SessionStatus.RefreshFailure -> {
-                                    LoadingScreen()
-                                }
-
-                                is SessionStatus.NotAuthenticated -> {
-                                    AuthNavigation {  }
-                                }
                             }
                         }
                     }
-
                 }
             }
         }

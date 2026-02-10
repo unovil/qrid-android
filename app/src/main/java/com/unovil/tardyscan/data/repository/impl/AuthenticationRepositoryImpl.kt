@@ -82,39 +82,45 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override suspend fun updateAllowedUser() {
         val user = auth.currentUserOrNull()
         Log.d("AuthenticationRepository", "user: $user")
-        if (user?.userMetadata?.get("admin_user_id") != null) {
-            val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-                limit(1)
-                single()
-            }.decodeAs<AdminUserDto>()
 
-            val allowedUser = User.Administrator(Administrator(
-                adminResponse.domain,
-                adminResponse.domainId,
-                adminResponse.name,
-                adminResponse.role
-            ))
+        try {
+            if (user?.userMetadata?.get("admin_user_id") != null) {
+                val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+                    limit(1)
+                    single()
+                }.decodeAs<AdminUserDto>()
 
-            nameManager.setAllowedUser(allowedUser)
-        } else if (user?.userMetadata?.get("student_user_id") != null) {
-            val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
-                limit(1)
-                single()
-            }.decodeAs<StudentUserDto>().let { attendanceRepository.getStudentInfo(it.lrn) }
+                val allowedUser = User.Administrator(Administrator(
+                    adminResponse.domain,
+                    adminResponse.domainId,
+                    adminResponse.name,
+                    adminResponse.role
+                ))
 
-            val allowedUser = User.Student(Student(
-                studentResponse?.id ?: 100000000000,
-                studentResponse?.lastName ?: "",
-                studentResponse?.firstName ?: "",
-                studentResponse?.middleName,
-                studentResponse?.section?.level ?: 0,
-                studentResponse?.section?.section ?: "",
-                studentResponse?.section?.school?.name ?: "",
-                attendanceRepository.getAvatarFlow(studentResponse?.avatarLink ?: "")
-            ))
+                nameManager.setAllowedUser(allowedUser)
+            } else if (user?.userMetadata?.get("student_user_id") != null) {
+                val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
+                    limit(1)
+                    single()
+                }.decodeAs<StudentUserDto>().let { attendanceRepository.getStudentInfo(it.lrn) }
 
-            nameManager.setAllowedUser(allowedUser)
-        } else {
+                val allowedUser = User.Student(Student(
+                    studentResponse?.id ?: 100000000000,
+                    studentResponse?.lastName ?: "",
+                    studentResponse?.firstName ?: "",
+                    studentResponse?.middleName,
+                    studentResponse?.section?.level ?: 0,
+                    studentResponse?.section?.section ?: "",
+                    studentResponse?.section?.school?.name ?: "",
+                    attendanceRepository.getAvatarFlow(studentResponse?.avatarLink ?: "")
+                ))
+
+                nameManager.setAllowedUser(allowedUser)
+            } else {
+                nameManager.setAllowedUser(null)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
             nameManager.setAllowedUser(null)
         }
     }
