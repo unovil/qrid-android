@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewDynamicColors
@@ -60,19 +61,20 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 @ExperimentalMaterial3Api
 @Composable
-fun HistoryScreen(
-    historyViewModel: HistoryViewModel? = hiltViewModel(),
-    selectedTimestamp: State<Instant> = historyViewModel!!.selectedTimestamp.collectAsState(),
-    attendanceFilters: List<String> = historyViewModel!!.attendanceFilterOptions,
-    selectedFilter: State<String> = historyViewModel!!.selectedFilter.collectAsState(),
-    onChangeFilter: (String) -> Unit = historyViewModel!!::onChangeFilter,
-    isAttendancesLoaded: State<Boolean> = historyViewModel!!.isAttendancesLoaded.collectAsState(),
-    loadAttendances: () -> Unit = historyViewModel!!::onLoadAttendances,
-    onDateSelected: (LocalDate) -> Unit = historyViewModel!!::onChangeDate,
-    attendances: State<List<AttendanceUiModel>> = historyViewModel!!.filteredUiAttendances.collectAsState()
+fun HistoryAdminScreen(
+    historyAdminViewModel: HistoryAdminViewModel? = hiltViewModel(),
+    selectedTimestamp: State<Instant> = historyAdminViewModel!!.selectedTimestamp.collectAsState(),
+    attendanceFilters: List<String> = historyAdminViewModel!!.attendanceFilterOptions,
+    selectedFilter: State<String> = historyAdminViewModel!!.selectedFilter.collectAsState(),
+    onChangeFilter: (String) -> Unit = historyAdminViewModel!!::onChangeFilter,
+    isAttendancesLoaded: State<Boolean> = historyAdminViewModel!!.isAttendancesLoaded.collectAsState(),
+    loadAttendances: () -> Unit = historyAdminViewModel!!::onLoadAttendances,
+    onDateSelected: (LocalDate) -> Unit = historyAdminViewModel!!::onChangeDate,
+    attendances: State<List<AttendanceStudentUiModel>> = historyAdminViewModel!!.filteredUiAttendances.collectAsState()
 ) {
     var showDatePicker by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -136,26 +138,26 @@ fun HistoryScreen(
                 val size = attendances.value.size
                 if (isAttendancesLoaded.value) {
                     when (selectedFilter.value) {
-                        context.getString(R.string.history_filter_on_time) -> Toast.makeText(context,
-                            context.getString(
+                        resources.getString(R.string.history_filter_on_time) -> Toast.makeText(context,
+                            resources.getString(
                                 R.string.history_toast_student_on_time,
                                 size,
                                 if (size != 1) "s" else ""
                             ), Toast.LENGTH_SHORT).show()
-                        context.getString(R.string.history_filter_absent) -> Toast.makeText(context,
-                            context.getString(
+                        resources.getString(R.string.history_filter_absent) -> Toast.makeText(context,
+                            resources.getString(
                                 R.string.history_toast_student_absent,
                                 size,
                                 if (size != 1) "s" else ""
                             ), Toast.LENGTH_SHORT).show()
-                        context.getString(R.string.history_filter_late) -> Toast.makeText(context,
-                            context.getString(
+                        resources.getString(R.string.history_filter_late) -> Toast.makeText(context,
+                            resources.getString(
                                 R.string.history_toast_student_late,
                                 size,
                                 if (size != 1) "s" else ""
                             ), Toast.LENGTH_SHORT).show()
-                        context.getString(R.string.history_filter_all) -> Toast.makeText(context,
-                            context.getString(
+                        resources.getString(R.string.history_filter_all) -> Toast.makeText(context,
+                            resources.getString(
                                 R.string.history_toast_student_all, size, if (size != 1) "s" else ""
                             ), Toast.LENGTH_SHORT).show()
                     }
@@ -169,7 +171,7 @@ fun HistoryScreen(
                         verticalArrangement = Arrangement.spacedBy(15.dp)
                     ) {
                         items(attendances.value.size) { index ->
-                            HistoryItem(attendances.value[index])
+                            AttendanceItem(attendances.value[index])
                         }
                     }
                 } else if (isAttendancesLoaded && attendances.value.isEmpty()) {
@@ -259,15 +261,15 @@ fun DatePickerModal(
 @ExperimentalMaterial3Api
 @PreviewLightDark
 @Composable
-private fun PreviewHistoryScreen() {
+private fun PreviewHistoryAdminScreen() {
     val attendanceFilterOptions = listOf("Present", "Absent", "Late", "All")
     val selectedDate = remember { mutableStateOf(System.now()) }
     val filter = remember { mutableStateOf(attendanceFilterOptions[0]) }
-    val attendances = remember { mutableStateOf<List<AttendanceUiModel>>(listOf()) }
+    val attendances = remember { mutableStateOf<List<AttendanceStudentUiModel>>(listOf()) }
 
     TardyScannerTheme {
-        HistoryScreen(
-            historyViewModel = null,
+        HistoryAdminScreen(
+            historyAdminViewModel = null,
             selectedTimestamp = selectedDate,
             onChangeFilter = { filter.value = it },
             selectedFilter = filter,

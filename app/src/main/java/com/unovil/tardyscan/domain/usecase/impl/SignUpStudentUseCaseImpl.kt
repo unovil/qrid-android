@@ -1,6 +1,7 @@
 package com.unovil.tardyscan.domain.usecase.impl
 
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
+import com.unovil.tardyscan.domain.usecase.SignUpStudentUseCase
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -9,15 +10,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SignUpUseCaseImpl @Inject constructor(
+class SignUpStudentUseCaseImpl @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
-) : SignUpUseCase {
-    override suspend fun execute(input: SignUpUseCase.Input): SignUpUseCase.Output = withContext(
+) : SignUpStudentUseCase {
+    override suspend fun execute(input: SignUpStudentUseCase.Input): SignUpUseCase.Output  = withContext(
         Dispatchers.IO
     ) {
         try {
             authenticationRepository.signUp(
-                input.allowedUser, input.email, input.password
+                input.signUpStudentUser, input.email, input.password
             )
             SignUpUseCase.Output.Success
         } catch (e: Exception) {

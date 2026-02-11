@@ -1,5 +1,6 @@
 package com.unovil.tardyscan.domain.usecase.impl
 
+import android.util.Log
 import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.domain.usecase.CreateAttendanceUseCase
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -19,6 +20,7 @@ class CreateAttendanceUseCaseImpl @Inject constructor(
             attendanceRepository.createAttendance(input.attendance)
             CreateAttendanceUseCase.Output.Success
         } catch (e: Exception) {
+            Log.e("CreateAttendanceUseCase", "Error creating attendance", e)
             when (e) {
                 is IllegalAccessException -> CreateAttendanceUseCase.Output.Failure.Duplication
                 is HttpRequestException -> CreateAttendanceUseCase.Output.Failure.HttpRequestException

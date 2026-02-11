@@ -13,7 +13,8 @@ sealed class Screen() {
     @Serializable object Settings : Screen()
 
     // for auth screen
-    @Serializable object VerifyGivenCredentials : Screen()
+    @Serializable object VerifyCredentialsAdmin : Screen()
+    @Serializable object VerifyCredentialsStudent : Screen()
     @Serializable object SignUp : Screen()
     @Serializable object SignIn : Screen()
 

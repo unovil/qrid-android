@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class AllowedUserDto (
+class AdminUserDto (
     @SerialName("id")
     val id: Int,
 
@@ -13,12 +13,6 @@ class AllowedUserDto (
 
     @SerialName("org_id")
     val domainId: String,
-
-    /*@SerialName("given_password")
-    val givenPassword: String,
-
-    @SerialName("is_registered")
-    val isRegistered: Boolean,*/
 
     @SerialName("name")
     val name: String?,

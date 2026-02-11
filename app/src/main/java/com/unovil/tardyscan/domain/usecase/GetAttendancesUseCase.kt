@@ -2,9 +2,13 @@ package com.unovil.tardyscan.domain.usecase
 
 import com.unovil.tardyscan.domain.model.Attendance
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.YearMonth
 
 interface GetAttendancesUseCase : UseCase<GetAttendancesUseCase.Input, GetAttendancesUseCase.Output> {
-    data class Input(val date: LocalDate)
+    sealed class Input {
+        data class Admin(val date: LocalDate) : Input()
+        data class Student(val month: YearMonth) : Input()
+    }
 
     sealed class Output {
         data class Success(val attendanceList: List<Attendance>) : Output()

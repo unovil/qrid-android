@@ -16,6 +16,6 @@ data class AttendanceDto @OptIn(ExperimentalTime::class) constructor(
     @SerialName("timestamp")
     val timestamp: Instant,
 
-    @SerialName("allowed_user_id")
+    @SerialName("admin_user_id")
     val senderId: Int? = null
 )
