@@ -45,9 +45,13 @@ class AuthenticationRepositoryImpl @Inject constructor(
     val userDevicesTable = postgrest["user_devices"]
 
     override suspend fun saveFcmToken(token: String) {
+        val userId = (auth.currentUserOrNull()?.userMetadata?.get("student_user_id") as? JsonPrimitive)?.content?.toInt()
+            ?: throw IllegalAccessException("User is not a student.")
+
         userDevicesTable.insert(UserDeviceDto(
             fcmToken = token,
-            timestamp = Clock.System.now()
+            timestamp = Clock.System.now(),
+            studentUserId = userId
         ))
     }
 

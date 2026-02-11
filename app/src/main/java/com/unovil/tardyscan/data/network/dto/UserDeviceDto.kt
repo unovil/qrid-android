@@ -12,5 +12,8 @@ data class UserDeviceDto (
     val fcmToken: String,
 
     @SerialName("created_at")
-    val timestamp: Instant
+    val timestamp: Instant,
+
+    @SerialName("student_user_id")
+    val studentUserId: Int
 )

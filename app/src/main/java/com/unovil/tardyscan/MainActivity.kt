@@ -33,6 +33,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.unovil.tardyscan.data.network.internetcheck.AppUiState
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
+import com.unovil.tardyscan.domain.model.User
 import com.unovil.tardyscan.presentation.feature.loading.LoadingScreen
 import com.unovil.tardyscan.presentation.navigation.AuthNavigation
 import com.unovil.tardyscan.presentation.navigation.MainNavigation
@@ -42,6 +43,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import javax.inject.Inject
@@ -77,9 +79,21 @@ class MainActivity : ComponentActivity() {
             val user = authNameManager.allowedUser.collectAsState()
             val isSystemInDarkTheme = isSystemInDarkTheme()
             val mainViewModel: MainViewModel = hiltViewModel()
+            val hasSavedFcmToken by mainViewModel.hasSavedFcmToken.collectAsState()
             val isConnected by mainViewModel.isConnected.collectAsState()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
+
+            LaunchedEffect(sessionStatus, user.value) {
+                if (
+                    !hasSavedFcmToken &&
+                    sessionStatus is SessionStatus.Authenticated &&
+                    user.value is User.Student
+                ) {
+                    val token = FirebaseMessaging.getInstance().token.await()
+                    mainViewModel.saveFcmToken(token)
+                }
+            }
 
             LaunchedEffect(Unit) {
                 FirebaseMessaging.getInstance().token.addOnSuccessListener {
