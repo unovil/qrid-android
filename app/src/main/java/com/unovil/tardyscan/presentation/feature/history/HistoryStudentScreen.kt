@@ -1,5 +1,7 @@
 package com.unovil.tardyscan.presentation.feature.history
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.Crossfade
@@ -53,6 +55,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
@@ -72,7 +77,7 @@ import java.util.Locale
 import kotlin.time.ExperimentalTime
 
 @Composable
-@ExperimentalTime
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalTime::class)
 fun HistoryStudentScreen(
     historyStudentViewModel: HistoryStudentViewModel? = hiltViewModel(),
     selectedMonth: State<YearMonth> = historyStudentViewModel!!.selectedMonth.collectAsState(),
@@ -95,6 +100,18 @@ fun HistoryStudentScreen(
     val endMonth = remember { selectedMonth.value.plusMonths(48) } // Adjust as needed
     val daysOfWeek = remember { daysOfWeek() } // Available from the library
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val notificationPermissionState = rememberPermissionState(
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+
+        LaunchedEffect(notificationPermissionState) {
+            if (notificationPermissionState.status is PermissionStatus.Denied) {
+                notificationPermissionState.launchPermissionRequest()
+            }
+        }
+    }
 
     val state = rememberCalendarState(
         startMonth = startMonth,

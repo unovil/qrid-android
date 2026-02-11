@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.protobuf)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -108,6 +109,9 @@ dependencies {
     kspAndroidTest(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.datetime)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 
     // pref datastore
     implementation(libs.androidx.datastore)

@@ -1,5 +1,7 @@
 package com.unovil.tardyscan
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -27,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.firebase.messaging.FirebaseMessaging
 import com.unovil.tardyscan.data.network.internetcheck.AppUiState
 import com.unovil.tardyscan.di.AuthNameManager
 import com.unovil.tardyscan.di.ThemeManager
@@ -58,6 +61,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        // create a notification channel
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val studentNotificationChannel = NotificationChannel(
+            STUDENT_CHANNEL_ID,
+            "Student Centric",
+            NotificationManager.IMPORTANCE_HIGH
+        ).also { it.description = "Student notifications, such as real-time attendance logs" }
+        notificationManager.createNotificationChannel(studentNotificationChannel)
+
         setContent {
             val sessionStatus by supabaseClient.auth.sessionStatus.collectAsState()
             val isDarkTheme = themeManager.isDarkTheme.collectAsState()
@@ -68,6 +80,13 @@ class MainActivity : ComponentActivity() {
             val isConnected by mainViewModel.isConnected.collectAsState()
             var isLoadingThemeFinished by remember { mutableStateOf(false) }
             var scanMode by rememberSaveable { mutableStateOf(false) }
+
+            LaunchedEffect(Unit) {
+                FirebaseMessaging.getInstance().token.addOnSuccessListener {
+                    mainViewModel.saveFcmToken(it)
+                    Log.d("MainActivity", "Token is $it")
+                }
+            }
 
             val appUiState = when {
                 !isConnected -> AppUiState.NoInternet

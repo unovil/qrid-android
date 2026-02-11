@@ -54,11 +54,13 @@ class HistoryStudentViewModel @Inject constructor(
     }
 
     private val timestampFormat = LocalDateTime.Format {
-        hour()
+        amPmHour(Padding.NONE)      // 1-12 instead of 0-23
         chars(":")
         minute()
         chars(":")
         second()
+        chars(" ")
+        amPmMarker("AM", "PM")
     }
 
     private var attendances = listOf<Attendance>()

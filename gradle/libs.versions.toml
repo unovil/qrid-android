@@ -7,6 +7,7 @@ composecalendar = "1.4.0"
 composeMultiplatform = "2.10.0"
 datastore = "1.2.0"
 fernetJava8 = "1.5.0"
+firebaseBom = "34.9.0"
 hiltNavigationCompose = "1.3.0"
 kotlinFakerBom = "2.0.0-rc.11"
 kotlinxCoroutinesTest = "1.10.2"
@@ -44,6 +45,9 @@ compose-multiplatform = { module = "com.kizitonwose.calendar:compose-multiplatfo
 composecalendar = { module = "io.github.boguszpawlowski.composecalendar:composecalendar", version.ref = "composecalendar" }
 composecalendar-kotlinx-datetime = { module = "io.github.boguszpawlowski.composecalendar:kotlinx-datetime", version.ref = "composecalendar" }
 fernet-java8 = { module = "com.macasaet.fernet:fernet-java8", version.ref = "fernetJava8" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltVersion" }
 kotlin-faker = { module = "io.github.serpro69:kotlin-faker" }

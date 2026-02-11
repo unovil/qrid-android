@@ -5,6 +5,7 @@ import com.unovil.tardyscan.data.network.dto.AdminUserDto
 import com.unovil.tardyscan.data.network.dto.GetAdminUserRpcDto
 import com.unovil.tardyscan.data.network.dto.GetStudentUserRpcDto
 import com.unovil.tardyscan.data.network.dto.StudentUserDto
+import com.unovil.tardyscan.data.network.dto.UserDeviceDto
 import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository.UserRpcResult
@@ -28,7 +29,10 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class AuthenticationRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val auth: Auth,
@@ -38,6 +42,14 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     val adminUsersTable = postgrest["admin_users"]
     val studentUsersTable = postgrest["student_users"]
+    val userDevicesTable = postgrest["user_devices"]
+
+    override suspend fun saveFcmToken(token: String) {
+        userDevicesTable.insert(UserDeviceDto(
+            fcmToken = token,
+            timestamp = Clock.System.now()
+        ))
+    }
 
     override suspend fun getUserResult(signUpAdministratorUser: SignUpAdministratorUser): UserRpcResult {
         val adminUserDto = signUpAdministratorUser.let { GetAdminUserRpcDto(it.domain, it.domainId) }

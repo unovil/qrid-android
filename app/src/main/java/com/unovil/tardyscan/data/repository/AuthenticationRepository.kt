@@ -21,4 +21,5 @@ interface AuthenticationRepository {
     suspend fun signUp(signUpStudentUser: SignUpStudentUser, email: String, password: String)
     suspend fun signIn(email: String, password: String)
     suspend fun signOut()
+    suspend fun saveFcmToken(token: String)
 }
