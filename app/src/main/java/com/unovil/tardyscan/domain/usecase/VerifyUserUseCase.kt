@@ -1,10 +1,6 @@
 package com.unovil.tardyscan.domain.usecase
 
-import com.unovil.tardyscan.domain.model.AllowedUser
-
-interface VerifyAllowedUserUseCase : UseCase<VerifyAllowedUserUseCase.Input, VerifyAllowedUserUseCase.Output> {
-    class Input(val allowedUser: AllowedUser)
-
+interface VerifyUserUseCase<Input: Any>: UseCase<Input, VerifyUserUseCase.Output> {
     sealed class Output {
         object Success : Output()
         open class Failure : Output() {

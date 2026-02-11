@@ -1,34 +1,37 @@
 [versions]
 accompanistPermissions = "0.37.3"
-agp = "8.13.1"
+agp = "9.0.0"
 argon2kt = "1.6.0"
 barcodeScanning = "17.3.0"
+composecalendar = "1.4.0"
+composeMultiplatform = "2.10.0"
 datastore = "1.2.0"
 fernetJava8 = "1.5.0"
+firebaseBom = "34.9.0"
 hiltNavigationCompose = "1.3.0"
 kotlinFakerBom = "2.0.0-rc.11"
 kotlinxCoroutinesTest = "1.10.2"
 kotlinxDatetime = "0.7.1"
-ktorClient = "3.3.3"
-mockkVersion = "1.14.6"
+ktorClient = "3.4.0"
+mockkVersion = "1.14.9"
 multiplatformSettings = "1.3.0"
-protobufKotlinLite = "4.33.1"
+protobufKotlinLite = "4.33.5"
 secretsGradlePlugin = "2.0.1"
-supabaseBom = "3.2.6"
-camera = "1.5.1"
-kotlin = "2.2.21"
+supabaseBom = "3.3.0"
+camera = "1.5.3"
+kotlin = "2.3.10"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.0"
-composeBom = "2025.11.01"
-navigationCompose = "2.9.6"
-kotlinSerialization = "2.2.21"
-hiltVersion = "2.57.2"
+activityCompose = "1.12.3"
+composeBom = "2026.01.01"
+navigationCompose = "2.9.7"
+kotlinSerialization = "2.3.10"
+hiltVersion = "2.59.1"
 ksp = "2.3.2"
-protobuf = "0.9.5"
+protobuf = "0.9.6"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -38,7 +41,13 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
+compose-multiplatform = { module = "com.kizitonwose.calendar:compose-multiplatform", version.ref = "composeMultiplatform" }
+composecalendar = { module = "io.github.boguszpawlowski.composecalendar:composecalendar", version.ref = "composecalendar" }
+composecalendar-kotlinx-datetime = { module = "io.github.boguszpawlowski.composecalendar:kotlinx-datetime", version.ref = "composecalendar" }
 fernet-java8 = { module = "com.macasaet.fernet:fernet-java8", version.ref = "fernetJava8" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltVersion" }
 kotlin-faker = { module = "io.github.serpro69:kotlin-faker" }
@@ -46,6 +55,7 @@ kotlin-faker-bom = { module = "io.github.serpro69:kotlin-faker-bom", version.ref
 kotlin-faker-edu = { module = "io.github.serpro69:kotlin-faker-edu" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkVersion" }
@@ -79,7 +89,6 @@ hilt = { module = "com.google.dagger:hilt-android", version.ref = "hiltVersion" 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltVersion" }

@@ -6,9 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unovil.tardyscan.R
 import com.unovil.tardyscan.domain.helpers.PasswordValidation
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.SignUpAdministratorUser
+import com.unovil.tardyscan.domain.model.SignUpStudentUser
+import com.unovil.tardyscan.domain.usecase.SignUpAdministratorUseCase
+import com.unovil.tardyscan.domain.usecase.SignUpStudentUseCase
 import com.unovil.tardyscan.domain.usecase.SignUpUseCase
-import com.unovil.tardyscan.domain.usecase.VerifyAllowedUserUseCase
+import com.unovil.tardyscan.domain.usecase.VerifyAdministratorUseCase
+import com.unovil.tardyscan.domain.usecase.VerifyStudentUseCase
+import com.unovil.tardyscan.domain.usecase.VerifyUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,14 +24,22 @@ import javax.inject.Inject
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val verifyAllowedUserUseCase: VerifyAllowedUserUseCase,
-    private val signUpUseCase: SignUpUseCase
+    private val verifyAdministratorUseCase: VerifyAdministratorUseCase,
+    private val verifyStudentUseCase: VerifyStudentUseCase,
+    private val signUpAdministratorUseCase: SignUpAdministratorUseCase,
+    private val signUpStudentUseCase: SignUpStudentUseCase
 ) : ViewModel() {
+    private val _userMode = MutableStateFlow(SignUpUserMode.ADMINISTRATOR)
+    val userMode = _userMode.asStateFlow()
+
     private val _domain = MutableStateFlow("")
     val domain = _domain.asStateFlow()
 
     private val _domainId = MutableStateFlow("")
     val domainId = _domainId.asStateFlow()
+
+    private val _lrn = MutableStateFlow("")
+    val lrn = _lrn.asStateFlow()
 
     private val _rawPassword = MutableStateFlow("")
     val rawPassword = _rawPassword.asStateFlow()
@@ -62,6 +75,10 @@ class SignUpViewModel @Inject constructor(
     private val _isSignUpButtonEnabled = MutableStateFlow(false)
     val isSignUpButtonEnabled = _isSignUpButtonEnabled.asStateFlow()
 
+    fun onUserModeChange(userMode: SignUpUserMode) {
+        _userMode.value = userMode
+    }
+
     fun onDomainChange(domain: String) {
         _domain.value = domain
         _verificationErrorMessage.value = ""
@@ -69,6 +86,13 @@ class SignUpViewModel @Inject constructor(
 
     fun onDomainIdChange(domainId: String) {
         _domainId.value = domainId
+        _verificationErrorMessage.value = ""
+    }
+
+    fun onLrnChange(lrn: String) {
+        if (!lrn.isEmpty() && !lrn.matches(Regex("^\\d+$"))) return
+
+        _lrn.value = lrn
         _verificationErrorMessage.value = ""
     }
 
@@ -107,53 +131,91 @@ class SignUpViewModel @Inject constructor(
         ) && _passwordValidations.value.values.count { it } == _passwordValidations.value.size
     }
 
-    fun onVerifyCredentials() {
+    fun onVerifyCredentials(mode: SignUpUserMode = _userMode.value) {
+        if (mode == SignUpUserMode.STUDENT && (_lrn.value.toLongOrNull() == null || _lrn.value.toLongOrNull() == 0L)) {
+            _verificationErrorMessage.value = "This LRN is not a numeric value. Please enter a numeric value."
+            return
+        }
+
         viewModelScope.launch {
-            val result = verifyAllowedUserUseCase.execute(
-                VerifyAllowedUserUseCase.Input(AllowedUser(
-                    domain = _domain.value,
-                    domainId = _domainId.value,
-                    givenPassword = _rawPassword.value
-                ))
-            )
+            val result = when (mode) {
+                SignUpUserMode.ADMINISTRATOR -> {
+                    verifyAdministratorUseCase.execute(
+                        VerifyAdministratorUseCase.Input(SignUpAdministratorUser(
+                            domain = _domain.value,
+                            domainId = _domainId.value,
+                            givenPassword = _rawPassword.value
+                        ))
+                    )
+                }
+                SignUpUserMode.STUDENT -> {
+                    verifyStudentUseCase.execute(
+                        VerifyStudentUseCase.Input(SignUpStudentUser(
+                            lrn = _lrn.value.toLong(),
+                            givenPassword = _rawPassword.value
+                        ))
+                    )
+                }
+            }
 
             _verificationErrorMessage.value = when (result) {
-                is VerifyAllowedUserUseCase.Output.Success -> {
+                is VerifyUserUseCase.Output.Success -> {
                     ""
                 }
-                is VerifyAllowedUserUseCase.Output.Failure.AlreadyRegistered -> {
+
+                is VerifyUserUseCase.Output.Failure.AlreadyRegistered -> {
                     context.getString(R.string.error_duplicate_credentials)
                 }
-                is VerifyAllowedUserUseCase.Output.Failure.NotFound -> {
+
+                is VerifyUserUseCase.Output.Failure.NotFound -> {
                     context.getString(R.string.error_invalid_credentials)
                 }
+
                 else -> {
                     context.getString(R.string.error_unknown)
                 }
             }
 
-            _isVerified.value = result is VerifyAllowedUserUseCase.Output.Success
+            _isVerified.value = result is VerifyUserUseCase.Output.Success
+
             Log.d("SignUpVM", "Verification result: ${isVerified.value}")
         }
     }
 
-    fun onSignUp() {
+    fun onSignUp(mode: SignUpUserMode = _userMode.value) {
         viewModelScope.launch {
             Log.d("SignUp", "domain: ${_domain.value}")
             Log.d("SignUp", "org number: ${_domainId.value}")
+            Log.d("SignUp", "lrn: ${_lrn.value}")
             Log.d("SignUp", "given pw: ${_rawPassword.value}")
 
-            val result = signUpUseCase.execute(
-                SignUpUseCase.Input(
-                    AllowedUser(
-                        domain = _domain.value,
-                        domainId = _domainId.value,
-                        givenPassword = _rawPassword.value
-                    ),
-                    _newEmail.value,
-                    _newPassword.value
-                )
-            )
+            val result = when (mode) {
+                SignUpUserMode.ADMINISTRATOR -> {
+                    signUpAdministratorUseCase.execute(
+                        SignUpAdministratorUseCase.Input(
+                            SignUpAdministratorUser(
+                                domain = _domain.value,
+                                domainId = _domainId.value,
+                                givenPassword = _rawPassword.value
+                            ),
+                            _newEmail.value,
+                            _newPassword.value
+                        )
+                    )
+                }
+                SignUpUserMode.STUDENT -> {
+                    signUpStudentUseCase.execute(
+                        SignUpStudentUseCase.Input(
+                            SignUpStudentUser(
+                                lrn = _lrn.value.toLong(),
+                                givenPassword = _rawPassword.value
+                            ),
+                            _newEmail.value,
+                            _newPassword.value
+                        )
+                    )
+                }
+            }
 
             _signUpErrorMessage.value = when (result) {
                 is SignUpUseCase.Output.Failure.Unverified -> {

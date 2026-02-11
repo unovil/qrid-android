@@ -27,7 +27,7 @@ import kotlin.time.ExperimentalTime
 
 @HiltViewModel
 @OptIn(ExperimentalTime::class)
-class HistoryViewModel @Inject constructor(
+class HistoryAdminViewModel @Inject constructor(
     private val getAttendancesUseCase: GetAttendancesUseCase,
     @ApplicationContext val context: Context
 ) : ViewModel() {
@@ -58,7 +58,7 @@ class HistoryViewModel @Inject constructor(
     private val _isAttendancesLoaded = MutableStateFlow(true)
     val isAttendancesLoaded = _isAttendancesLoaded.asStateFlow()
 
-    private val _filteredUiAttendances = MutableStateFlow<List<AttendanceUiModel>>(emptyList())
+    private val _filteredUiAttendances = MutableStateFlow<List<AttendanceStudentUiModel>>(emptyList())
     val filteredUiAttendances = _filteredUiAttendances.asStateFlow()
 
     private val _selectedTimestamp = MutableStateFlow(Clock.System.now())
@@ -68,7 +68,7 @@ class HistoryViewModel @Inject constructor(
 
     fun onLoadAttendances() {
         viewModelScope.launch {
-            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input(
+            when (val result = getAttendancesUseCase.execute(GetAttendancesUseCase.Input.Admin(
                 _selectedTimestamp.value.toLocalDateTime(
                     TimeZone.currentSystemDefault()
                 ).date
@@ -114,7 +114,7 @@ class HistoryViewModel @Inject constructor(
                 false -> Presence.ABSENT
             }
 
-            AttendanceUiModel(
+            AttendanceStudentUiModel(
                 id = attendance.studentId,
                 name = attendance.name,
                 level = attendance.level,

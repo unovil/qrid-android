@@ -1,6 +1,6 @@
 package com.unovil.tardyscan.presentation.feature.history
 
-data class AttendanceUiModel(
+data class AttendanceStudentUiModel(
     val id: Long,
     val name: String,
     val level: Int,
@@ -8,5 +8,3 @@ data class AttendanceUiModel(
     val presence: Presence,
     val displayTimestamp: String // pre-formatted timestamp
 )
-
-enum class Presence { PRESENT, LATE, ABSENT }

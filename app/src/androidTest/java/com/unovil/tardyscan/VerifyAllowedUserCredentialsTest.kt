@@ -15,7 +15,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.platform.app.InstrumentationRegistry
-import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyGivenCredentials
+import com.unovil.tardyscan.presentation.feature.onboarding.signup.VerifyCredentialsAdmin
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -52,7 +52,7 @@ class VerifyAllowedUserCredentialsTest {
             TardyScannerTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        VerifyGivenCredentials { success = true }
+                        VerifyCredentialsAdmin { success = true }
                     }
                 }
             }

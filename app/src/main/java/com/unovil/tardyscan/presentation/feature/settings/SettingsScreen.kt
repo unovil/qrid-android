@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.unovil.tardyscan.R
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
+import com.unovil.tardyscan.domain.model.User
 import com.unovil.tardyscan.ui.theme.TardyScannerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -56,7 +57,7 @@ fun SettingsScreen(
     onSetAppearance: () -> Unit = settingsViewModel!!::onSetAppearance,
     onLogOut: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onLogOut,
     onCheckProfile: (onFailure: () -> Unit) -> Unit = settingsViewModel!!::onCheckProfile,
-    allowedUser: State<AllowedUserDto> = settingsViewModel!!.userProfile.collectAsState(),
+    allowedUser: State<User?> = settingsViewModel!!.userProfile.collectAsState(),
     authName: String?
 ) {
     var isOpenedAppearanceDialog by remember { mutableStateOf(false) }
@@ -65,6 +66,7 @@ fun SettingsScreen(
     val aboutIntent = Intent(Intent.ACTION_VIEW, "https://github.com/unovil/QR-ID".toUri())
 
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -92,8 +94,7 @@ fun SettingsScreen(
                 ) else ""
             ) {
                 onCheckProfile {
-                    Toast.makeText(context,
-                        context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, resources.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
                 }.also { isOpenedAboutUser = !isOpenedAboutUser }
             }
 
@@ -115,7 +116,7 @@ fun SettingsScreen(
                 subLabel = stringResource(R.string.settings_logout_sub),
                 color = Color.Red,
             ) { onLogOut {
-                Toast.makeText(context, context.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, resources.getString(R.string.error_unknown), Toast.LENGTH_SHORT).show()
             }}
         }
     }
@@ -125,23 +126,59 @@ fun SettingsScreen(
             icon = { Icon(Icons.Default.Person, contentDescription = stringResource(R.string.content_desc_about_user)) },
             title = { Text(stringResource(R.string.settings_profile_title)) },
             text = {
-                Column { 
-                    Text(stringResource(R.string.settings_profile_name), style = MaterialTheme.typography.labelMedium)
-                    Text(allowedUser.value.name ?: stringResource(R.string.settings_profile_name_error), style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(stringResource(R.string.settings_profile_access_level), style = MaterialTheme.typography.labelMedium)
-                    Text(when (allowedUser.value.role) {
-                        "FULL" -> stringResource(R.string.settings_profile_access_level_full)
-                        "CLASS" -> stringResource(R.string.settings_profile_access_level_class)
-                        "LEVEL" -> stringResource(R.string.settings_profile_access_level_level)
-                        else -> stringResource(R.string.settings_profile_access_level_error)
-                    }, style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(stringResource(R.string.settings_profile_domain), style = MaterialTheme.typography.labelMedium)
-                    Text(allowedUser.value.domain, style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(stringResource(R.string.settings_profile_domain_id), style = MaterialTheme.typography.labelMedium)
-                    Text(allowedUser.value.domainId, style = MaterialTheme.typography.bodyLarge)
+                Column {
+                    when (allowedUser.value) {
+                        is User.Administrator -> {
+                            val admin = (allowedUser.value as User.Administrator).admin
+
+                            Text(stringResource(R.string.settings_profile_name), style = MaterialTheme.typography.labelMedium)
+                            Text(admin.name ?: stringResource(R.string.settings_profile_name_error), style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(stringResource(R.string.settings_profile_access_level), style = MaterialTheme.typography.labelMedium)
+                            Text(when (admin.role) {
+                                "FULL" -> stringResource(R.string.settings_profile_access_level_full)
+                                "CLASS" -> stringResource(R.string.settings_profile_access_level_class)
+                                "LEVEL" -> stringResource(R.string.settings_profile_access_level_level)
+                                else -> stringResource(R.string.settings_profile_access_level_error)
+                            }, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(stringResource(R.string.settings_profile_domain), style = MaterialTheme.typography.labelMedium)
+                            Text(admin.domain, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text(stringResource(R.string.settings_profile_domain_id), style = MaterialTheme.typography.labelMedium)
+                            Text(admin.domainId, style = MaterialTheme.typography.bodyLarge)
+                        }
+                        is User.Student -> {
+                            val student = (allowedUser.value as User.Student).student
+                            val name = "${student.lastName}, ${student.firstName} ${student.middleName}"
+                            val section = "${student.level} - ${student.section}"
+
+                            Text(stringResource(R.string.settings_profile_name), style = MaterialTheme.typography.labelMedium)
+                            Text(name, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text("Section:", style = MaterialTheme.typography.labelMedium)
+                            Text(section, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text("School:", style = MaterialTheme.typography.labelMedium)
+                            Text(student.school, style = MaterialTheme.typography.bodyLarge)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            Text("LRN:", style = MaterialTheme.typography.labelMedium)
+                            Text(student.id.toString(), style = MaterialTheme.typography.bodyLarge)
+                        }
+                        null -> { }
+                    }
                 }
             },
             onDismissRequest = { isOpenedAboutUser = false },

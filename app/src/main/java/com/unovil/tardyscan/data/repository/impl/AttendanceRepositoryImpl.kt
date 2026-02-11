@@ -15,6 +15,7 @@ import io.github.jan.supabase.storage.downloadAuthenticatedAsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.JsonPrimitive
@@ -62,7 +63,7 @@ class AttendanceRepositoryImpl @Inject constructor(
             throw IllegalAccessException("Attendance already exists")
         }
 
-        val userId = (auth.currentUserOrNull()!!.userMetadata!!["allowed_user_id"] as JsonPrimitive).content.toInt()
+        val userId = (auth.currentUserOrNull()!!.userMetadata!!["admin_user_id"] as JsonPrimitive).content.toInt()
 
         val attendanceDto = AttendanceDto(
             studentId = attendance.studentId,
@@ -89,6 +90,28 @@ class AttendanceRepositoryImpl @Inject constructor(
                 and {
                     AttendanceDto::timestamp gte startOfDay
                     AttendanceDto::timestamp lte endOfDay
+                }
+            }
+        }.decodeList<AttendanceDto>()
+
+        return attendanceList
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun getAttendances(month: YearMonth): List<AttendanceDto> {
+        Log.d("AttendanceRepositoryImpl", "year and month: $month")
+
+        val startOfMonth = month.firstDay.atStartOfDayIn(TimeZone.currentSystemDefault())
+
+        val endOfMonth = month.lastDay.atStartOfDayIn(TimeZone.currentSystemDefault())
+            .plus(Duration.parse("24h"))
+            .minus(Duration.parse("1ms"))
+
+        val attendanceList = attendanceTable.select {
+            filter {
+                and {
+                    AttendanceDto::timestamp gte startOfMonth
+                    AttendanceDto::timestamp lte endOfMonth
                 }
             }
         }.decodeList<AttendanceDto>()

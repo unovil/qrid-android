@@ -119,4 +119,5 @@
     <string name="scan_card_reject_attendance">Reject attendance</string>
 
     <string name="signup_verify_credentials">Verify Credentials</string>
+    <string name="lrn">LRN</string>
 </resources>

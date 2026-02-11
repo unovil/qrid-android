@@ -1,12 +1,20 @@
 package com.unovil.tardyscan.data.repository.impl
 
 import android.util.Log
-import com.unovil.tardyscan.data.network.dto.AllowedUserDto
-import com.unovil.tardyscan.data.network.dto.VerifyAllowedUserRpcDto
+import com.unovil.tardyscan.data.network.dto.AdminUserDto
+import com.unovil.tardyscan.data.network.dto.GetAdminUserRpcDto
+import com.unovil.tardyscan.data.network.dto.GetStudentUserRpcDto
+import com.unovil.tardyscan.data.network.dto.StudentUserDto
+import com.unovil.tardyscan.data.network.dto.UserDeviceDto
+import com.unovil.tardyscan.data.repository.AttendanceRepository
 import com.unovil.tardyscan.data.repository.AuthenticationRepository
-import com.unovil.tardyscan.data.repository.AuthenticationRepository.AllowedUserResult
+import com.unovil.tardyscan.data.repository.AuthenticationRepository.UserRpcResult
 import com.unovil.tardyscan.di.AuthNameManager
-import com.unovil.tardyscan.domain.model.AllowedUser
+import com.unovil.tardyscan.domain.model.Administrator
+import com.unovil.tardyscan.domain.model.SignUpAdministratorUser
+import com.unovil.tardyscan.domain.model.SignUpStudentUser
+import com.unovil.tardyscan.domain.model.Student
+import com.unovil.tardyscan.domain.model.User
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -21,21 +29,38 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import javax.inject.Inject
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
+@ExperimentalTime
 class AuthenticationRepositoryImpl @Inject constructor(
     private val postgrest: Postgrest,
     private val auth: Auth,
-    private val nameManager: AuthNameManager
+    private val nameManager: AuthNameManager,
+    private val attendanceRepository: AttendanceRepository
 ) : AuthenticationRepository {
 
-    val allowedUsersTable = postgrest["allowed_users"]
+    val adminUsersTable = postgrest["admin_users"]
+    val studentUsersTable = postgrest["student_users"]
+    val userDevicesTable = postgrest["user_devices"]
 
-    override suspend fun getAllowedUserResult(allowedUser: AllowedUser): AllowedUserResult {
-        val allowedUserDto = allowedUser.let { VerifyAllowedUserRpcDto(it.domain, it.domainId) }
+    override suspend fun saveFcmToken(token: String) {
+        val userId = (auth.currentUserOrNull()?.userMetadata?.get("student_user_id") as? JsonPrimitive)?.content?.toInt()
+            ?: throw IllegalAccessException("User is not a student.")
+
+        userDevicesTable.insert(UserDeviceDto(
+            fcmToken = token,
+            timestamp = Clock.System.now(),
+            studentUserId = userId
+        ))
+    }
+
+    override suspend fun getUserResult(signUpAdministratorUser: SignUpAdministratorUser): UserRpcResult {
+        val adminUserDto = signUpAdministratorUser.let { GetAdminUserRpcDto(it.domain, it.domainId) }
 
         val functionCall = postgrest.rpc(
-            function = "get_allowed_user_json",
-            parameters = Json.encodeToJsonElement(VerifyAllowedUserRpcDto.serializer(), allowedUserDto) as JsonObject
+            function = "get_admin_user_json",
+            parameters = Json.encodeToJsonElement(GetAdminUserRpcDto.serializer(), adminUserDto) as JsonObject
         ).data
         
         val functionCallJson = Json.parseToJsonElement(functionCall).jsonObject
@@ -43,50 +68,138 @@ class AuthenticationRepositoryImpl @Inject constructor(
         val hashedPassword = functionCallJson["hashedPassword"]?.jsonPrimitive?.contentOrNull
 
         return when (status) {
-            -1 -> AllowedUserResult.Failure.NotFound
-            0 -> AllowedUserResult.Failure.AlreadyRegistered
-            null -> AllowedUserResult.Failure.Unknown
-            else -> AllowedUserResult.Success(status, hashedPassword!!)
+            -1 -> UserRpcResult.Failure.NotFound
+            0 -> UserRpcResult.Failure.AlreadyRegistered
+            null -> UserRpcResult.Failure.Unknown
+            else -> UserRpcResult.Success(status, hashedPassword!!)
+        }
+    }
+
+    override suspend fun getUserResult(signUpStudentUser: SignUpStudentUser): UserRpcResult {
+        val studentUserDto = GetStudentUserRpcDto(signUpStudentUser.lrn)
+
+        val functionCall = postgrest.rpc(
+            function = "get_student_user_json",
+            parameters = Json.encodeToJsonElement(GetStudentUserRpcDto.serializer(), studentUserDto) as JsonObject
+        ).data
+
+        val functionCallJson = Json.parseToJsonElement(functionCall).jsonObject
+        val status = functionCallJson["status"]?.jsonPrimitive?.int
+        val hashedPassword = functionCallJson["hashedPassword"]?.jsonPrimitive?.contentOrNull
+
+        return when (status) {
+            -1 -> UserRpcResult.Failure.NotFound
+            0 -> UserRpcResult.Failure.AlreadyRegistered
+            null -> UserRpcResult.Failure.Unknown
+            else -> UserRpcResult.Success(status, hashedPassword!!)
         }
     }
 
     override suspend fun updateAllowedUser() {
-        val allowedUser = allowedUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-            limit(1)
-            single()
-        }.decodeAs<AllowedUserDto>()
+        val user = auth.currentUserOrNull()
+        Log.d("AuthenticationRepository", "user: $user")
 
-        nameManager.setAllowedUser(allowedUser)
-        nameManager.setAllowedUserName(allowedUser.name ?: "")
+        try {
+            if (user?.userMetadata?.get("admin_user_id") != null) {
+                val adminResponse = adminUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
+                    limit(1)
+                    single()
+                }.decodeAs<AdminUserDto>()
+
+                val allowedUser = User.Administrator(Administrator(
+                    adminResponse.domain,
+                    adminResponse.domainId,
+                    adminResponse.name,
+                    adminResponse.role
+                ))
+
+                nameManager.setAllowedUser(allowedUser)
+            } else if (user?.userMetadata?.get("student_user_id") != null) {
+                val studentResponse = studentUsersTable.select(Columns.list("id, lrn")) {
+                    limit(1)
+                    single()
+                }.decodeAs<StudentUserDto>().let { attendanceRepository.getStudentInfo(it.lrn) }
+
+                val allowedUser = User.Student(Student(
+                    studentResponse?.id ?: 100000000000,
+                    studentResponse?.lastName ?: "",
+                    studentResponse?.firstName ?: "",
+                    studentResponse?.middleName,
+                    studentResponse?.section?.level ?: 0,
+                    studentResponse?.section?.section ?: "",
+                    studentResponse?.section?.school?.name ?: "",
+                    attendanceRepository.getAvatarFlow(studentResponse?.avatarLink ?: "")
+                ))
+
+                nameManager.setAllowedUser(allowedUser)
+            } else {
+                nameManager.setAllowedUser(null)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            nameManager.setAllowedUser(null)
+        }
     }
 
     override suspend fun signUp(
-        allowedUser: AllowedUser,
+        signUpAdministratorUser: SignUpAdministratorUser,
         email: String,
         password: String
     ) {
-        val allowedUserResult = getAllowedUserResult(allowedUser)
-        if (allowedUserResult !is AllowedUserResult.Success) {
+        val userResult = getUserResult(signUpAdministratorUser)
+        if (userResult !is UserRpcResult.Success) {
             throw IllegalAccessException("User is not allowed to sign up.")
         }
 
-        Log.d("AuthenticationRepository", "allowedUserId: ${allowedUserResult.allowedUserId}")
+        Log.d("AuthenticationRepository", "adminUserId: ${userResult.allowedUserId}")
 
         auth.signUpWith(Email) {
             this.email = email
             this.password = password
             data = buildJsonObject {
-                put("allowed_user_id", JsonPrimitive(allowedUserResult.allowedUserId))
+                put("admin_user_id", JsonPrimitive(userResult.allowedUserId))
             }
         }
 
         val user = auth.currentUserOrNull()
-        val allowedUserId = (user?.userMetadata?.get("allowed_user_id") as JsonPrimitive).content.toInt()
+        val adminUserId = (user?.userMetadata?.get("admin_user_id") as JsonPrimitive).content.toInt()
 
         val markRegisteredResult = postgrest.rpc(
-            function = "mark_as_registered",
+            function = "admin_mark_as_registered",
             parameters = buildJsonObject {
-                put("allowed_id", JsonPrimitive(allowedUserId))
+                put("admin_id", JsonPrimitive(adminUserId))
+            }
+        ).decodeAs<Int>()
+
+        // registered result of 0: success, -1: failure
+        if (markRegisteredResult != 0) throw IllegalStateException("Failed to mark user as registered.")
+
+        updateAllowedUser()
+    }
+
+    override suspend fun signUp(signUpStudentUser: SignUpStudentUser, email: String, password: String) {
+        val userResult = getUserResult(signUpStudentUser)
+        if (userResult !is UserRpcResult.Success) {
+            throw IllegalAccessException("User is not allowed to sign up.")
+        }
+
+        Log.d("AuthenticationRepository", "studentUserId: ${userResult.allowedUserId}")
+
+        auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+            data = buildJsonObject {
+                put("student_user_id", JsonPrimitive(userResult.allowedUserId))
+            }
+        }
+
+        val user = auth.currentUserOrNull()
+        val studentUserId = (user?.userMetadata?.get("student_user_id") as JsonPrimitive).content.toInt()
+
+        val markRegisteredResult = postgrest.rpc(
+            function = "student_mark_as_registered",
+            parameters = buildJsonObject {
+                put("student_id", JsonPrimitive(studentUserId))
             }
         ).decodeAs<Int>()
 
@@ -100,18 +213,11 @@ class AuthenticationRepositoryImpl @Inject constructor(
             this.password = password
         }
         auth.signOut(SignOutScope.OTHERS)
-
-        val allowedUser = allowedUsersTable.select(Columns.list("id, domain, org_id, name, role")) {
-            limit(1)
-            single()
-        }.decodeAs<AllowedUserDto>()
-
-        nameManager.setAllowedUserName(allowedUser.name ?: "")
+        updateAllowedUser()
     }
 
     override suspend fun signOut() {
         auth.signOut(SignOutScope.LOCAL)
-        nameManager.setAllowedUser(AllowedUserDto(0, "", "", "", ""))
-        nameManager.setAllowedUserName("")
+        updateAllowedUser()
     }
 }

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.unovil.tardyscan" />
+                  <option name="mobileSdkAppId" value="1:201299149145:android:683d56ce9e2ee0c6164c48" />
+                  <option name="projectId" value="qrid-android" />
+                  <option name="projectNumber" value="201299149145" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
