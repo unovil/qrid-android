@@ -1,7 +1,16 @@
 # QR-ID: A Research Project 📸🌈
 
-Welcome to the repository for QR-ID, an application designed and coded by me for my group's research requirements.
-This was our research entry for our Grade 11, school year 2024 - 2025.
+Welcome to the repository for QR-ID on Android, an application designed and coded by me for my group's research requirements.
+This was our research entry for our Grade 11 and Grade 12 (S.Y. '24-'25, '25-'26).
+
+_The web version of QR-ID, focused on attendance management and analytics tracking, is available [here](https://github.com/unovil/qrid-web)._
+
+## Achievements
+
+After QR-ID's completion, it won the School Science and Technology Fair (SSTF) in the STEM Innovation Exposition (STEMIE) category.
+It was then used as the school's project in the Division Science and Technology Fair (DSTF) and ranked 3rd best research project and
+awarded Best in Display and Innovation in the same category. Because of these, we were all awarded an Excellence in Research award
+in our Commencement Excercises.
 
 ## Why create QR-ID?
 
