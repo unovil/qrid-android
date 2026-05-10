@@ -36,3 +36,7 @@ will suffice. QR code production is also extremely cheap on plastic card IDs as 
 * MLKit and CameraX - barcode and camera
 * Jetpack Compose - framework
 * Supabase - database
+
+### Documentation
+
+<img width="1197" height="858" alt="App Documentation" src="https://github.com/user-attachments/assets/74b2f90f-9ae6-4af3-b237-a0654df0f66b" />
